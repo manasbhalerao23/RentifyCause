@@ -64,4 +64,10 @@ authRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         console.log(err);
     }
 }));
+authRouter.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+    });
+    res.send("User Logged Out Successful!");
+}));
 exports.default = authRouter;

@@ -52,7 +52,7 @@ blogRouter.delete("/delete", auth_1.userAuth, (req, res) => __awaiter(void 0, vo
         res.status(500).json({ message: err.message });
     }
 }));
-blogRouter.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+blogRouter.get("/all", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const blogs = yield db_1.BlogsModel.find();
         if (!blogs || blogs.length === 0) {

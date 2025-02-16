@@ -46,7 +46,7 @@ blogRouter.delete("/delete",userAuth, async (req:AuthRequest,res:Response)=>{
                 }
 })
 
-blogRouter.get("/all", async (req: AuthRequest, res: Response) => {
+blogRouter.get("/all",userAuth ,async (req: AuthRequest, res: Response) => {
     try {
         const blogs = await BlogsModel.find();
         if (!blogs || blogs.length === 0) {
