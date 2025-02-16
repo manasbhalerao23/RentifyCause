@@ -38,4 +38,31 @@ blogRouter.post("/create", auth_1.userAuth, (req, res) => __awaiter(void 0, void
         res.status(500).json({ message: err.message });
     }
 }));
+blogRouter.delete("/delete", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.body.id;
+        const blog = yield db_1.BlogsModel.findByIdAndDelete(id);
+        if (!blog) {
+            res.status(404).json({ message: "Blog not found" });
+            return;
+        }
+        res.status(200).json(blog);
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}));
+blogRouter.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const blogs = yield db_1.BlogsModel.find();
+        if (!blogs || blogs.length === 0) {
+            res.status(404).json({ message: "No blogs found" });
+            return;
+        }
+        res.status(200).json(blogs);
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}));
 exports.default = blogRouter;
