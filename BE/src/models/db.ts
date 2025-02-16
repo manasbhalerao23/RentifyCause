@@ -3,19 +3,29 @@ import { model, Schema } from "mongoose";
 //users
 const UserSchema = new Schema({
     username : {type: String, unique: true},
+    email: {type:String , unique:true},
     password : {type: String},
     role: {type: String, required: true},
     contact: {type: String},
     address: {type: String},
     shopName: {type: String, required: true},
-    monthRent: {type: String},
-    currentRent: {type: String},
-    currentDonation: {type: String},
-    totalDonation: {type: String}
+    monthRent: {type: String,
+        default: "10000"
+    },
+    currentRent: {type: String,
+        default: "10000"
+    },
+    currentDonation: {type: String,
+        default: "0"
+    },
+    totalDonation: {type: String,
+        default:"0"
     }
+    },{ timestamps: true }
 );
 
-export const UserModel = model('User', UserSchema);
+export const User = model('User', UserSchema);
+
 
 
 //admin
