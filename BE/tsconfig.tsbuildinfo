@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/middlewares/auth.ts","./src/models/db.ts","./src/routes/auth.ts","./src/routes/blog.ts"],"version":"5.7.2"}
+{"root":["./src/index.ts","./src/middlewares/auth.ts","./src/middlewares/multer.ts","./src/models/db.ts","./src/routes/auth.ts","./src/routes/blog.ts","./src/utils/cloudinary.ts"],"version":"5.7.2"}

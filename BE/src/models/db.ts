@@ -5,7 +5,9 @@ const UserSchema = new Schema({
     username : {type: String, unique: true},
     email: {type:String , unique:true},
     password : {type: String},
-    role: {type: String, required: true},
+    role: {type: String, required: true,
+        default:"user"
+    },
     contact: {type: String},
     address: {type: String},
     shopName: {type: String, required: true},
@@ -47,7 +49,8 @@ const BlogsSchema = new Schema({
     location : {type: String, required: true},
     titleBody : [{title: String,
                   body: String
-                }]
+                }],
+    images: [{ type: String }]
 })
 
 export const BlogsModel = model('Blogs', BlogsSchema);

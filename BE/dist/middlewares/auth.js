@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userAuth = void 0;
+exports.checkAdmin = exports.userAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../models/db");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -54,3 +54,18 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.userAuth = userAuth;
+const checkAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (req.user && req.user.role != "admin") {
+            res.status(403).send("You are not an admin");
+            return;
+        }
+        else {
+            next();
+        }
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.checkAdmin = checkAdmin;

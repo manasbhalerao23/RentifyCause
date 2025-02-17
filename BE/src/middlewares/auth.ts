@@ -60,3 +60,18 @@ return;
         next(err)
     }
 };
+
+
+export const checkAdmin = async(req:AuthRequest, res:Response, next:NextFunction)=>{
+    try{
+        if(req.user && req.user.role!="admin" ){
+            res.status(403).send("You are not an admin");
+            return;
+        }
+        else{
+            next();
+        }
+}catch(err){
+    next(err);
+}
+};

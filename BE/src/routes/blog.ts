@@ -1,25 +1,49 @@
 import express from "express"
 import { Request,Response } from "express";
 import {BlogsModel} from "../models/db"
-import { userAuth,AuthRequest } from "../middlewares/auth";
+import { userAuth,AuthRequest, checkAdmin } from "../middlewares/auth";
+import upload from "../middlewares/multer";
+import cloudinary from "../utils/cloudinary";
 const blogRouter= express.Router();
 
 
 
-blogRouter.post("/create", userAuth ,async(req:AuthRequest,res:Response)=>{
+blogRouter.post("/create", userAuth ,checkAdmin ,upload.array("images",6) ,async(req:AuthRequest,res:Response)=>{
 try{
-    // heading : {type: String, required: true},
-    // dateTime : {type: Date, required: true, default: Date.now},
-    // location : {type: String, required: true},
-    // titleBody : [{title: String,
-    //               body: String
-    //             }]
+    let imgUrlArr:any=[];
+
+if(req.files){
+    const imgUpload= (req.files as Express.Multer.File[]).map((e:Express.Multer.File)=>{
+      return cloudinary.uploader.upload(e.path)
+      .then((result)=>{
+        imgUrlArr.push(result.url);
+
+      })
+      .catch((err)=>{
+        console.log(err);
+        
+      })
+    })
+    
+    await Promise.all(imgUpload)
+}
+
+console.log(req.files);
+console.log(req.body);
+
+if (typeof req.body.titleBody === "string") {
+    req.body.titleBody = JSON.parse(req.body.titleBody);
+}
+
+    
     const {heading, dateTime, location, titleBody}= req.body;
 const blog= new BlogsModel({
     heading:heading,
     dateTime:dateTime,
     location:location,
-    titleBody:titleBody
+    titleBody:titleBody,
+    images:imgUrlArr
+    
 
 
 })
@@ -32,7 +56,7 @@ res.status(201).json(blog);
 })
 
 
-blogRouter.delete("/delete",userAuth, async (req:AuthRequest,res:Response)=>{
+blogRouter.delete("/delete",userAuth,checkAdmin ,async (req:AuthRequest,res:Response)=>{
     try{
         const id=req.body.id;
         const blog=await BlogsModel.findByIdAndDelete(id);

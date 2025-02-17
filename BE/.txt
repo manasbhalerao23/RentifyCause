@@ -1,0 +1,22 @@
+{
+    "username":"Vipul-28",
+    "password":"vipul12",
+    "contact":"9999999999",
+    "address":"near jp Hospital",
+    "shopName":"shop no-12",
+    "email":"vjaiswal.2810@gmail.com"
+    
+
+}
+
+
+{
+    "username":"manas40",
+    "password":"manas12",
+    "contact":"2332365341",
+    "address":"near jp Hospital",
+    "shopName":"shop no-10",
+    "email":"manas-40@gmail.com"
+    
+
+}   
