@@ -1,8 +1,8 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Header from "./components/Header";
 import Body from "./components/Body";
 import CreateBlog from "./components/CreateBlog";
+import Test from "./components/test";
 function App() {
   return (
     <BrowserRouter>
@@ -11,8 +11,7 @@ function App() {
 
         {/* Children Routes */}
         <Route path="/createBlog" element={<div> <CreateBlog/> </div>}/>
-
-
+        <Route path="/test" element={<div> <Test/> </div>}/>
           </Route>
       </Routes>
     </BrowserRouter>
