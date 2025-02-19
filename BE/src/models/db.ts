@@ -47,13 +47,10 @@ const BlogsSchema = new Schema({
     heading : {type: String, required: true},
     dateTime : {type: Date, required: true, default: Date.now},
     location : {type: String, required: true},
-    titleBody : [{title: String,
-                  body: String
-                }],
+    body: { type: String, required: true },
     images: [{ type: String }]
 })
 
 export const BlogsModel = model('Blogs', BlogsSchema);
-
 
 //payments
