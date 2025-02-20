@@ -40,9 +40,7 @@ const BlogsSchema = new mongoose_1.Schema({
     heading: { type: String, required: true },
     dateTime: { type: Date, required: true, default: Date.now },
     location: { type: String, required: true },
-    titleBody: [{ title: String,
-            body: String
-        }],
+    body: { type: String, required: true },
     images: [{ type: String }]
 });
 exports.BlogsModel = (0, mongoose_1.model)('Blogs', BlogsSchema);

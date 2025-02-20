@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Body from "./components/Body";
 import CreateBlog from "./components/CreateBlog";
 import Test from "./components/test";
+import { Cards } from "./components/Cards";
 function App() {
   return (
     <BrowserRouter>
@@ -11,8 +12,9 @@ function App() {
 
         {/* Children Routes */}
         <Route path="/createBlog" element={<div> <CreateBlog/> </div>}/>
-        <Route path="/test" element={<div> <Test/> </div>}/>
-          </Route>
+        <Route path="/card" element={<div><Cards/></div>} ></Route>
+
+        <Route path="/test" element={<div> <Test/> </div>}/></Route>
       </Routes>
     </BrowserRouter>
   );

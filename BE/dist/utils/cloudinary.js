@@ -22,6 +22,16 @@ cloudinary_1.v2.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log("Warming up Cloudinary...");
+        yield cloudinary_1.v2.api.ping(); // Test API
+        console.log("Cloudinary is ready!");
+    }
+    catch (err) {
+        console.error("Cloudinary Warm-up Failed:", err);
+    }
+}))();
 exports.default = cloudinary_1.v2;
 const uploadOnCloudinary = (localFilePath) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -7,7 +7,18 @@ cloudinary.config({
     cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
     api_key:process.env.CLOUDINARY_API_KEY,
     api_secret:process.env.CLOUDINARY_API_SECRET
-})
+});
+
+(async () => {
+    try {
+      console.log("Warming up Cloudinary...");
+      await cloudinary.api.ping(); // Test API
+      console.log("Cloudinary is ready!");
+    } catch (err) {
+      console.error("Cloudinary Warm-up Failed:", err);
+    }
+  })();
+
 export default cloudinary;
 
 export const uploadOnCloudinary= async (localFilePath:any)=>{

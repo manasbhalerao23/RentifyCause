@@ -8,43 +8,46 @@ const blogRouter= express.Router();
 
 
 
-blogRouter.post("/create", userAuth ,checkAdmin ,upload.array("images",6) ,async(req:AuthRequest,res:Response)=>{
+blogRouter.post("/create",upload.array("images",6) ,async(req:AuthRequest,res:Response)=>{ // add middlewares later rn for testing we have removed it --NOTE
 try{
     let imgUrlArr:any=[];
-
+    // console.log("Waiting 500ms to ensure files are ready...");
+    // await new Promise(resolve => setTimeout(resolve, 500));
 if(req.files){
-    const imgUpload= (req.files as Express.Multer.File[]).map((e:Express.Multer.File)=>{
-      return cloudinary.uploader.upload(e.path)
-      .then((result)=>{
-        imgUrlArr.push(result.url);
+    // Keep Cloudinary connection "warm" on server start
 
-      })
-      .catch((err)=>{
-        console.log(err);
+    for (const file of req.files as Express.Multer.File[]) {
+        console.log(file);
         
-      })
-    })
-    
-    await Promise.all(imgUpload)
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            resource_type: "auto",
+            timeout: 30000,
+          });
+          imgUrlArr.push(result.url);
+        } catch (err) {
+          console.error("Cloudinary Upload Error:", err);
+          imgUrlArr.push(null); // Push null or handle the error gracefully
+          res.status(500).json({message:err});
+          return 
+        }
+      }
 }
 
-console.log(req.files);
-console.log(req.body);
+// console.log(req.files);
+// console.log(req.body);
 
-if (typeof req.body.titleBody === "string") {
-    req.body.titleBody = JSON.parse(req.body.titleBody);
-}
 
     
-    const {heading, dateTime, location, titleBody}= req.body;
+    const {heading, dateTime, location, body}= req.body;
+    console.log(heading, dateTime, location,body);
+    
 const blog= new BlogsModel({
     heading:heading,
     dateTime:dateTime,
     location:location,
-    titleBody:titleBody,
+    body:body,
     images:imgUrlArr
-    
-
 
 })
 await blog.save();
@@ -70,7 +73,7 @@ blogRouter.delete("/delete",userAuth,checkAdmin ,async (req:AuthRequest,res:Resp
                 }
 })
 
-blogRouter.get("/all",userAuth ,async (req: AuthRequest, res: Response) => {
+blogRouter.get("/all" ,async (req: AuthRequest, res: Response) => { //,userAuth middleware ddaalna h for testing purposes its removed
     try {
         const blogs = await BlogsModel.find();
         if (!blogs || blogs.length === 0) {

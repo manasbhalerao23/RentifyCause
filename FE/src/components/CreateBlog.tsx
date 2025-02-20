@@ -9,17 +9,22 @@ const BlogEditor = () => {
   const [images, setImages] = useState([]);
   const [imageUrls, setImageUrls] = useState([]);
   const [HindiOption, setHindiOption] = useState(false);
-
-  // New fields
   const [mainHeading, setMainHeading] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
+  const { quill, quillRef } = useQuill();
+  const [transliterateText, setTransliterateText] = useState("");
+  const [blogContent, setBlogContent] = useState(""); // Store blog content separately
+  const [imageUpload, setImageUpload]=useState(false);
 
+  // Handle file selection
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files).slice(0, 6); // Limit to 6 images
     setImages(selectedFiles);
+    setImageUpload(false)
   };
 
+  // Upload images to backend
   const handleUpload = async () => {
     if (images.length === 0) {
       alert("Please select up to 6 images!");
@@ -28,36 +33,83 @@ const BlogEditor = () => {
 
     const formData = new FormData();
     images.forEach((image) => formData.append("images", image));
+
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData, {
+      const response = await axios.post("http://localhost:4000/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setImageUrls(response.data.imageUrls);
+      setImageUrls(response.data.imageUrls); // Store uploaded image URLs
       alert("Images uploaded successfully!");
     } catch (error) {
       console.error("Error uploading images:", error);
     }
   };
 
-  const { quill, quillRef } = useQuill();
-  const [transliterateText, setTransliterateText] = useState("");
-
+  // Insert transliterated text into Quill editor
   const insertTextIntoQuill = () => {
     if (quill && transliterateText.trim() !== "") {
-      const range = quill.getSelection(); // Get cursor position
-      const insertIndex = range ? range.index : quill.getLength(); // Default to end if no selection
+      const range = quill.getSelection();
+      const insertIndex = range ? range.index : quill.getLength();
+      quill.insertText(insertIndex, transliterateText);
+      quill.setSelection(insertIndex + transliterateText.length);
+      quill.focus();
+      setTransliterateText("");
+    }
+  };
 
-      quill.insertText(insertIndex, transliterateText); // Insert text
-      quill.setSelection(insertIndex + transliterateText.length); // Move cursor forward
-      quill.focus(); // Keep focus inside Quill editor
-      setTransliterateText(""); // Clear input after inserting
+  // Capture blog content from Quill editor
+  React.useEffect(() => {
+    if (quill) {
+      quill.on("text-change", () => {
+        setBlogContent(quill.root.innerHTML); // Store content as HTML
+      });
+    }
+  }, [quill]);
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!mainHeading || !location || !date || !blogContent) {
+      alert("Please fill out all fields before submitting.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("heading", mainHeading);
+    formData.append("dateTime", date);
+    formData.append("location", location);
+    formData.append("body", blogContent); // Send Quill HTML content
+
+    // Append images
+    images.forEach((image) => formData.append("images", image));
+
+
+    try {
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      
+      const response = await axios.post("http://localhost:4000/blog/create", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("Blog submitted successfully!");
+      console.log("Response:", response.data);
+    } catch (error) {
+      if(imageUpload==false){
+        console.log("uploaded images");
+        alert("Images Uploaded");
+        return
+        
+      }
+      console.error("Submission error:", error);
+      alert("Failed to submit blog.");
     }
   };
 
   return (
-    <div>
-      <h2>Blog Editor</h2>
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h2 className="text-2xl font-semibold text-center mb-4">Blog Editor</h2>
 
       {/* Main Heading Field */}
       <input
@@ -65,37 +117,45 @@ const BlogEditor = () => {
         value={mainHeading}
         onChange={(e) => setMainHeading(e.target.value)}
         placeholder="Enter Main Heading"
-        className="w-full p-2 border border-gray-300 rounded mb-3"
+        className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring focus:ring-blue-200 outline-none"
       />
 
-      {/* Location Field */}
-      <input
-        type="text"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        placeholder="Enter Location"
-        className="w-full p-2 border border-gray-300 rounded mb-3"
-      />
+      {/* Location & Date Fields */}
+      <div className="grid grid-cols-2 gap-4">
+        <input
+          type="text"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Enter Location"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none"
+        />
 
-      {/* Date Field */}
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-3"
-      />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none"
+        />
+      </div>
 
       {/* File Upload */}
-      <div>
-        <input type="file" multiple accept="image/*" onChange={handleFileChange} />
-        <button onClick={handleUpload}>Submit</button>
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-gray-700">Upload Images (Max 6)</label>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={handleFileChange}
+          className="w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none"
+        />
+        
 
         {imageUrls.length > 0 && (
-          <div>
-            <p>Uploaded Images:</p>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <div className="mt-4">
+            <p className="text-sm text-gray-500 mb-2">Uploaded Images:</p>
+            <div className="flex flex-wrap gap-3">
               {imageUrls.map((url, index) => (
-                <img key={index} src={url} alt={`Uploaded ${index}`} width="150" />
+                <img key={index} src={url} alt={`Uploaded ${index}`} className="w-20 h-20 rounded-lg object-cover" />
               ))}
             </div>
           </div>
@@ -103,12 +163,13 @@ const BlogEditor = () => {
       </div>
 
       {/* Quill Editor */}
-      <div>
-        <div ref={quillRef} style={{ height: "250px", marginTop: "10px", border: "1px solid #ccc" }} />
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-gray-700">Blog Content</label>
+        <div ref={quillRef} className="h-40 mt-2 border border-gray-300 rounded-lg" />
 
         {/* Hindi Transliteration Option */}
-        {HindiOption ? (
-          <div>
+        {HindiOption && (
+          <div className="mt-4">
             <ReactTransliterate
               value={transliterateText}
               onChangeText={setTransliterateText}
@@ -117,40 +178,41 @@ const BlogEditor = () => {
               renderComponent={(props) => (
                 <input
                   {...props}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                    fontSize: "16px",
-                  }}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none"
                   placeholder="Type Hinglish here..."
                 />
               )}
             />
             <button
               onClick={insertTextIntoQuill}
-              style={{
-                padding: "8px 15px",
-                borderRadius: "5px",
-                border: "none",
-                backgroundColor: "#007bff",
-                color: "white",
-                cursor: "pointer",
-              }}
+              className="mt-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg w-full transition"
             >
               Insert
             </button>
           </div>
-        ) : null}
+        )}
 
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-3"
+          className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg w-full transition"
           onClick={() => setHindiOption(!HindiOption)}
         >
-          Hindi Option
+          {HindiOption ? "Hide Hindi Option" : "Enable Hindi Option"}
         </button>
       </div>
+
+      {/* Submit Button */}
+      <button
+          onClick={handleSubmit}
+          className="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg w-full transition"
+        >
+          Upload Images
+        </button>
+      <button
+        className="mt-6 bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg w-full transition"
+        onClick={handleSubmit}
+      >
+        Submit Blog
+      </button>
     </div>
   );
 };
