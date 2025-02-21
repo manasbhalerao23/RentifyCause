@@ -99,11 +99,13 @@ blogRouter.get("/open/:blogId",async (req: Request, res: Response) => {
             return;
         }
         res.status(200).json(blog);
+        return;
     }
     catch(e: any){
         res.status(500).json({
             message: e.message
         });
+        return;
     }
 })
 

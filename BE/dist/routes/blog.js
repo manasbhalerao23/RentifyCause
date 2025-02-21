@@ -100,11 +100,13 @@ blogRouter.get("/open/:blogId", (req, res) => __awaiter(void 0, void 0, void 0, 
             return;
         }
         res.status(200).json(blog);
+        return;
     }
     catch (e) {
         res.status(500).json({
             message: e.message
         });
+        return;
     }
 }));
 exports.default = blogRouter;

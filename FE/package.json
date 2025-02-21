@@ -20,6 +20,7 @@
     "react-quilljs": "^2.0.5",
     "react-router-dom": "^7.2.0",
     "react-transliterate": "^1.1.9",
+    "swiper": "^11.2.4",
     "tailwindcss": "^4.0.7"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "@types/draft-js": "^0.11.18",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@types/swiper": "^6.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.19.0",
     "eslint-plugin-react-hooks": "^5.0.0",

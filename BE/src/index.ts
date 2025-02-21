@@ -25,6 +25,7 @@ app.use("/blog",blogRouter);
 
 
 async function main() {
+    
     await mongoose.connect(process.env.MONGO_URL as string);
     app.listen(3000);
 }

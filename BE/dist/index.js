@@ -32,6 +32,7 @@ app.use("/auth", auth_1.default);
 app.use("/blog", blog_1.default);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log(process.env.MONGO_URL);
         yield mongoose_1.default.connect(process.env.MONGO_URL);
         app.listen(3000);
     });
