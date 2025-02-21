@@ -4,5 +4,6 @@ export interface BlogData{
     heading: string,
     body:string,
     location: string,
-    dateTime: Date
+    dateTime: Date,
+    _id: string
 }

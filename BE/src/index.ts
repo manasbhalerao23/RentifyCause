@@ -25,7 +25,7 @@ app.use("/blog",blogRouter);
 
 
 async function main() {
-    await mongoose.connect("mongodb://localhost:27017/");
+    await mongoose.connect(process.env.MONGO_URL as string);
     app.listen(3000);
 }
 const port = process.env.PORT || 4000;

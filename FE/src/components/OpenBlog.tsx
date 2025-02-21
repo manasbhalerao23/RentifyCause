@@ -1,56 +1,44 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react'
+import axios from "axios";
+import { useParams } from "react-router-dom"
+import { BACKEND_URL } from "../config";
+import {  useEffect, useState } from "react";
+import { BlogData } from "../Types";
 import DOMPurify from "dompurify";
-import { BlogData } from '../Types';
-import { BACKEND_URL } from '../config';
-import { useNavigate } from 'react-router-dom';
 
-export const Cards = () => {
-const [apiData,setApiData]=useState<BlogData[]>([]);
-const navigate = useNavigate();
-
-const getData = async ()=>{
-    try{
-        const res = await axios.get(`${BACKEND_URL}/blog/all`);
-        //console.log(res);
-        //chack for apidata is always an array
-        setApiData(Array.isArray(res.data) ? res.data : []);
+export const OpenBlog = () => {
+    const [blog,setblog] = useState<BlogData[]>([]);
+    const {blogId} = useParams();
+    useEffect(() => {
+        async function fetchblog() {
+            try{
+                const res = await axios.get(`${BACKEND_URL}/blog/open/${blogId}`);
+                //console.log(res);
+                //fix here
+                setblog(Array.isArray(res.data) ? res.data : []);
+                console.log(blog);
             }
-            catch(err){
-                console.log(err);
-              }
-  }
+            catch(e: any){
+                console.log(e.message);
+            }
+        }
+        fetchblog();
+    }, [blogId])
 
-  const openblog = (Id: string) => {
-    try{
-      navigate(`/openBlog/${Id}`);
-    }
-    catch(e: any){
-      console.log(e.message);
-    }
-  }
+    return(
+        <div>
+            {
+    blog ? (
 
-useEffect(()=>{
-  getData();
-},[])
-
-
-
-  return (
-    <div>
-{
-    apiData ? (
-
-        apiData.map((e,index)=>{
+        blog.map((e,index)=>{
             return(
                 <div className="max-w-sm w-full lg:max-w-full lg:flex" key={index}>
                 <div
-                  className="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
+                  className="flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
                   style={{ backgroundImage: `url(${e?.images[0]})` }}
                   title="Woman holding a mug"
                 />
 
-                <div onClick={() => openblog(e._id)} className="cursor-pointer border-red-300 border-2 bg-red-50 rounded-xl p-6 flex flex-col justify-between shadow-md transition-all duration-300 hover:bg-red-100 ">
+                <div className="cursor-pointer border-red-300 border-2 bg-red-50 rounded-xl p-6 flex flex-col justify-between shadow-md transition-all duration-300 hover:bg-red-100 ">
                   <div className="mb-8">
                     {/* <p className="text-sm text-gray-600 flex items-center">
                       <svg className="fill-current text-gray-500 w-3 h-3 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -81,10 +69,9 @@ useEffect(()=>{
        
 
     ) : (
-        <div>NO data </div>
+        <div>Empty Blog</div>
     )
 }
-
-    </div>
-  )
+        </div>
+    )
 }

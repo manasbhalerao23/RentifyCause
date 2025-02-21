@@ -78,13 +78,33 @@ blogRouter.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const blogs = yield db_1.BlogsModel.find();
         if (!blogs || blogs.length === 0) {
-            res.status(404).json({ message: "No blogs found" });
+            res.status(200).json({ message: "No blogs found" });
             return;
         }
         res.status(200).json(blogs);
     }
     catch (err) {
         res.status(500).json({ message: err.message });
+    }
+}));
+//check point for url
+blogRouter.get("/open/:blogId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { blogId } = req.params;
+        //console.log(blogId);
+        const blog = yield db_1.BlogsModel.findById(blogId);
+        if (!blog) {
+            res.status(200).json({
+                message: "Empty blog"
+            });
+            return;
+        }
+        res.status(200).json(blog);
+    }
+    catch (e) {
+        res.status(500).json({
+            message: e.message
+        });
     }
 }));
 exports.default = blogRouter;

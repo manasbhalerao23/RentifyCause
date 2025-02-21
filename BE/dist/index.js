@@ -32,7 +32,7 @@ app.use("/auth", auth_1.default);
 app.use("/blog", blog_1.default);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield mongoose_1.default.connect("mongodb://localhost:27017/");
+        yield mongoose_1.default.connect(process.env.MONGO_URL);
         app.listen(3000);
     });
 }

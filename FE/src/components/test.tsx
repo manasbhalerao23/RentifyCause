@@ -5,7 +5,7 @@ const TransliterateInput = () => {
   const [text, setText] = useState("");
   const [lastTranslatedWord, setLastTranslatedWord] = useState("");
 
-  const handleChange = async (e) => {
+  const handleChange = async (e: { target: { value: any; }; }) => {
     let inputText = e.target.value;
 
     // Check if user added a space (word completed)
@@ -42,8 +42,8 @@ const TransliterateInput = () => {
     <div>
       <h2>Live Hinglish to Hindi Transliteration</h2>
       <textarea
-        rows="4"
-        cols="50"
+        rows={4}
+        cols={50}
         value={text}
         onChange={handleChange}
         placeholder="Type in Hinglish..."

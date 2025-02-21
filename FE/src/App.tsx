@@ -4,6 +4,7 @@ import Body from "./components/Body";
 import CreateBlog from "./components/CreateBlog";
 import Test from "./components/test";
 import { Cards } from "./components/Cards";
+import { OpenBlog } from "./components/OpenBlog";
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +16,7 @@ function App() {
         <Route path="/card" element={<div><Cards/></div>} ></Route>
 
         <Route path="/test" element={<div> <Test/> </div>}/></Route>
+        <Route path="/openBlog/:blogId" element={<OpenBlog/>}/>
       </Routes>
     </BrowserRouter>
   );

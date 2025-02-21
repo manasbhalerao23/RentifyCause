@@ -49,14 +49,14 @@ const blog= new BlogsModel({
     body:body,
     images:imgUrlArr
 
-})
+});
 await blog.save();
 res.status(201).json(blog);
 }catch(err:any){
     res.status(500).json({message:err.message});
 }
 
-})
+});
 
 
 blogRouter.delete("/delete",userAuth,checkAdmin ,async (req:AuthRequest,res:Response)=>{
@@ -71,20 +71,41 @@ blogRouter.delete("/delete",userAuth,checkAdmin ,async (req:AuthRequest,res:Resp
             }catch(err:any){
                 res.status(500).json({message:err.message});
                 }
-})
+});
 
 blogRouter.get("/all" ,async (req: AuthRequest, res: Response) => { //,userAuth middleware ddaalna h for testing purposes its removed
     try {
         const blogs = await BlogsModel.find();
         if (!blogs || blogs.length === 0) {
-res.status(404).json({ message: "No blogs found" });
-return;
+            res.status(200).json({ message: "No blogs found" });
+            return;
         }
         res.status(200).json(blogs);
     } catch (err: any) {
         res.status(500).json({ message: err.message });
     }
 });
+
+//check point for url
+blogRouter.get("/open/:blogId",async (req: Request, res: Response) => {
+    try{
+        const {blogId} = req.params;
+        //console.log(blogId);
+        const blog = await BlogsModel.findById(blogId);
+        if(!blog){
+            res.status(200).json({
+                message: "Empty blog"
+            });
+            return;
+        }
+        res.status(200).json(blog);
+    }
+    catch(e: any){
+        res.status(500).json({
+            message: e.message
+        });
+    }
+})
 
 
 export default blogRouter;
