@@ -1,9 +1,10 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import DOMPurify from "dompurify";
+import { BlogData } from '../Types';
 
 export const Cards = () => {
-const [apiData,setApiData]=useState([]);
+const [apiData,setApiData]=useState<BlogData>();
 const getData= async ()=>{
     try{
         const res= await axios.get("http://localhost:4000/blog/all")
