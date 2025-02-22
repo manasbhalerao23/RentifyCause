@@ -11,15 +11,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DashBoard/>}/>
+        <Route path="/" element={<Body/>}>
+            {/* Children Routes */}
+        <Route index element={<DashBoard/>}/>
 
-          {/* Children Routes */}
           <Route path="/auth" element={<AuthForm/>}/>
-          <Route path="/createBlog" element={<div><CreateBlog/></div>}/>
-          <Route path="/card" element={<div><Cards/></div>} />
-          <Route path="/test" element={<div> <Test/> </div>}/>
+          <Route path="/createBlog" element={<CreateBlog/>}/>
+          <Route path="/card" element={<Cards/>} />
+          <Route path="/test" element={ <Test/> }/>
         {/* </Route> */}
         <Route path="/openBlog/:blogId" element={<OpenBlog/>}/>
+        </Route>
       </Routes>
     </BrowserRouter>
   );

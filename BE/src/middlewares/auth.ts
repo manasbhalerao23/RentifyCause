@@ -42,7 +42,7 @@ return;
             throw new Error("User not found");
         }
 
-        req.user = req.user = {
+        req.user = {
             username: user.username ?? "",
             email: user.email ?? "",
             contact: user.contact ?? "",

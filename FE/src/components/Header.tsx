@@ -1,4 +1,5 @@
 import {CircleUserRound, Facebook, Twitter, Youtube} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 function Header() {
     return(
@@ -20,7 +21,7 @@ function Header() {
                 <div className='flex items-center space-x-4'>
                     <div>
                         <h1 className='text-xl font-bold'>
-                            Red Cross
+                           <Link to="/"> Red Cross</Link>
                         </h1>
                         <p className='text-sm'>
                             indore,mp.

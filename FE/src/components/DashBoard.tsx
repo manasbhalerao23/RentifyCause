@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Footer from "./Footer";
 import { Globe } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function DashBoard() {
     const slides = [
@@ -31,7 +32,7 @@ function DashBoard() {
                     </div>
                     <div className="">
                         <button className="cursor-pointer">
-                            Register/Login
+                        <Link to="/auth">    Register/Login</Link>
                         </button>
                     </div>
                 </div>
