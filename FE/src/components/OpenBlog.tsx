@@ -2,7 +2,6 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { BACKEND_URL } from "../config";
 import { useEffect, useState } from "react";
-import { BlogData } from "../Types";
 import DOMPurify from "dompurify";
 import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";

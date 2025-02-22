@@ -10,7 +10,7 @@ const UserSchema = new Schema({
     },
     contact: {type: String},
     address: {type: String},
-    shopName: {type: String, required: true},
+    shopName: {type: String},
     monthRent: {type: String,
         default: "10000"
     },

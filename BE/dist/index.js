@@ -22,7 +22,9 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const blog_1 = __importDefault(require("./routes/blog"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    credentials: true
+}));
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -32,7 +34,6 @@ app.use("/auth", auth_1.default);
 app.use("/blog", blog_1.default);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(process.env.MONGO_URL);
         yield mongoose_1.default.connect(process.env.MONGO_URL);
         app.listen(3000);
     });
