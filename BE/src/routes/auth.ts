@@ -13,8 +13,17 @@ const authRouter= express.Router();
 authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
   try{
     const {username, password} = req.body;
-    const user = await User.findOne({username});
+    console.log(username);
+    
+    let user = await User.findOne(
+      {$or:[{username},
+        {email:username}
+      ]}
+    );
+    console.log(user);
+    
     if(!user){
+    
        res.status(400).json({ error: "Not Found User" });
        return;
     }

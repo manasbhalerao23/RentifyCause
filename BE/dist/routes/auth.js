@@ -22,7 +22,11 @@ const authRouter = express_1.default.Router();
 authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
-        const user = yield db_1.User.findOne({ username });
+        console.log(username);
+        let user = yield db_1.User.findOne({ $or: [{ username },
+                { email: username }
+            ] });
+        console.log(user);
         if (!user) {
             res.status(400).json({ error: "Not Found User" });
             return;

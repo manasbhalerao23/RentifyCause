@@ -82,7 +82,7 @@ console.log(user);
                     type="name"
                     name="name"
                     value={username}
-                    placeholder="Username"
+                    placeholder="Username or Email..."
                     onChange={(e) => {(setusername(e.target.value))}}
                     required
                     className="w-full p-2 border rounded-xl"
