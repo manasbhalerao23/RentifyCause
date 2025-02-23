@@ -39,9 +39,8 @@ export const OpenBlog = () => {
   }, []);
 
   return (
-    <div>
-      <div className="max-w-sm w-full lg:max-w-full lg:flex">
-        <div className="w-64">
+    <div className="grid  grid-cols-[30%_70%] gap-3">
+      <div className="w-full">
         <Swiper
           modules={[Navigation, Pagination]}
           spaceBetween={10}
@@ -54,12 +53,15 @@ export const OpenBlog = () => {
               <img
                 src={e}
                 alt={`Blog Image ${idx}`}
-                className=" object-cover rounded-lg"
+                className=" w-full h-64 object-cover rounded-lg"
               />
             </SwiperSlide>
           ))}
         </Swiper>
         </div>
+
+      <div className="max-w-sm w-full lg:max-w-full lg:flex">
+        
         <div className="cursor-pointer border-red-300 border-2 bg-red-50 rounded-xl p-6 flex flex-col justify-between shadow-md transition-all duration-300 hover:bg-red-100 ">
           <div className="mb-8">
             {/* <p className="text-sm text-gray-600 flex items-center">
@@ -80,7 +82,7 @@ export const OpenBlog = () => {
           <div className="flex items-center">
             <div className="text-sm">
               <p className="text-gray-900 leading-none">{location}</p>
-              <p className="text-gray-600">{dateTime.toLocaleString()}</p>
+              <p className="text-gray-600">{dateTime.toString()}</p>
             </div>
           </div>
         </div>
