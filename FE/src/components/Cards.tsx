@@ -4,13 +4,17 @@ import DOMPurify from "dompurify";
 import { BlogData } from '../Types';
 import { BACKEND_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 export const Cards = () => {
 const [apiData,setApiData]=useState<BlogData[]>([]);
 const navigate = useNavigate();
-
+const userInfo=useSelector((store)=>store.cart)
+   
 const getData = async ()=>{
     try{
+      console.log(userInfo);
+      
         const res = await axios.get(`${BACKEND_URL}/blog/all`);
         //console.log(res);
         //chack for apidata is always an array
@@ -33,6 +37,7 @@ const getData = async ()=>{
 useEffect(()=>{
   getData();
 },[])
+
 
 
 
