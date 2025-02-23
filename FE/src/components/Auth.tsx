@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import {useSelector, useDispatch} from "react-redux";
 import { RootState } from "../Utils/store";
 import {  setUser } from "../Utils/cartSlice";
+import {motion, AnimatePresence } from "framer-motion";
 
 function AuthForm() {
     const [isLogin, setisLogin] = useState(false);
@@ -74,83 +75,59 @@ console.log(user);
     }
 
     return(
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="w-96 p-6 shadow-xl bg-white rounded-2xl">
-                <h2 className="text-xl font-bold text-center mb-4">{isLogin ? "Login" : "Sign up"}</h2>
-                <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="flex justify-center items-center min-h-screen bg-gray-200">
+        <div className="w-96 p-6 shadow-xl bg-white rounded-2xl overflow-hidden relative">
+            <h2 className="text-xl font-bold text-center mb-4">{isLogin ? "Login" : "Sign up"}</h2>
+            <AnimatePresence mode="wait">
+                <motion.form
+                    key={isLogin ? "login" : "signup"}
+                    className="space-y-4"
+                    onSubmit={handleSubmit}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.4 }}
+                >
                     <input
-                    type="name"
-                    name="name"
-                    value={username}
-                    placeholder="Username or Email..."
-                    onChange={(e) => {(setusername(e.target.value))}}
-                    required
-                    className="w-full p-2 border rounded-xl"
+                        type="text"
+                        value={username}
+                        placeholder="Username or Email..."
+                        onChange={(e) => setusername(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded-xl"
                     />
                     <input
-                    type="password"
-                    name="password"
-                    value={password}
-                    placeholder="Password"
-                    onChange={(e) => {(setpassword(e.target.value))}}
-                    required
-                    className="w-full p-2 border rounded-xl"
+                        type="password"
+                        value={password}
+                        placeholder="Password"
+                        onChange={(e) => setpassword(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded-xl"
                     />
 
                     {!isLogin && (
                         <>
-                        <input
-                        type="text"
-                        name="contact"
-                        value={contact}
-                        placeholder="Contact"
-                        onChange={(e) => {(setcontact(e.target.value))}}
-                        required
-                        className="w-full p-2 border rounded-xl"
-                        />
-                        <input
-                        type="text"
-                        name="address"
-                        value={address}
-                        placeholder="Address"
-                        onChange={(e) => {(setaddress(e.target.value))}}
-                        required
-                        className="w-full p-2 border rounded-xl"
-                        />
-                        <input
-                        type="text"
-                        name="shopname"
-                        value={shopname}
-                        placeholder="Shop Name"
-                        onChange={(e) => {(setshopname(e.target.value))}}
-                        required
-                        className="w-full p-2 border rounded-xl"
-                        />
-                        <input
-                        type="email"
-                        name="email"
-                        value={email}
-                        placeholder="Email"
-                        onChange={(e) => {(setemail(e.target.value))}}
-                        required
-                        className="w-full p-2 border rounded-xl"
-                        />
+                            <input type="text" value={contact} placeholder="Contact" onChange={(e) => setcontact(e.target.value)} required className="w-full p-2 border rounded-xl" />
+                            <input type="text" value={address} placeholder="Address" onChange={(e) => setaddress(e.target.value)} required className="w-full p-2 border rounded-xl" />
+                            <input type="text" value={shopname} placeholder="Shop Name" onChange={(e) => setshopname(e.target.value)} required className="w-full p-2 border rounded-xl" />
+                            <input type="email" value={email} placeholder="Email" onChange={(e) => setemail(e.target.value)} required className="w-full p-2 border rounded-xl" />
                         </>
                     )}
-
-                    <button type="submit" className="w-full bg-red-500 text-white rounded-2xl py-2 cursor-pointer" >
+                    
+                    <button type="submit" className="w-full bg-red-500 text-white rounded-2xl py-2 cursor-pointer">
                         {isLogin ? "Login" : "Sign up"}
                     </button>
-                </form>
-                <p className="text-center mt-4 text-sm">
-                    {isLogin ? "Don't have account" : "Already have an account?"}
-                    <span>  </span>
-                    <button onClick={toggle} className="text-blue-500 cursor-pointer">
-                        {isLogin ? "Sign up" : "Login"}
-                    </button>
-                </p>
-            </div>
+                </motion.form>
+            </AnimatePresence>
+            
+            <p className="text-center mt-4 text-md">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button onClick={toggle} className="text-blue-500 cursor-pointer ml-1">
+                    {isLogin ? "Sign up" : "Login"}
+                </button>
+            </p>
         </div>
+    </div>
     )
 }
 

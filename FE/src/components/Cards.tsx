@@ -5,11 +5,12 @@ import { BlogData } from '../Types';
 import { BACKEND_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { RootState } from '../Utils/store';
 
 export const Cards = () => {
 const [apiData,setApiData]=useState<BlogData[]>([]);
 const navigate = useNavigate();
-const userInfo=useSelector((store)=>store.cart)
+const userInfo = useSelector((store: RootState)=>store.cart)
    
 const getData = async ()=>{
     try{
