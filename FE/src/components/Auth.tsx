@@ -2,6 +2,9 @@ import axios from "axios";
 import { useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
+import {useSelector, useDispatch} from "react-redux";
+import { RootState } from "../Utils/store";
+import {  setUser } from "../Utils/cartSlice";
 
 function AuthForm() {
     const [isLogin, setisLogin] = useState(false);
@@ -11,6 +14,8 @@ function AuthForm() {
     const [address, setaddress] = useState("");
     const [shopname, setshopname] = useState("");
     const [email, setemail] = useState("");
+    const userInfo= useSelector((store:RootState)=>store.cart);
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
@@ -29,7 +34,7 @@ function AuthForm() {
                     {username,password,contact,address,shopname,email}
                     // {withCredentials: true}
                 );
-                console.log(res);
+                console.log(res?.data);
                 setisLogin(!isLogin);
             }
             catch(e: any){
@@ -42,7 +47,24 @@ function AuthForm() {
                     {username,password},
                     {withCredentials: true}
                 );
-                console.log(res);
+                console.log(res.data.msg);
+                const data= res.data.msg;
+                const user= {
+                    _id:data._id,//
+                    username:data.username,//
+                    email:data.email,//
+                    address:data.address,//
+                    contact:data.contact,//
+                    currentDonation:data.currentDonation,//
+                    currentRent:data.currentRent,//
+                    monthRent:data.monthRent,//
+                    totalDonation:data.totalDonation,//
+                    role:data.role,//
+                    language:"English"
+                }
+dispatch(setUser(user));
+console.log(user);
+
                 navigate('/card');
             }
             catch(e: any){
@@ -116,7 +138,7 @@ function AuthForm() {
                         </>
                     )}
 
-                    <button type="submit" className="w-full bg-blue-600 text-white rounded-2xl py-2 cursor-pointer" >
+                    <button type="submit" className="w-full bg-red-500 text-white rounded-2xl py-2 cursor-pointer" >
                         {isLogin ? "Login" : "Sign up"}
                     </button>
                 </form>

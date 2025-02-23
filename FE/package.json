@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
     "@tailwindcss/vite": "^4.0.7",
     "@types/swiper": "^5.4.3",
     "axios": "^1.7.9",
@@ -19,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-quilljs": "^2.0.5",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.2.0",
     "react-transliterate": "^1.1.9",
     "swiper": "^11.2.4",

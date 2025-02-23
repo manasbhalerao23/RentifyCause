@@ -7,8 +7,11 @@ import { Cards } from "./components/Cards";
 import { OpenBlog } from "./components/OpenBlog";
 import DashBoard from "./components/DashBoard";
 import AuthForm from "./components/Auth";
+import { Provider } from "react-redux";
+import store from "./Utils/store";
 function App() {
   return (
+    <Provider store={store}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Body/>}>
@@ -24,6 +27,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </Provider>
   );
 }
 

@@ -1,13 +1,22 @@
 import {CircleUserRound, Facebook, Twitter, Youtube} from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-
+import { changeLanguage } from '../Utils/cartSlice';
 function Header() {
+    const userInfo=useSelector((store)=>store.cart)
+    const dispatch=useDispatch();
+    const changeLang=()=>{
+        if(userInfo.language=="English")
+        dispatch(changeLanguage("हिन्दी"));
+    else
+    dispatch(changeLanguage("English"))
+    }
     return(
         <header>
             <div className='flex justify-between items-center px-6 py-2 text-sm bg-red-600'>
                 <div className='flex space-x-4 '>
-                    <button className='cursor-pointer'>
-                        Hindi
+                    <button className='cursor-pointer' onClick={changeLang}>
+                        {userInfo.language}
                     </button>
                 </div>
                 <div className='cursor-pointer flex space-x-3'>

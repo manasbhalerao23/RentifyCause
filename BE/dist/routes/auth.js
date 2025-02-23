@@ -36,7 +36,19 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.cookie("token", token, {
             expires: new Date(Date.now() + 10000000)
         });
-        res.json({ msg: user });
+        const sendingUser = {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            address: user.address,
+            contact: user.contact,
+            currentDonation: user.currentDonation,
+            currentRent: user.currentRent,
+            monthRent: user.monthRent,
+            totalDonation: user.totalDonation,
+            role: user.role,
+        };
+        res.json({ msg: sendingUser });
         return;
     }
     catch (err) {
@@ -57,8 +69,16 @@ authRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
             email,
             role: "user"
         });
+        const sendingUser = {
+            username: user.username,
+            email: user.email,
+            contact: user.contact,
+            address: user.address,
+            shopName: user.shopName,
+            role: user.role
+        };
         yield user.save();
-        res.send("User added " + user);
+        res.send("User added " + sendingUser);
     }
     catch (err) {
         console.log(err);

@@ -25,26 +25,7 @@ const BlogEditor = () => {
   };
 
   // Upload images to backend
-  const handleUpload = async () => {
-    if (images.length === 0) {
-      alert("Please select up to 6 images!");
-      return;
-    }
-
-    const formData = new FormData();
-    images.forEach((image) => formData.append("images", image));
-
-    try {
-      const response = await axios.post("http://localhost:4000/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      setImageUrls(response.data.imageUrls); // Store uploaded image URLs
-      alert("Images uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading images:", error);
-    }
-  };
+  
 
   // Insert transliterated text into Quill editor
   const insertTextIntoQuill = () => {

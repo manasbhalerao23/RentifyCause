@@ -35,7 +35,7 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         if (!user) {
             throw new Error("User not found");
         }
-        req.user = req.user = {
+        req.user = {
             username: (_a = user.username) !== null && _a !== void 0 ? _a : "",
             email: (_b = user.email) !== null && _b !== void 0 ? _b : "",
             contact: (_c = user.contact) !== null && _c !== void 0 ? _c : "",
