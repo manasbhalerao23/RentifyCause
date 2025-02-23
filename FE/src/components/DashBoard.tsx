@@ -56,7 +56,7 @@ function DashBoard() {
                             <a href="#" className="text-gray-700 hover:text-red-600">Services</a>
                             <a href="#" className="text-gray-700 hover:text-red-600">Contact</a>
                         </div>
-                        <button className="animate-pulse bg-red-600 text-white px-6 p-2 rounded-full hover:bg-teal-500 transition-all duration-300 cursor-pointer">
+                        <button className="animate-pulse bg-red-600 text-white px-6 p-2 rounded-full hover:bg-teal-500 transition-all duration-500 cursor-pointer">
                             Donate
                         </button>
                     </div>
