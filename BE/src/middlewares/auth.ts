@@ -2,20 +2,23 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "../models/db";
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import { ObjectId } from "mongoose";
 dotenv.config();
 // 
 // Extend Request type to include user
+
 interface Iuser{
     username: string;
     email :string;
     contact: string;
     role: string;
     shopName: string;
-    monthRent: string;
-    currentRent: string;
-    currentDonation: string;
-    totalDonation: string;
+    monthRent: Number;
+    currentRent: Number;
+    currentDonation: Number;
+    totalDonation: Number;
     address?: string;
+    id:string;
 }
 export interface AuthRequest extends Request {
     user?: Iuser;
@@ -43,6 +46,7 @@ return;
         }
 
         req.user = {
+            id:user._id.toString() ?? "",
             username: user.username ?? "",
             email: user.email ?? "",
             contact: user.contact ?? "",

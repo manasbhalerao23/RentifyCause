@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
 //users
 const UserSchema = new Schema({
@@ -11,18 +11,19 @@ const UserSchema = new Schema({
     contact: {type: String},
     address: {type: String},
     shopName: {type: String},
-    monthRent: {type: String,
-        default: "10000"
+    monthRent: {type: Number,
+        default: 2000
     },
-    currentRent: {type: String,
-        default: "10000"
+    currentRent: {type: Number,
+        default: 2000
     },
-    currentDonation: {type: String,
-        default: "0"
+    currentDonation: {type: Number,
+        default: 0
     },
-    totalDonation: {type: String,
-        default:"0"
-    }
+    totalDonation: {type: Number,
+        default:0
+    },
+    rentPaidUntil: { type: Date }
     },{ timestamps: true }
 );
 
@@ -54,3 +55,69 @@ const BlogsSchema = new Schema({
 export const BlogsModel = model('Blogs', BlogsSchema);
 
 //payments
+const PaymentSchema=new Schema({
+        
+        paymentId:{
+            type:String,
+        },
+        orderId:{
+            type:String,
+            required:true
+        },
+        status:{
+            type:String,
+            required:true
+        },
+        amount:{
+            type:Number,
+            required:true
+        },
+        currency:{
+            type:String,
+            required:true
+        },
+        receipt:{
+            type:String,
+            required:true
+        },
+        monthsPaid:{
+            type:Number,
+        },
+        
+        notes:{
+            username:{
+                type:String,
+            },
+            email:{
+                type:String,
+            },
+            contact:{
+                type:String,
+            },
+            userId:{
+                type: Schema.Types.ObjectId,
+                ref:"User",
+                required:true
+            },
+            paymentType:{
+                type:String,
+                }
+            
+        },
+        paymentMethod:{
+            type:String,
+          },
+          paidAt:{
+            type:Date,
+           
+          },
+},{timestamps:true});
+
+PaymentSchema.pre("save", function (next) {
+    if (this.status === "captured" && !this.paidAt) {
+        this.paidAt = new Date();
+    }
+    next();
+});
+
+export const paymentModel= model('Payment',PaymentSchema)

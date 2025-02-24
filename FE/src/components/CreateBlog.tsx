@@ -4,6 +4,7 @@ import "quill/dist/quill.snow.css";
 import { ReactTransliterate } from "react-transliterate";
 import "react-transliterate/dist/index.css";
 import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 const BlogEditor = () => {
   const [images, setImages] = useState([]);
@@ -70,7 +71,7 @@ const BlogEditor = () => {
         console.log(pair[0], pair[1]);
       }
       
-      const response = await axios.post("http://localhost:4000/blog/create", formData, {
+      const response = await axios.post( `${BACKEND_URL}/blog/create`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

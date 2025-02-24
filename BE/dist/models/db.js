@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BlogsModel = exports.AdminModel = exports.User = void 0;
+exports.paymentModel = exports.BlogsModel = exports.AdminModel = exports.User = void 0;
 const mongoose_1 = require("mongoose");
 //users
 const UserSchema = new mongoose_1.Schema({
@@ -13,18 +13,19 @@ const UserSchema = new mongoose_1.Schema({
     contact: { type: String },
     address: { type: String },
     shopName: { type: String },
-    monthRent: { type: String,
-        default: "10000"
+    monthRent: { type: Number,
+        default: 2000
     },
-    currentRent: { type: String,
-        default: "10000"
+    currentRent: { type: Number,
+        default: 2000
     },
-    currentDonation: { type: String,
-        default: "0"
+    currentDonation: { type: Number,
+        default: 0
     },
-    totalDonation: { type: String,
-        default: "0"
-    }
+    totalDonation: { type: Number,
+        default: 0
+    },
+    rentPaidUntil: { type: Date }
 }, { timestamps: true });
 exports.User = (0, mongoose_1.model)('User', UserSchema);
 //admin
@@ -45,3 +46,63 @@ const BlogsSchema = new mongoose_1.Schema({
 });
 exports.BlogsModel = (0, mongoose_1.model)('Blogs', BlogsSchema);
 //payments
+const PaymentSchema = new mongoose_1.Schema({
+    paymentId: {
+        type: String,
+    },
+    orderId: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true
+    },
+    currency: {
+        type: String,
+        required: true
+    },
+    receipt: {
+        type: String,
+        required: true
+    },
+    monthsPaid: {
+        type: Number,
+    },
+    notes: {
+        username: {
+            type: String,
+        },
+        email: {
+            type: String,
+        },
+        contact: {
+            type: String,
+        },
+        userId: {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        },
+        paymentType: {
+            type: String,
+        }
+    },
+    paymentMethod: {
+        type: String,
+    },
+    paidAt: {
+        type: Date,
+    },
+}, { timestamps: true });
+PaymentSchema.pre("save", function (next) {
+    if (this.status === "captured" && !this.paidAt) {
+        this.paidAt = new Date();
+    }
+    next();
+});
+exports.paymentModel = (0, mongoose_1.model)('Payment', PaymentSchema);

@@ -18,7 +18,7 @@ const db_1 = require("../models/db");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     try {
         const { token } = req.cookies;
         if (!token) {
@@ -36,16 +36,17 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             throw new Error("User not found");
         }
         req.user = {
-            username: (_a = user.username) !== null && _a !== void 0 ? _a : "",
-            email: (_b = user.email) !== null && _b !== void 0 ? _b : "",
-            contact: (_c = user.contact) !== null && _c !== void 0 ? _c : "",
-            role: (_d = user.role) !== null && _d !== void 0 ? _d : "",
-            shopName: (_e = user.shopName) !== null && _e !== void 0 ? _e : "",
-            monthRent: (_f = user.monthRent) !== null && _f !== void 0 ? _f : "",
-            currentRent: (_g = user.currentRent) !== null && _g !== void 0 ? _g : "",
-            currentDonation: (_h = user.currentDonation) !== null && _h !== void 0 ? _h : "",
-            totalDonation: (_j = user.totalDonation) !== null && _j !== void 0 ? _j : "",
-            address: (_k = user.address) !== null && _k !== void 0 ? _k : "",
+            id: (_a = user._id.toString()) !== null && _a !== void 0 ? _a : "",
+            username: (_b = user.username) !== null && _b !== void 0 ? _b : "",
+            email: (_c = user.email) !== null && _c !== void 0 ? _c : "",
+            contact: (_d = user.contact) !== null && _d !== void 0 ? _d : "",
+            role: (_e = user.role) !== null && _e !== void 0 ? _e : "",
+            shopName: (_f = user.shopName) !== null && _f !== void 0 ? _f : "",
+            monthRent: (_g = user.monthRent) !== null && _g !== void 0 ? _g : "",
+            currentRent: (_h = user.currentRent) !== null && _h !== void 0 ? _h : "",
+            currentDonation: (_j = user.currentDonation) !== null && _j !== void 0 ? _j : "",
+            totalDonation: (_k = user.totalDonation) !== null && _k !== void 0 ? _k : "",
+            address: (_l = user.address) !== null && _l !== void 0 ? _l : "",
         };
         next();
     }

@@ -9,6 +9,7 @@ import DashBoard from "./components/DashBoard";
 import AuthForm from "./components/Auth";
 import { Provider } from "react-redux";
 import store from "./Utils/store";
+import Rent from "./components/Rent";
 function App() {
   return (
     <Provider store={store}>
@@ -24,6 +25,8 @@ function App() {
           <Route path="/test" element={ <Test/> }/>
         {/* </Route> */}
         <Route path="/openBlog/:blogId" element={<OpenBlog/>}/>
+        <Route path="/rent" element={<Rent/>}/>
+
         </Route>
       </Routes>
     </BrowserRouter>
