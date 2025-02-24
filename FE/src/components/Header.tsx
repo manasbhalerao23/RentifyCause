@@ -11,7 +11,7 @@ function Header() {
   };
   return (
     <header>
-      <div className="flex justify-between items-center px-6 py-2 text-sm bg-red-600">
+      <div className="flex justify-between items-center px-6  text-sm bg-red-600">
         <div className="flex space-x-4 ">
           <button className="cursor-pointer" onClick={changeLang}>
             {userInfo.language}
@@ -24,35 +24,61 @@ function Header() {
         </div>
       </div>
       {/*main part*/}
-      <div className=" flex justify-between items-center px-6 py-6 bg-red-100 text-black border-b-2 border-red-200">
+      <div className=" flex justify-between items-center px-16 py-1 bg-red-100 text-black border-b-2 border-red-200">
         <div className="flex items-center space-x-4">
-          <div>
-            <h1 className="text-xl font-bold">
-              <Link to="/"> Red Cross</Link>
+        <Link to="/">
+          <div className=" flex items-center gap-3">
+            <img className="h-28" src="http://redcross.mp.gov.in/assets/img/logo/mp-redcross-logo.png"/>
+            <div>
+            <h1 className="text-2xl font-bold">
+               Indian Red Cross Society
             </h1>
-            <p className="text-sm">indore,mp.</p>
+            <p className="text-xl">Chhindwara, Madhya Pradesh State Branch</p>
+            </div>
           </div>
+          </Link>
         </div>
         <div className="flex space-x-3 items-center gap-7">
           {userInfo.role == "Admin" ? (
             <Link to="/createBlog">
-            <button className="bg-red-600 text-white px-4 py-2 rounded-3xl cursor-pointer hover:bg-teal-500 transition duration-500 animate-pulse ease-in-out ">
-              Create Blog
-            </button>
+              <button className="bg-red-600 text-white px-4 py-2 rounded-3xl cursor-pointer hover:bg-teal-500 transition duration-500 animate-pulse ease-in-out ">
+                Create Blog
+              </button>
             </Link>
-          ) : (
-
+          ) : userInfo.role == "User" ? (
             <button className="bg-red-600 text-white px-4 py-2 rounded-3xl cursor-pointer hover:bg-teal-500 transition duration-500 animate-pulse ease-in-out ">
               Rent
             </button>
+          ) : (
+            <div></div>
           )}
+          {userInfo.username ? <button className="rounded-md flex gap-1 font-medium cursor-pointer">
+            <CircleUserRound />
+            {userInfo.username}
+          </button> : <div>
           <button className="rounded-md flex gap-1 font-medium cursor-pointer">
             <CircleUserRound />
-            Profile
+            Guest
           </button>
+            </div> }
         </div>
       </div>
+      <div className="flex justify-between items-center border-b-2 border-red-500 bg-red-500 px-4 py-1">
+                    {/* <div className="flex items-center gap-1 cursor-pointer">
+                        <Globe size={14}/>
+                        <button className="cursor-pointer">
+                            Hindi
+                        </button>
+                    </div> */}
+                    <div className="flex items-center space-x-4 ">
+                      {userInfo.username ?
+                        <button className="cursor-pointer">
+                        Logout
+                        </button>: <button className="cursor-pointer rounded-lg bg-red-200 px-3 hover:bg-blue-400 transition duration-500">   <Link to="/auth"> Register/Login   </Link>  </button>}
+                    </div>
+                </div>
     </header>
+    
   );
 }
 

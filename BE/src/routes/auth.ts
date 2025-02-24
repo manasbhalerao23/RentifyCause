@@ -13,6 +13,7 @@ const authRouter= express.Router();
 authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
   try{
     const {username, password} = req.body;
+    
     console.log(username);
     
     let user = await User.findOne(

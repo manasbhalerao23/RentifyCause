@@ -33,14 +33,14 @@ export const OpenBlog = () => {
       console.log(e.message);
     }
   };
-
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   useEffect(() => {
     fetchblog();
   }, []);
 
   return (
-    <div className="grid  grid-cols-[30%_70%] gap-3">
-      <div className="w-full">
+    <div className="grid  grid-cols-[33%_65%] gap-3 p-2 py-5">
+      <div className="w-full my-10 ">
         <Swiper
           modules={[Navigation, Pagination]}
           spaceBetween={10}
@@ -82,7 +82,7 @@ export const OpenBlog = () => {
           <div className="flex items-center">
             <div className="text-sm">
               <p className="text-gray-900 leading-none">{location}</p>
-              <p className="text-gray-600">{dateTime.toString()}</p>
+              <p className="text-gray-600">{dateTime.toLocaleString().slice(0,10)}</p>
             </div>
           </div>
         </div>

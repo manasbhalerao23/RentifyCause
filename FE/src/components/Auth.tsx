@@ -114,7 +114,7 @@ console.log(user);
                         </>
                     )}
                     
-                    <button type="submit" className="w-full bg-red-500 text-white rounded-2xl py-2 cursor-pointer">
+                    <button type="submit" className="w-full bg-red-500 hover:bg-red-700 transition duration-300 text-white rounded-2xl py-2 cursor-pointer">
                         {isLogin ? "Login" : "Sign up"}
                     </button>
                 </motion.form>

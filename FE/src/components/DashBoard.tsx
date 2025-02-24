@@ -25,21 +25,7 @@ function DashBoard() {
     return(
         <div className="min-h-screen bg-white w-full">
             {/* Header part */}
-            <header>
-                <div className="flex justify-between items-center border-b-2 border-red-500 bg-red-500 px-4 py-1">
-                    {/* <div className="flex items-center gap-1 cursor-pointer">
-                        <Globe size={14}/>
-                        <button className="cursor-pointer">
-                            Hindi
-                        </button>
-                    </div> */}
-                    <div className="flex items-center space-x-4 ">
-                        <button className="cursor-pointer">
-                        <Link to="/auth">    Register/Login</Link>
-                        </button>
-                    </div>
-                </div>
-            </header>
+            
             
             {/* Main part */}
             <nav className="bg-white shadow-md">
@@ -53,7 +39,7 @@ function DashBoard() {
                         <div className="hidden md:flex space-x-6">
                             <a href="#" className="text-gray-700 hover:text-red-600">Home</a>
                             <a href="#" className="text-gray-700 hover:text-red-600">About Us</a>
-                            <a href="#" className="text-gray-700 hover:text-red-600">Services</a>
+                           <Link to="/card"> <a href="#" className="text-gray-700 hover:text-red-600">Services</a></Link>
                             <a href="#" className="text-gray-700 hover:text-red-600">Contact</a>
                         </div>
                         <button className="animate-pulse bg-red-600 text-white px-6 p-2 rounded-full hover:bg-teal-500 transition-all duration-500 cursor-pointer">
@@ -109,7 +95,6 @@ function DashBoard() {
                 <p>Phone: 123</p>
                 <p>Email: contact@</p>
             </div> */}
-            <Footer/>
         </div>
     );
 };
