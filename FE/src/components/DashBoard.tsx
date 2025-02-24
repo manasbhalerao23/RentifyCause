@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Footer from "./Footer";
 import { Link } from "react-router-dom";
 
 function DashBoard() {

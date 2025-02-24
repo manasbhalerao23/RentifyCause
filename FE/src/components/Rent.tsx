@@ -9,8 +9,7 @@ declare global {
     }
   }
 const Rent = ()=>{
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const [num, setNum]=useState(1);
+const [num]=useState(1);
 const handleRent= async ()=>{
     try{
 const order= await axios.post( `${BACKEND_URL}/payment/create`,{

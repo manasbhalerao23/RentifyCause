@@ -2,8 +2,9 @@ import { CircleUserRound, Facebook, Twitter, Youtube } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { changeLanguage } from "../Utils/cartSlice";
+import { RootState } from "../Utils/store";
 function Header() {
-  const userInfo = useSelector((store) => store.cart);
+  const userInfo = useSelector((store:RootState) => store.cart);
   const dispatch = useDispatch();
   const changeLang = () => {
     if (userInfo.language == "English") dispatch(changeLanguage("हिन्दी"));

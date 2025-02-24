@@ -8,8 +8,7 @@ import { BACKEND_URL } from "../config";
   
 const BlogEditor = () => {
   const [images, setImages] = useState<File[]>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls] = useState([]);
   const [HindiOption, setHindiOption] = useState(false);
   const [mainHeading, setMainHeading] = useState("");
   const [location, setLocation] = useState("");
