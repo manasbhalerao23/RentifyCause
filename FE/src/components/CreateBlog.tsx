@@ -5,9 +5,10 @@ import { ReactTransliterate } from "react-transliterate";
 import "react-transliterate/dist/index.css";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
-
+  
 const BlogEditor = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<File[]>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [imageUrls, setImageUrls] = useState([]);
   const [HindiOption, setHindiOption] = useState(false);
   const [mainHeading, setMainHeading] = useState("");
@@ -19,10 +20,11 @@ const BlogEditor = () => {
   const [imageUpload, setImageUpload]=useState(false);
 
   // Handle file selection
-  const handleFileChange = (event) => {
-    const selectedFiles = Array.from(event.target.files).slice(0, 6); // Limit to 6 images
-    setImages(selectedFiles);
-    setImageUpload(false)
+  const handleFileChange = (event:React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files?.length ? Array.from(event.target.files) : [];
+  
+    setImages(files.slice(0, 6)); // Limit to 6 images
+    setImageUpload(false);
   };
 
   // Upload images to backend
@@ -63,11 +65,12 @@ const BlogEditor = () => {
     formData.append("body", blogContent); // Send Quill HTML content
 
     // Append images
-    images.forEach((image) => formData.append("images", image));
+
+    images?.forEach((image) => formData.append("images", image));
 
 
     try {
-      for (let pair of formData.entries()) {
+      for (const pair of formData.entries()) {
         console.log(pair[0], pair[1]);
       }
       

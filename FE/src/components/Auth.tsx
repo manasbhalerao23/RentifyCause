@@ -2,8 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
-import {useSelector, useDispatch} from "react-redux";
-import { RootState } from "../Utils/store";
+import { useDispatch} from "react-redux";
 import {  setUser } from "../Utils/cartSlice";
 import {motion, AnimatePresence } from "framer-motion";
 
@@ -15,7 +14,6 @@ function AuthForm() {
     const [address, setaddress] = useState("");
     const [shopname, setshopname] = useState("");
     const [email, setemail] = useState("");
-    const userInfo= useSelector((store:RootState)=>store.cart);
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
@@ -38,8 +36,8 @@ function AuthForm() {
                 console.log(res?.data);
                 setisLogin(!isLogin);
             }
-            catch(e: any){
-                console.log(e.message);
+            catch(e){
+                console.log(e);
             }
         }
         else{
@@ -68,8 +66,8 @@ console.log(user);
 
                 navigate('/card');
             }
-            catch(e: any){
-                console.log(e.message);
+            catch(e){
+                console.log(e);
             }
         }
     }

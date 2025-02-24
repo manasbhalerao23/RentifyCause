@@ -2,8 +2,14 @@ import axios from 'axios';
 import { useState } from 'react';
 import { BACKEND_URL } from '../config';
 
-
+declare global {
+    interface Window {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      Razorpay: any;
+    }
+  }
 const Rent = ()=>{
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const [num, setNum]=useState(1);
 const handleRent= async ()=>{
     try{
@@ -33,6 +39,8 @@ const options = {
       color: '#F37254'
     },
   };
+  
+  
 const rzp = new window.Razorpay(options);
 rzp.open();
     }catch(err){

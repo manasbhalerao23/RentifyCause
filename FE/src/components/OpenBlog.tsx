@@ -29,11 +29,10 @@ export const OpenBlog = () => {
       setImages(fetched);
 
       setLocation(location);
-    } catch (e: any) {
-      console.log(e.message);
+    } catch (e) {
+      console.log(e);
     }
   };
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   useEffect(() => {
     fetchblog();
   }, []);

@@ -35,7 +35,7 @@ const cartSlice = createSlice({
     name: "cart",
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<UserInfo>) => {
+        setUser: (_state, action: PayloadAction<UserInfo>) => {
             return action.payload; 
         },
         updateUser: (state, action: PayloadAction<Partial<UserInfo>>) => {

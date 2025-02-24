@@ -30,8 +30,8 @@ const getData = async ()=>{
     try{
       navigate(`/openBlog/${Id}`);
     }
-    catch(e: any){
-      console.log(e.message);
+    catch(e){
+      console.log(e);
     }
   }
 
