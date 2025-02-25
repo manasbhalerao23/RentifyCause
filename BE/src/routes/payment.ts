@@ -139,18 +139,7 @@ console.log(paymentDetails);
 
 
 
-const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
-console.log(payment);
-if(!payment){
-    res.status(200).json({msg:"No such Order"})
-    return;
-}
-payment.status= paymentDetails.status;
-await payment.save();
-
-
-console.log(payment);
-
+if(paymentDetails.status=="captured"){
     const user = await User.findById(payment.notes?.userId);
     console.log("user");
     
@@ -187,6 +176,23 @@ console.log(payment);
 user.rentPaidUntil=new Date(Date.now());
 
     await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
+}
+
+
+const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
+console.log(payment);
+if(!payment){
+    res.status(200).json({msg:"No such Order"})
+    return;
+}
+
+payment.status= paymentDetails.status;
+await payment.save();
+
+
+console.log(payment);
+
+   
 
 //DATE MANIPULATION LOGIC 
 
