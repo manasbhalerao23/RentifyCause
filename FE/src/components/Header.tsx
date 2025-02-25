@@ -46,10 +46,10 @@ function Header() {
                 Create Blog
               </button>
             </Link>
-          ) : userInfo.role == "User" ? (
-            <button className="bg-red-600 text-white px-4 py-2 rounded-3xl cursor-pointer hover:bg-teal-500 transition duration-500 animate-pulse ease-in-out ">
+          ) : userInfo.role == "user" ? (
+           <Link to="/rent"> <button className="bg-red-600 text-white px-4 py-2 rounded-3xl cursor-pointer hover:bg-teal-500 transition duration-500 animate-pulse ease-in-out ">
               Rent
-            </button>
+            </button></Link>
           ) : (
             <div></div>
           )}
