@@ -151,7 +151,6 @@ console.log("---------------");
 
 console.log(payment);
 
-if(payment.status == "captured"){
     const user = await User.findById(payment.notes?.userId);
     if(!user){
         res.status(200).json({message: "No user found"});
@@ -182,16 +181,15 @@ if(payment.status == "captured"){
     user.monthstatus = paid_months;
     // user.set("monthstatus", paid_months) 
     await user.save();
-}
 
 //DATE MANIPULATION LOGIC 
-const user= await User.findOne({_id:payment.notes?.userId});//take num and add in date and save it
-if(!user){
+const anotherUser= await User.findOne({_id:payment.notes?.userId});//take num and add in date and save it
+if(!anotherUser){
     res.status(200).json({msg:"No such User"});
     return;
 }
-user.rentPaidUntil=new Date(Date.now());
-await user.save();
+anotherUser.rentPaidUntil=new Date(Date.now());
+await anotherUser.save();
 
  
 //return success response to razorpay
