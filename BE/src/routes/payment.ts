@@ -180,16 +180,12 @@ console.log(payment);
     
     user.monthstatus = paid_months;
     // user.set("monthstatus", paid_months) 
+user.rentPaidUntil=new Date(Date.now());
+
     await user.save();
 
 //DATE MANIPULATION LOGIC 
-const anotherUser= await User.findOne({_id:payment.notes?.userId});//take num and add in date and save it
-if(!anotherUser){
-    res.status(200).json({msg:"No such User"});
-    return;
-}
-anotherUser.rentPaidUntil=new Date(Date.now());
-await anotherUser.save();
+
 
  
 //return success response to razorpay
