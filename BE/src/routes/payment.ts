@@ -150,6 +150,8 @@ await payment.save();
 
 
 console.log(payment);
+console.log(payment.notes?.userId);
+
 
     const user = await User.findById(payment.notes?.userId);
     console.log("user");
