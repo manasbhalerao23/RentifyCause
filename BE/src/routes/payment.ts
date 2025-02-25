@@ -21,7 +21,7 @@ const paymentRouter= express.Router();
 //     currentDonation: string;
 //     totalDonation: string;
 //     address?: string;
-paymentRouter.post("/create", userAuth, async (req:AuthRequest,res:Response)=>{
+paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Response)=>{
     try{
         // const {amount}=req.body;
         // const {email,contact,username,id}= req?.user;
@@ -105,7 +105,7 @@ paymentRouter.post("/create", userAuth, async (req:AuthRequest,res:Response)=>{
     }
 })
 
-paymentRouter.post("/webhook", async (req,res)=>{
+paymentRouter.post("/payment/webhook", async (req,res)=>{
    try {
     const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
 const isWebhookValid=validateWebhookSignature(JSON.stringify(req.body),
@@ -116,8 +116,12 @@ if(!isWebhookValid){
      res.status(400).json({error: "Invalid webhook signature"})
      return;
 }
+console.log(isWebhookValid);
+
 //update payment status in db
 const paymentDetails=req.body.payload.payment.entity;
+console.log(paymentDetails);
+
 const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
 if(!payment){
     res.status(200).json({msg:"No such Order"})
@@ -125,6 +129,10 @@ if(!payment){
 }
 payment.status= paymentDetails.status;
 await payment.save();
+
+console.log("---------------");
+
+console.log(payment);
 
 //DATE MANIPULATION LOGIC 
 const user= await User.findOne({_id:payment.notes?.userId});

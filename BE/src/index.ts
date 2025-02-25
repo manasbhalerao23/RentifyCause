@@ -25,7 +25,7 @@ app.get("/",async (req:Request,res:Response)=>{
 })
 app.use("/auth", authRouter);
 app.use("/blog",blogRouter);
-app.use("/payment",paymentRouter);
+app.use("/",paymentRouter);
 
 
 async function main() {
