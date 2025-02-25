@@ -12,6 +12,8 @@ const Rent = ()=>{
 const [num]=useState(3);
 const handleRent= async ()=>{
     try{
+        console.log(num);
+        
 const order= await axios.post( `${BACKEND_URL}/payment/create`,{
   num:num  
 },{
