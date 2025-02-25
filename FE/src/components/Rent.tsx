@@ -9,7 +9,7 @@ declare global {
     }
   }
 const Rent = ()=>{
-const [num]=useState(1);
+const [num]=useState(3);
 const handleRent= async ()=>{
     try{
 const order= await axios.post( `${BACKEND_URL}/payment/create`,{
