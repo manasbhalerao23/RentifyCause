@@ -151,7 +151,7 @@ console.log("---------------");
 
 console.log(payment);
 
-if(payment.status === "captured"){
+if(payment.status == "captured"){
     const user = await User.findById(payment.notes?.userId);
     if(!user){
         res.status(200).json({message: "No user found"});
@@ -160,7 +160,13 @@ if(payment.status === "captured"){
 
     let paid_months = user.monthstatus;//arr
     let monthsupdate = payment.notes?.months_paid;//months payment
+    console.log("arr" +paid_months );
+    console.log("Months update "+ monthsupdate);
+    
+
     const currentmonth = new Date().getMonth()+6; /// yahan bhi kaayde se +1 hoga bas 
+    console.log("curr"+currentmonth);
+    
     for(let i=0; i < paid_months.length; i++){  
         if(!paid_months[i] && i <= currentmonth && monthsupdate as number > 0){
             paid_months[i] = true;
@@ -171,6 +177,8 @@ if(payment.status === "captured"){
             break;
         }
     }
+    console.log("updated arr"+paid_months);
+    
     user.monthstatus = paid_months;
     // user.set("monthstatus", paid_months) 
     await user.save();
