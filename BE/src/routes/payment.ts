@@ -4,7 +4,7 @@ import { AuthRequest, userAuth } from "../middlewares/auth";
 import razorpayInstance from "../config/razorpay"
 import { Response } from "express";
 import {paymentModel, User} from "../models/db"
-const {validateWebhookSignature} = require('razorpay/dist/utils/razorpay-utils')
+import { validateWebhookSignature } from 'razorpay/dist/utils/razorpay-utils';
 
 dotenv.config()
 
@@ -21,7 +21,23 @@ const paymentRouter= express.Router();
 //     currentDonation: string;
 //     totalDonation: string;
 //     address?: string;
-paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Response)=>{
+
+const getmonths = (months_paid: boolean [], num: number) => {
+    let months = 0;
+    const currentmonth = new Date().getMonth();
+
+    for(let i=0; i < months_paid.length; i++){
+        if(!months_paid[i] && i <= currentmonth){
+            months++;
+            if(months === num){
+                break;
+            }
+        }
+    }
+    return months;
+};
+
+paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Response): Promise<void> =>{
     try{
         // const {amount}=req.body;
         // const {email,contact,username,id}= req?.user;
@@ -30,14 +46,28 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
         const contact= req.user?.contact ?? "";
         const username= req.user?.username ?? "";
         const {num}= req.body // Num= number of month
-        if(num<=0 || num>6){
+        if(num<=0 || num>3){
             res.status(500).json({msg: "Invalid number of months"})
             return;
         }
         
+        const user = await User.findById(id);
+        if(!user){
+            res.status(404).json({message: "User not found"});
+            return;
+        }
+        
+        const months_paid = user.monthstatus;
+        const payablemonths = getmonths(months_paid,num);
+
+        if(payablemonths === 0){
+            res.status(200).json({
+                message: "no dues"
+            });
+        }
 
         const order= await razorpayInstance.orders.create({
-            amount:100,//amount ko dynamic baad mein karte hai
+            amount:100*payablemonths,//amount ko dynamic baad mein karte hai
             currency:"INR",
             receipt:`rcpt_${id.slice(-6)}_${Date.now().toString().slice(-6)}`,
             notes:{
@@ -45,37 +75,13 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
                 email:email,
                 contact:contact,
                 username:username,
-                paymentType:"rent" 
+                paymentType:"rent" ,
+                months_paid: payablemonths
             }
 
         })
         
         
-        
-        // monthsPaid:{
-        //     type:Number,
-        //     required:true,
-        // },
-       
-        // notes:{
-        //     username:{
-        //         type:String,
-        //     },
-        //     email:{
-        //         type:String,
-        //     },
-        //     contact:{
-        //         type:String,
-        //     }
-            
-        // },
-        // paymentMethod:{
-        //     type:String,
-        //   },
-        //   paidAt:{
-        //     type:Date,
-           
-        //   }
         const payment= new paymentModel({
             orderId:order.id,
             status:order.status,
@@ -92,7 +98,7 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
 
 
         res.send({...savePayment.toJSON(),keyId:process.env.RAZORPAY_KEY_ID})
-        
+        return;
         
 
         
@@ -105,12 +111,12 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
     }
 })
 
-paymentRouter.post("/payment/webhook", async (req,res)=>{
+paymentRouter.post("/payment/webhook", async (req,res): Promise<void> => {
    try {
     const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
 const isWebhookValid=validateWebhookSignature(JSON.stringify(req.body),
- webhookSignature, 
- process.env.RAZORPAY_WEBHOOK_SECRET
+ webhookSignature as string, 
+ process.env.RAZORPAY_WEBHOOK_SECRET as string
 )
 if(!isWebhookValid){
      res.status(400).json({error: "Invalid webhook signature"})
@@ -134,8 +140,28 @@ console.log("---------------");
 
 console.log(payment);
 
+if(payment.status === "captured"){
+    const user = await User.findById(payment.notes?.userId);
+    if(!user){
+        res.status(200).json({message: "No user found"});
+        return ;
+    }
+
+    let paid_months = user.monthstatus;
+    let monthsupdate = payment.notes?.months_paid;
+    const currentmonth = new Date().getMonth();
+    for(let i=0; i < paid_months.length; i++){
+        if(!paid_months[i] && i <= currentmonth && monthsupdate as number > 0){
+            paid_months[i] = true;
+            (monthsupdate as number)--;
+        }
+    }
+    user.monthstatus = paid_months;
+    await user.save();
+}
+
 //DATE MANIPULATION LOGIC 
-const user= await User.findOne({_id:payment.notes?.userId});
+const user= await User.findOne({_id:payment.notes?.userId});//take num and add in date and save it
 if(!user){
     res.status(200).json({msg:"No such User"});
     return;
@@ -143,7 +169,7 @@ if(!user){
 user.rentPaidUntil=new Date(Date.now());
 await user.save();
 
-
+ 
 //return success response to razorpay
     // if (req.body.event == "payment.captured") {
 

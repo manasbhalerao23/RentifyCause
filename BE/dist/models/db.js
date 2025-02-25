@@ -101,7 +101,7 @@ const PaymentSchema = new mongoose_1.Schema({
 }, { timestamps: true });
 PaymentSchema.pre("save", function (next) {
     if (this.status === "captured" && !this.paidAt) {
-        this.paidAt = new Date();
+        this.paidAt = new Date(); //bult here the logic
     }
     next();
 });

@@ -23,7 +23,11 @@ const UserSchema = new Schema({
     totalDonation: {type: Number,
         default:0
     },
-    rentPaidUntil: { type: Date }
+    rentPaidUntil: { type: Date 
+    },
+    monthstatus: { type: [Boolean],
+        default: [true,true,false,false,false,false,false,false,false,false,false,false]
+    }
     },{ timestamps: true }
 );
 
@@ -101,8 +105,10 @@ const PaymentSchema=new Schema({
             },
             paymentType:{
                 type:String,
-                }
-            
+                },
+            months_paid:{
+                type: Number
+            }
         },
         paymentMethod:{
             type:String,
@@ -115,7 +121,7 @@ const PaymentSchema=new Schema({
 
 PaymentSchema.pre("save", function (next) {
     if (this.status === "captured" && !this.paidAt) {
-        this.paidAt = new Date();
+        this.paidAt = new Date();//bult here the logic
     }
     next();
 });

@@ -17,7 +17,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = require("../middlewares/auth");
 const razorpay_1 = __importDefault(require("../config/razorpay"));
 const db_1 = require("../models/db");
-const { validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
+const razorpay_utils_1 = require("razorpay/dist/utils/razorpay-utils");
 dotenv_1.default.config();
 const paymentRouter = express_1.default.Router();
 // username: string;
@@ -30,7 +30,7 @@ const paymentRouter = express_1.default.Router();
 //     currentDonation: string;
 //     totalDonation: string;
 //     address?: string;
-paymentRouter.post("/create", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     try {
         // const {amount}=req.body;
@@ -54,29 +54,8 @@ paymentRouter.post("/create", auth_1.userAuth, (req, res) => __awaiter(void 0, v
                 contact: contact,
                 username: username,
                 paymentType: "rent"
-            }
+            } //no fo months in db also
         });
-        // monthsPaid:{
-        //     type:Number,
-        //     required:true,
-        // },
-        // notes:{
-        //     username:{
-        //         type:String,
-        //     },
-        //     email:{
-        //         type:String,
-        //     },
-        //     contact:{
-        //         type:String,
-        //     }
-        // },
-        // paymentMethod:{
-        //     type:String,
-        //   },
-        //   paidAt:{
-        //     type:Date,
-        //   }
         const payment = new db_1.paymentModel({
             orderId: order.id,
             status: order.status,
@@ -95,17 +74,19 @@ paymentRouter.post("/create", auth_1.userAuth, (req, res) => __awaiter(void 0, v
         return;
     }
 }));
-paymentRouter.post("/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
-        const isWebhookValid = validateWebhookSignature(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
+        const isWebhookValid = (0, razorpay_utils_1.validateWebhookSignature)(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
         if (!isWebhookValid) {
             res.status(400).json({ error: "Invalid webhook signature" });
             return;
         }
+        console.log(isWebhookValid);
         //update payment status in db
         const paymentDetails = req.body.payload.payment.entity;
+        console.log(paymentDetails);
         const payment = yield db_1.paymentModel.findOne({ orderId: paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.order_id });
         if (!payment) {
             res.status(200).json({ msg: "No such Order" });
@@ -113,8 +94,10 @@ paymentRouter.post("/webhook", (req, res) => __awaiter(void 0, void 0, void 0, f
         }
         payment.status = paymentDetails.status;
         yield payment.save();
+        console.log("---------------");
+        console.log(payment);
         //DATE MANIPULATION LOGIC 
-        const user = yield db_1.User.findOne({ _id: (_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId });
+        const user = yield db_1.User.findOne({ _id: (_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId }); //take num and add in date and save it
         if (!user) {
             res.status(200).json({ msg: "No such User" });
             return;
