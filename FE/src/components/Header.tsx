@@ -75,7 +75,7 @@ function Header() {
                       {userInfo.username ?
                         <button className="cursor-pointer">
                         Logout
-                        </button>: <button className="cursor-pointer rounded-lg bg-red-200 px-3 hover:bg-blue-400 transition duration-500">   <Link to="/auth"> Register/Login   </Link>  </button>}
+                        </button>:<Link to="/auth"> <button className="cursor-pointer rounded-lg bg-red-200 px-3 hover:bg-blue-400 transition duration-500">    Register/Login     </button></Link>}
                     </div>
                 </div>
     </header>

@@ -38,7 +38,7 @@ function DashBoard() {
                         <div className="hidden md:flex space-x-6">
                             <a href="#" className="text-gray-700 hover:text-red-600">Home</a>
                             <a href="#" className="text-gray-700 hover:text-red-600">About Us</a>
-                           <Link to="/card"> <a href="#" className="text-gray-700 hover:text-red-600">Services</a></Link>
+                           <Link to="/card"> Services</Link>
                             <a href="#" className="text-gray-700 hover:text-red-600">Contact</a>
                         </div>
                         <button className="animate-pulse bg-red-600 text-white px-6 p-2 rounded-full hover:bg-teal-500 transition-all duration-500 cursor-pointer">

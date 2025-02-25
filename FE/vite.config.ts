@@ -8,4 +8,9 @@ export default defineConfig({
   define: {
     global: "window", // Fix for Draft.js
   },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true, // Enables transformation of mixed ES modules
+    },
+  },
 })
