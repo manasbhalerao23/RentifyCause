@@ -158,13 +158,17 @@ if(payment.status === "captured"){
         return ;
     }
 
-    let paid_months = user.monthstatus;
-    let monthsupdate = payment.notes?.months_paid;
-    const currentmonth = new Date().getMonth();
+    let paid_months = user.monthstatus;//arr
+    let monthsupdate = payment.notes?.months_paid;//months payment
+    const currentmonth = new Date().getMonth()+6; /// yahan bhi kaayde se +1 hoga bas 
     for(let i=0; i < paid_months.length; i++){  
         if(!paid_months[i] && i <= currentmonth && monthsupdate as number > 0){
             paid_months[i] = true;
             (monthsupdate as number)--;
+        }
+
+        if(monthsupdate==0){
+            break;
         }
     }
     user.monthstatus = paid_months;
