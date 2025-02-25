@@ -24,7 +24,7 @@ const paymentRouter= express.Router();
 
 const getmonths = (months_paid: boolean [], num: number) => {
     let months = 0;
-    const currentmonth = new Date().getMonth()+6;// rn we will do +4 but actually it should be +1
+    const currentmonth = new Date().getMonth()+1;
     console.log("current"+ currentmonth);
     
 
@@ -169,7 +169,7 @@ console.log(payment.notes?.userId);
     console.log("Months update "+ monthsupdate);
     
 
-    const currentmonth = new Date().getMonth()+6; /// yahan bhi kaayde se +1 hoga bas 
+    const currentmonth = new Date().getMonth()+1;  
     console.log("curr"+currentmonth);
     
     for(let i=0; i < paid_months.length; i++){  
