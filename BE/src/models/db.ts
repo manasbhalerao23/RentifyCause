@@ -26,7 +26,7 @@ const UserSchema = new Schema({
     rentPaidUntil: { type: Date 
     },
     monthstatus: { type: [Boolean],
-        default: [true,true,false,false,false,false,false,false,false,false,false,false]
+        default: ()=> [true,true,false,false,false,false,false,false,false,false,false,false]
     }
     },{ timestamps: true }
 );

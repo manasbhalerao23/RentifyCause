@@ -25,7 +25,11 @@ const UserSchema = new mongoose_1.Schema({
     totalDonation: { type: Number,
         default: 0
     },
-    rentPaidUntil: { type: Date }
+    rentPaidUntil: { type: Date
+    },
+    monthstatus: { type: [Boolean],
+        default: () => [true, true, false, false, false, false, false, false, false, false, false, false]
+    }
 }, { timestamps: true });
 exports.User = (0, mongoose_1.model)('User', UserSchema);
 //admin
@@ -90,6 +94,9 @@ const PaymentSchema = new mongoose_1.Schema({
         },
         paymentType: {
             type: String,
+        },
+        months_paid: {
+            type: Number
         }
     },
     paymentMethod: {

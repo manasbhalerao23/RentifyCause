@@ -30,6 +30,20 @@ const paymentRouter = express_1.default.Router();
 //     currentDonation: string;
 //     totalDonation: string;
 //     address?: string;
+const getmonths = (months_paid, num) => {
+    let months = 0;
+    const currentmonth = new Date().getMonth() + 4; // rn we will do +4 but actually it should be +1
+    console.log("current" + currentmonth);
+    for (let i = 0; i < months_paid.length; i++) {
+        if (!months_paid[i] && i <= currentmonth) {
+            months++;
+            if (months === num) {
+                break;
+            }
+        }
+    }
+    return months;
+};
 paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     try {
@@ -40,12 +54,29 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
         const contact = (_f = (_e = req.user) === null || _e === void 0 ? void 0 : _e.contact) !== null && _f !== void 0 ? _f : "";
         const username = (_h = (_g = req.user) === null || _g === void 0 ? void 0 : _g.username) !== null && _h !== void 0 ? _h : "";
         const { num } = req.body; // Num= number of month
-        if (num <= 0 || num > 6) {
+        if (num <= 0 || num > 3) {
             res.status(500).json({ msg: "Invalid number of months" });
             return;
         }
+        const user = yield db_1.User.findById(id);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        const months_paid = user.monthstatus;
+        const payablemonths = getmonths(months_paid, num);
+        console.log(months_paid);
+        console.log(payablemonths);
+        user.save();
+        console.log(user.monthstatus);
+        if (payablemonths === 0) {
+            res.status(200).json({
+                message: "no dues"
+            });
+            return;
+        }
         const order = yield razorpay_1.default.orders.create({
-            amount: 100, //amount ko dynamic baad mein karte hai
+            amount: 100 * payablemonths, //amount ko dynamic baad mein karte hai
             currency: "INR",
             receipt: `rcpt_${id.slice(-6)}_${Date.now().toString().slice(-6)}`,
             notes: {
@@ -53,8 +84,9 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
                 email: email,
                 contact: contact,
                 username: username,
-                paymentType: "rent"
-            } //no fo months in db also
+                paymentType: "rent",
+                months_paid: payablemonths
+            }
         });
         const payment = new db_1.paymentModel({
             orderId: order.id,
@@ -67,6 +99,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
         const savePayment = yield payment.save();
         console.log(savePayment);
         res.send(Object.assign(Object.assign({}, savePayment.toJSON()), { keyId: process.env.RAZORPAY_KEY_ID }));
+        return;
     }
     catch (err) {
         console.log(err);
@@ -75,7 +108,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
     }
 }));
 paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b, _c;
     try {
         const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
         const isWebhookValid = (0, razorpay_utils_1.validateWebhookSignature)(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
@@ -96,8 +129,27 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
         yield payment.save();
         console.log("---------------");
         console.log(payment);
+        if (payment.status === "captured") {
+            const user = yield db_1.User.findById((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId);
+            if (!user) {
+                res.status(200).json({ message: "No user found" });
+                return;
+            }
+            let paid_months = user.monthstatus;
+            let monthsupdate = (_b = payment.notes) === null || _b === void 0 ? void 0 : _b.months_paid;
+            const currentmonth = new Date().getMonth();
+            for (let i = 0; i < paid_months.length; i++) {
+                if (!paid_months[i] && i <= currentmonth && monthsupdate > 0) {
+                    paid_months[i] = true;
+                    monthsupdate--;
+                }
+            }
+            // user.monthstatus = paid_months;
+            user.set("monthstatus", paid_months);
+            yield user.save();
+        }
         //DATE MANIPULATION LOGIC 
-        const user = yield db_1.User.findOne({ _id: (_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId }); //take num and add in date and save it
+        const user = yield db_1.User.findOne({ _id: (_c = payment.notes) === null || _c === void 0 ? void 0 : _c.userId }); //take num and add in date and save it
         if (!user) {
             res.status(200).json({ msg: "No such User" });
             return;

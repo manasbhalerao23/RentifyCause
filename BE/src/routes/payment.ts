@@ -24,7 +24,9 @@ const paymentRouter= express.Router();
 
 const getmonths = (months_paid: boolean [], num: number) => {
     let months = 0;
-    const currentmonth = new Date().getMonth();
+    const currentmonth = new Date().getMonth()+6;// rn we will do +4 but actually it should be +1
+    console.log("current"+ currentmonth);
+    
 
     for(let i=0; i < months_paid.length; i++){
         if(!months_paid[i] && i <= currentmonth){
@@ -59,13 +61,20 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
         
         const months_paid = user.monthstatus;
         const payablemonths = getmonths(months_paid,num);
+console.log(months_paid);
+console.log(payablemonths);
+
+user.save();
+console.log(user.monthstatus);
 
         if(payablemonths === 0){
             res.status(200).json({
                 message: "no dues"
             });
+            return;
         }
 
+        
         const order= await razorpayInstance.orders.create({
             amount:100*payablemonths,//amount ko dynamic baad mein karte hai
             currency:"INR",
@@ -150,13 +159,14 @@ if(payment.status === "captured"){
     let paid_months = user.monthstatus;
     let monthsupdate = payment.notes?.months_paid;
     const currentmonth = new Date().getMonth();
-    for(let i=0; i < paid_months.length; i++){
+    for(let i=0; i < paid_months.length; i++){  
         if(!paid_months[i] && i <= currentmonth && monthsupdate as number > 0){
             paid_months[i] = true;
             (monthsupdate as number)--;
         }
     }
-    user.monthstatus = paid_months;
+    // user.monthstatus = paid_months;
+    user.set("monthstatus", paid_months) 
     await user.save();
 }
 
