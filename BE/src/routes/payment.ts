@@ -137,6 +137,8 @@ console.log(isWebhookValid);
 const paymentDetails=req.body.payload.payment.entity;
 console.log(paymentDetails);
 
+
+
 const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
 if(!payment){
     res.status(200).json({msg:"No such Order"})
@@ -165,8 +167,8 @@ if(payment.status === "captured"){
             (monthsupdate as number)--;
         }
     }
-    // user.monthstatus = paid_months;
-    user.set("monthstatus", paid_months) 
+    user.monthstatus = paid_months;
+    // user.set("monthstatus", paid_months) 
     await user.save();
 }
 
