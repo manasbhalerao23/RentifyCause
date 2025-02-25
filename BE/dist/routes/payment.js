@@ -95,7 +95,7 @@ paymentRouter.post("/create", auth_1.userAuth, (req, res) => __awaiter(void 0, v
         return;
     }
 }));
-paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+paymentRouter.post("/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
