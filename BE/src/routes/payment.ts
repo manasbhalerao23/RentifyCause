@@ -137,11 +137,9 @@ console.log(isWebhookValid);
 const paymentDetails=req.body.payload.payment.entity;
 console.log(paymentDetails);
 
-console.log("---------------");
 
 
 const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
-console.log("---------------");
 console.log(payment);
 if(!payment){
     res.status(200).json({msg:"No such Order"})
@@ -150,12 +148,15 @@ if(!payment){
 payment.status= paymentDetails.status;
 await payment.save();
 
-console.log("---------------");
 
 console.log(payment);
 
     const user = await User.findById(payment.notes?.userId);
+    console.log("user");
+    
     if(!user){
+        console.log("user");
+        
         res.status(200).json({message: "No user found"});
         return ;
     }
