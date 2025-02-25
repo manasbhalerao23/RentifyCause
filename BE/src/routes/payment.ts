@@ -182,11 +182,11 @@ console.log(payment);
     }
     console.log("updated arr"+paid_months);
     
-    user.monthstatus = paid_months;
-    // user.set("monthstatus", paid_months) 
+    // user.monthstatus = paid_months;
+    user.set("monthstatus", paid_months) 
 user.rentPaidUntil=new Date(Date.now());
 
-    await user.save();
+    await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
 
 //DATE MANIPULATION LOGIC 
 
