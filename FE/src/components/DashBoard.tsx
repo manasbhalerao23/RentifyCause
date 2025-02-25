@@ -4,11 +4,11 @@ import { Link } from "react-router-dom";
 function DashBoard() {
     const slides = [
         {
-            image: "http://redcross.mp.gov.in/uploads/slider/slider3.jpg",
+            image: "http://res.cloudinary.com/dz0sdsbfa/image/upload/v1740478250/xxitrygoahsg2zfocaej.jpg",
             title: "Helping Those In Need",
         },
         {
-            image: "http://redcross.mp.gov.in/uploads/slider/slider21.jpg",
+            image: "http://res.cloudinary.com/dz0sdsbfa/image/upload/v1740478248/x4aoyrojmicf30j1q7u5.jpg",
             title: " Response",
         }
     ];

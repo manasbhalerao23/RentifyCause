@@ -29,7 +29,7 @@ function Header() {
         <div className="flex items-center space-x-4">
         <Link to="/">
           <div className=" flex items-center gap-3">
-            <img className="h-28" src="http://redcross.mp.gov.in/assets/img/logo/mp-redcross-logo.png"/>
+            <img className="h-28" src="http://res.cloudinary.com/dz0sdsbfa/image/upload/v1740478249/u2eaqolxjdlpwk9kwqia.png"/>
             <div>
             <h1 className="text-2xl font-bold">
                Indian Red Cross Society
