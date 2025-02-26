@@ -49,6 +49,7 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
         monthRent:user.monthRent,
         totalDonation:user.totalDonation,
         role:user.role,
+        shopName:user.shopName
 
       }
       res.json({ msg:sendingUser });

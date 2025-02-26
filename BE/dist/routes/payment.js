@@ -88,6 +88,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
                 months_paid: payablemonths
             }
         });
+        const receiptID = order.receipt;
         const payment = new db_1.paymentModel({
             orderId: order.id,
             status: order.status,
@@ -98,7 +99,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
         });
         const savePayment = yield payment.save();
         console.log(savePayment);
-        res.send(Object.assign(Object.assign({}, savePayment.toJSON()), { keyId: process.env.RAZORPAY_KEY_ID }));
+        res.send(Object.assign(Object.assign({}, savePayment.toJSON()), { keyId: process.env.RAZORPAY_KEY_ID, receiptId: receiptID }));
         return;
     }
     catch (err) {

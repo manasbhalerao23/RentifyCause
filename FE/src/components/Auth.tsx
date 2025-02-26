@@ -12,7 +12,7 @@ function AuthForm() {
     const [password, setpassword] = useState("");
     const [contact, setcontact] = useState("");
     const [address, setaddress] = useState("");
-    const [shopname, setshopname] = useState("");
+    const [shopName, setshopName] = useState("");
     const [email, setemail] = useState("");
     const dispatch = useDispatch();
 
@@ -30,7 +30,7 @@ function AuthForm() {
         if(!isLogin){
             try{
                 const res = await axios.post(`${BACKEND_URL}/auth/signup`,
-                    {username,password,contact,address,shopname,email}
+                    {username,password,contact,address,shopName,email}
                     // {withCredentials: true}
                 );
                 console.log(res?.data);
@@ -59,6 +59,7 @@ function AuthForm() {
                     monthRent:data.monthRent,//
                     totalDonation:data.totalDonation,//
                     role:data.role,//
+                    shopName:data.shopName,
                     language:"English"
                 }
 dispatch(setUser(user));
@@ -107,7 +108,7 @@ console.log(user);
                         <>
                             <input type="text" value={contact} placeholder="Contact" onChange={(e) => setcontact(e.target.value)} required className="w-full p-2 border rounded-xl" />
                             <input type="text" value={address} placeholder="Address" onChange={(e) => setaddress(e.target.value)} required className="w-full p-2 border rounded-xl" />
-                            <input type="text" value={shopname} placeholder="Shop Name" onChange={(e) => setshopname(e.target.value)} required className="w-full p-2 border rounded-xl" />
+                            <input type="text" value={shopName} placeholder="Shop Name" onChange={(e) => setshopName(e.target.value)} required className="w-full p-2 border rounded-xl" />
                             <input type="email" value={email} placeholder="Email" onChange={(e) => setemail(e.target.value)} required className="w-full p-2 border rounded-xl" />
                         </>
                     )}

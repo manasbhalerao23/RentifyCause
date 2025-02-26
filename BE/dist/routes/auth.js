@@ -51,6 +51,7 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
             monthRent: user.monthRent,
             totalDonation: user.totalDonation,
             role: user.role,
+            shopName: user.shopName
         };
         res.json({ msg: sendingUser });
         return;

@@ -12,7 +12,7 @@ function ProfileBar({closeSidebar}: ProfileBarProps) {
     const userInfo = useSelector((store:RootState) => store.cart);
 
     return(
-        <div className="fixed top-0 right-0 h-full w-64 bg-white shadow-lg p-5 transition-transform transform translate-x-0 z-50 rounded-l-lg">
+        <div className="fixed top-0 right-0 h-96 w-64 bg-white shadow-lg p-5 transition-transform transform translate-x-0 z-50 rounded-l-lg">
       <button className="absolute top-2 right-2 text-gray-500 cursor-pointer" onClick={() => {
         closeSidebar();}}>
         <X size={24} />

@@ -74,7 +74,6 @@ console.log(user.monthstatus);
             return;
         }
 
-        
         const order= await razorpayInstance.orders.create({
             amount:100*payablemonths,//amount ko dynamic baad mein karte hai
             currency:"INR",
@@ -89,6 +88,7 @@ console.log(user.monthstatus);
             }
 
         })
+        const receiptID= order.receipt;
         
         
         const payment= new paymentModel({
@@ -106,7 +106,7 @@ console.log(user.monthstatus);
 
 
 
-        res.send({...savePayment.toJSON(),keyId:process.env.RAZORPAY_KEY_ID})
+        res.send({...savePayment.toJSON(),keyId:process.env.RAZORPAY_KEY_ID,receiptId:receiptID})
         return;
         
 
