@@ -10,6 +10,7 @@ import AuthForm from "./components/Auth";
 import { Provider } from "react-redux";
 import store from "./Utils/store";
 import Rent from "./components/Rent";
+import ProfilePage from "./components/ProfileBar";
 function App() {
   return (
     <Provider store={store}>
@@ -26,7 +27,8 @@ function App() {
         {/* </Route> */}
         <Route path="/openBlog/:blogId" element={<OpenBlog/>}/>
         <Route path="/rent" element={<Rent/>}/>
-
+        <Route path="/profile" element={<ProfilePage/>}/>
+        
         </Route>
       </Routes>
     </BrowserRouter>

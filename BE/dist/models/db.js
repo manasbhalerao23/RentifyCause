@@ -28,7 +28,7 @@ const UserSchema = new mongoose_1.Schema({
     rentPaidUntil: { type: Date
     },
     monthstatus: { type: [Boolean],
-        default: () => [true, true, false, false, false, false, false, false, false, false, false, false]
+        default: () => [true, false, false, false, false, false, false, false, false, false, false, false]
     }
 }, { timestamps: true });
 exports.User = (0, mongoose_1.model)('User', UserSchema);

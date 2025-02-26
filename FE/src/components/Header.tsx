@@ -1,16 +1,21 @@
-import { CircleUserRound, Facebook, Twitter, Youtube } from "lucide-react";
+import { Circle, CircleUserRound, Facebook, Twitter, Youtube } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { changeLanguage } from "../Utils/cartSlice";
 import { RootState } from "../Utils/store";
+import ProfileBar from "./ProfileBar";
+import { useState } from "react";
 function Header() {
+  const [profileopen, setprofileopen] = useState(false);
   const userInfo = useSelector((store:RootState) => store.cart);
   const dispatch = useDispatch();
   const changeLang = () => {
     if (userInfo.language == "English") dispatch(changeLanguage("हिन्दी"));
     else dispatch(changeLanguage("English"));
   };
+  
   return (
+    <>
     <header>
       <div className="flex justify-between items-center px-6  text-sm bg-red-600">
         <div className="flex space-x-4 ">
@@ -53,10 +58,16 @@ function Header() {
           ) : (
             <div></div>
           )}
-          {userInfo.username ? <button className="rounded-md flex gap-1 font-medium cursor-pointer">
-            <CircleUserRound />
-            {userInfo.username}
-          </button> : <div>
+          {userInfo.username ? 
+          <button className="rounded-md flex gap-1 font-medium cursor-pointer relative" onClick={() => {setprofileopen(true)}}>
+            <Circle className="w-10 h-10 text-blue-500 flex items-center justify-center text-xl font-bold">
+            </Circle>
+            
+            {/* Letter inside the circle */}
+            <span className="absolute inset-0 flex items-center justify-center text-black font-bold text-xl">
+              {userInfo.username.charAt(0).toUpperCase()}
+            </span>
+          </button>  : <div>
           <button className="rounded-md flex gap-1 font-medium cursor-pointer">
             <CircleUserRound />
             Guest
@@ -80,6 +91,9 @@ function Header() {
                 </div>
     </header>
     
+     {/* Profile Sidebar */}
+     {profileopen && <ProfileBar closeSidebar={() => setprofileopen(false)} />}
+     </>
   );
 }
 

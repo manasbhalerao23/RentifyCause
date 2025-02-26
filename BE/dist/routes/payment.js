@@ -32,7 +32,7 @@ const paymentRouter = express_1.default.Router();
 //     address?: string;
 const getmonths = (months_paid, num) => {
     let months = 0;
-    const currentmonth = new Date().getMonth() + 4; // rn we will do +4 but actually it should be +1
+    const currentmonth = new Date().getMonth();
     console.log("current" + currentmonth);
     for (let i = 0; i < months_paid.length; i++) {
         if (!months_paid[i] && i <= currentmonth) {
@@ -121,41 +121,43 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
         const paymentDetails = req.body.payload.payment.entity;
         console.log(paymentDetails);
         const payment = yield db_1.paymentModel.findOne({ orderId: paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.order_id });
+        console.log(payment);
         if (!payment) {
             res.status(200).json({ msg: "No such Order" });
             return;
         }
         payment.status = paymentDetails.status;
         yield payment.save();
-        console.log("---------------");
         console.log(payment);
-        if (payment.status === "captured") {
-            const user = yield db_1.User.findById((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId);
-            if (!user) {
-                res.status(200).json({ message: "No user found" });
-                return;
-            }
-            let paid_months = user.monthstatus;
-            let monthsupdate = (_b = payment.notes) === null || _b === void 0 ? void 0 : _b.months_paid;
-            const currentmonth = new Date().getMonth();
-            for (let i = 0; i < paid_months.length; i++) {
-                if (!paid_months[i] && i <= currentmonth && monthsupdate > 0) {
-                    paid_months[i] = true;
-                    monthsupdate--;
-                }
-            }
-            // user.monthstatus = paid_months;
-            user.set("monthstatus", paid_months);
-            yield user.save();
-        }
-        //DATE MANIPULATION LOGIC 
-        const user = yield db_1.User.findOne({ _id: (_c = payment.notes) === null || _c === void 0 ? void 0 : _c.userId }); //take num and add in date and save it
+        console.log((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId);
+        const user = yield db_1.User.findById((_b = payment.notes) === null || _b === void 0 ? void 0 : _b.userId);
+        console.log("user");
         if (!user) {
-            res.status(200).json({ msg: "No such User" });
+            console.log("user");
+            res.status(200).json({ message: "No user found" });
             return;
         }
+        let paid_months = user.monthstatus; //arr
+        let monthsupdate = (_c = payment.notes) === null || _c === void 0 ? void 0 : _c.months_paid; //months payment
+        console.log("arr" + paid_months);
+        console.log("Months update " + monthsupdate);
+        const currentmonth = new Date().getMonth();
+        console.log("curr" + currentmonth);
+        for (let i = 0; i < paid_months.length; i++) {
+            if (!paid_months[i] && i <= currentmonth && monthsupdate > 0) {
+                paid_months[i] = true;
+                monthsupdate--;
+            }
+            if (monthsupdate == 0) {
+                break;
+            }
+        }
+        console.log("updated arr" + paid_months);
+        // user.monthstatus = paid_months;
+        user.set("monthstatus", paid_months);
         user.rentPaidUntil = new Date(Date.now());
-        yield user.save();
+        yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
+        //DATE MANIPULATION LOGIC 
         //return success response to razorpay
         // if (req.body.event == "payment.captured") {
         // }

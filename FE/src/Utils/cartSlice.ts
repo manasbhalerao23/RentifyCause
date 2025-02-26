@@ -2,16 +2,16 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserInfo {
     _id: string;
-    username: string;
-    email: string;
+    username: string;//
+    email: string;//
     language: string;
-    address:string;
-    contact:string;
+    address:string;//
+    contact:string;//
     currentDonation:string;
     currentRent:string;
-    monthRent:string;
+    monthRent:string;//
     role:string;
-    totalDonation:string;
+    totalDonation:string;//
     
 
 }
