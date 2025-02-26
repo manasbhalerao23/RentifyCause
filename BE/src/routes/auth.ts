@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 import {Request , Response, Router} from "express"
 import { send } from "process"
+import { AuthRequest, userAuth } from "../middlewares/auth"
 dotenv.config()
 
 const authRouter= express.Router();
@@ -22,6 +23,7 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
       ]}
     );
     console.log(user);
+    
     
     if(!user){
     
@@ -49,9 +51,12 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
         monthRent:user.monthRent,
         totalDonation:user.totalDonation,
         role:user.role,
-        shopName:user.shopName
+        shopName:user.shopName,
+        monthStatus:user.monthstatus
 
       }
+    console.log(user?.monthstatus);
+console.log(sendingUser.monthStatus);
       res.json({ msg:sendingUser });
       return;
 
@@ -66,7 +71,46 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
   }
 })
 
+authRouter.post("/getInfo",userAuth,async (req:AuthRequest, res:Response)=>{
+  try{
 
+    const {id}= req.body;
+    if(!id){
+      res.status(400).json({ error: "Id not found" });
+      return;
+    }
+    const user= await User.findById(id);
+    if(!user){
+      res.status(400).json({ error: "Not Found User" });
+      return;
+      }
+
+    const sendingUser={
+      _id:user._id,
+      username:user.username,
+      email:user.email,
+      address:user.address,
+      contact:user.contact,
+      currentDonation:user.currentDonation,
+      currentRent:user.currentRent,
+      monthRent:user.monthRent,
+      totalDonation:user.totalDonation,
+      role:user.role,
+      shopName:user.shopName,
+      monthStatus:user.monthstatus
+
+    }
+    res.json({ msg:sendingUser });
+    return;
+
+
+
+  }catch(err){
+    console.log(err)
+    res.status(500).json({ error: "Internal Server Error" });
+    return;
+  }
+})
 
 authRouter.post("/signup",async (req: Request,res: Response)=>{
 

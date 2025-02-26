@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
 import { BACKEND_URL } from "../config";
-import { Circle } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../Utils/store";
+import { setUser } from "../Utils/cartSlice";
 
 declare global {
   interface Window {
@@ -9,42 +11,61 @@ declare global {
     Razorpay: any;
   }
 }
+
 const Rent = () => {
-  const [num] = useState(3);
+  const dispatch = useDispatch();
+  const userInfo = useSelector((store: RootState) => store.cart);
+  console.log(userInfo);
+const [rcpt, setRcpt]=useState("");
+const [orderInfo,setOrderInfo]=useState("")
+  const gettingNewData = async () => {
+    const res = await axios.post(
+      `${BACKEND_URL}/auth/getInfo`,
+      { id: userInfo._id },
+      { withCredentials: true }
+    );
+    const user = res.data;
+    console.log(user?.msg);
+    dispatch(setUser(user?.msg));
+  };
+
+  const [num, setNum] = useState(0);
+
   const handleRent = async () => {
     try {
-      console.log(num);
+      if (num === 0) {
+        alert("Please select number of Months");
+        return;
+      }
 
       const order = await axios.post(
         `${BACKEND_URL}/payment/create`,
-        {
-          num: num,
-        },
-        {
-          withCredentials: true,
-        }
+        { num: num },
+        { withCredentials: true }
       );
-      console.log(order);
 
       const { amount, currency, orderId, keyId, notes } = order.data;
 
       const options = {
-        key: keyId, // Replace with your Razorpay key_id
-        amount: amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        key: keyId,
+        amount: amount,
         currency: currency,
-        name: "Red Cross Society Rent payment",
+        name: "Red Cross Society Rent Payment",
         description: "Rent Transaction",
-        order_id: orderId, // This is the order_id created in the backend
-        // callback_url: 'http://localhost:3000/payment-success', // Your success URL
+        order_id: orderId,
         prefill: {
           name: notes.username,
           email: notes.email,
           contact: notes.contact,
         },
-        theme: {
-          color: "#F37254",
-        },
+        theme: { color: "#F37254" },
+        handler: gettingNewData,
       };
+      console.log(order);
+      setOrderInfo(order.data.orderId)
+      setRcpt(order.data.receiptId)
+
+
 
       const rzp = new window.Razorpay(options);
       rzp.open();
@@ -52,111 +73,81 @@ const Rent = () => {
       console.log(err);
     }
   };
-  {
-    /**/
-  }
 
   return (
-    <div className="container h-screen grid grid-rows-[10%_15%_10%_65%] border ">
-      <div className="flex justify-center items-center text-2xl font-bold">
-        User Info
-      </div>
-      <div className="grid grid-cols-3 justify-items-center text-[17px]">
-        <div className="grid grid-rows-3">
-          <div>Name</div>
-          <div>Email</div>
-          <div>Contact</div>
-        </div>
-        <div className="grid grid-rows-3">
-          <div>Shop Name</div>
-          <div>Shop Address</div>
-          <div>Total Donation</div>
-        </div>
-        <div className="flex items-center justify-center">
-          <div className="w-40 h-40 flex items-center justify-center rounded-full bg-blue-500  border-amber-400 border-solid border-8 text-white text-xl font-bold shadow-lg">
-            Content
+    <div className="container mx-auto p-5 h-screen flex flex-col gap-6 bg-gray-100 shadow-lg rounded-xl">
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center mb-4">User Info</h2>
+        <div className="grid grid-cols-3 gap-6">
+          <div>
+            <p className="text-lg font-semibold">Name: {userInfo.username}</p>
+            <p>Email: {userInfo.email}</p>
+            <p>Contact: {userInfo.contact}</p>
+          </div>
+          <div>
+            <p className="text-lg font-semibold">Shop Name: {userInfo.shopName}</p>
+            <p>Address: {userInfo.address}</p>
+            <p>Total Donation: {userInfo.totalDonation}</p>
+          </div>
+          <div className="flex justify-center items-center">
+            <div className="w-24 h-24 flex items-center justify-center rounded-full bg-blue-500 border-4 border-amber-400 text-white text-3xl font-bold shadow-lg">
+              {userInfo.username[0]}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="flex justify-center items-center text-2xl font-bold">
-        Rent Info
       </div>
 
-      <div className="grid grid-cols-[60%_40%] border p-2 px-5">
-        <div className=" grid grid-rows-[45%_20%_35%]">
-          <div className="grid grid-rows-[10%_30%_30%_30%]">
-            <div className="flex items-center justify-center font-bold">
-              Months Paid
-            </div>
-            <div className="grid grid-cols-4 gap-4 p-2">
-              <div className="border flex items-center justify-center">
-                January
-              </div>
-              <div className="border flex items-center justify-center">
-                February
-              </div>
-              <div className="border flex items-center justify-center">
-                March
-              </div>
-              <div className="border flex items-center justify-center">
-                April
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-4 p-2">
-              <div className="border flex items-center justify-center">May</div>
-              <div className="border flex items-center justify-center">
-                June
-              </div>
-              <div className="border flex items-center justify-center">
-                July
-              </div>
-              <div className="border flex items-center justify-center">
-                August
-              </div>
-            </div>
-            <div className="grid grid-cols-4 gap-4 p-2">
-              <div className="border flex items-center justify-center">
-                September
-              </div>
-              <div className="border flex items-center justify-center">
-                October
-              </div>
-              <div className="border flex items-center justify-center">
-                Number
-              </div>
-              <div className="border flex items-center justify-center">
-                December
-              </div>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center mb-4">Rent Info</h2>
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-lg font-bold mb-3">Months Paid</h3>
+            <div className="grid grid-cols-4 gap-2">
+              {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map(
+                (month, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-md text-center shadow-md font-medium ${
+                      userInfo.monthStatus[index] ? "bg-green-300 border-2 border-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    {month}
+                  </div>
+                )
+              )}
             </div>
           </div>
-          <div className="grid grid-rows-2 ">
-            <div>Month Rent</div>
-            <div>Fine</div>
-          </div>
-          <div className="grid grid-rows-[50%_20%_30%] pb-2">
-            <div className="grid grid-rows-[30%_70%]">
-              <div>Number of Month</div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex justify-center items-center border">1</div>
-                <div className="flex justify-center items-center border">2</div>
-                <div className="flex justify-center items-center border">3</div>
-                
+          <div className="flex flex-col justify-between">
+          <p className="text-lg font-semibold">Month Rent: {Number(userInfo.monthRent) * num}</p>
+<p className="text-lg font-semibold">Fine: -</p>
+<p className="text-lg font-semibold">Order ID: {orderInfo || "N/A"}</p>
+<p className="text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
+
+            <div className="mt-4">
+              <h3 className="text-lg font-bold">Number of Months</h3>
+              <div className="flex gap-4 mt-2">
+                {[1, 2, 3].map((value) => (
+                  <div
+                    key={value}
+                    onClick={() => setNum(value)}
+                    className={`cursor-pointer p-3 rounded-md shadow-md font-semibold w-12 text-center ${
+                      num === value ? "bg-green-300 border-2 border-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    {value}
+                  </div>
+                ))}
               </div>
             </div>
-            <div>Amount</div>
-            <div className="flex justify-center items-center">
-              {" "}
-              <button
-                onClick={() => handleRent()}
-                className=" p-2 cursor-pointer rounded-lg bg-red-500   hover:bg-blue-400 transition duration-500"
-              >
-                {" "}
-                Pay Rent{" "}
-              </button>{" "}
-            </div>
+
+            <button
+              onClick={handleRent}
+              className="mt-6 p-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-500 transition"
+            >
+              Pay Rent
+            </button>
           </div>
         </div>
-        <div>INVOICE</div>
       </div>
     </div>
   );

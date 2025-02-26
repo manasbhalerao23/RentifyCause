@@ -60,7 +60,8 @@ function AuthForm() {
                     totalDonation:data.totalDonation,//
                     role:data.role,//
                     shopName:data.shopName,
-                    language:"English"
+                    language:"English",
+                    monthStatus:data.monthStatus
                 }
 dispatch(setUser(user));
 console.log(user);

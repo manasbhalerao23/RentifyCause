@@ -27,7 +27,9 @@ function App() {
         {/* </Route> */}
         <Route path="/openBlog/:blogId" element={<OpenBlog/>}/>
         <Route path="/rent" element={<Rent/>}/>
-        <Route path="/profile" element={<ProfilePage/>}/>
+        <Route path="/profile" element={<ProfilePage closeSidebar={function (): void {
+              throw new Error("Function not implemented.");
+            } }/>}/>
         
         </Route>
       </Routes>

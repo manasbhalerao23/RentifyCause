@@ -17,6 +17,7 @@ const express_1 = __importDefault(require("express"));
 const db_1 = require("../models/db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const auth_1 = require("../middlewares/auth");
 dotenv_1.default.config();
 const authRouter = express_1.default.Router();
 authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,7 +52,44 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
             monthRent: user.monthRent,
             totalDonation: user.totalDonation,
             role: user.role,
-            shopName: user.shopName
+            shopName: user.shopName,
+            monthStatus: user.monthstatus
+        };
+        console.log(user === null || user === void 0 ? void 0 : user.monthstatus);
+        console.log(sendingUser.monthStatus);
+        res.json({ msg: sendingUser });
+        return;
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}));
+authRouter.post("/getInfo", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.body;
+        if (!id) {
+            res.status(400).json({ error: "Id not found" });
+            return;
+        }
+        const user = yield db_1.User.findById(id);
+        if (!user) {
+            res.status(400).json({ error: "Not Found User" });
+            return;
+        }
+        const sendingUser = {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            address: user.address,
+            contact: user.contact,
+            currentDonation: user.currentDonation,
+            currentRent: user.currentRent,
+            monthRent: user.monthRent,
+            totalDonation: user.totalDonation,
+            role: user.role,
+            shopName: user.shopName,
+            monthStatus: user.monthstatus
         };
         res.json({ msg: sendingUser });
         return;
@@ -59,6 +97,7 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
     catch (err) {
         console.log(err);
         res.status(500).json({ error: "Internal Server Error" });
+        return;
     }
 }));
 authRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

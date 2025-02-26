@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UserInfo {
+    monthStatus: Array<boolean>;
+    shopName: string;
     _id: string;
     username: string;//
     email: string;//
@@ -27,7 +29,9 @@ monthRent: "",
 role:"",
 totalDonation:"",
 username: "",
-_id:""
+_id:"",
+monthStatus: [],
+shopName: ""
 
 };
 
