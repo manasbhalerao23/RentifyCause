@@ -12,6 +12,7 @@ import store from "./Utils/store";
 import Rent from "./components/Rent";
 import ProfilePage from "./components/ProfileBar";
 function App() {
+  
   return (
     <Provider store={store}>
     <BrowserRouter>

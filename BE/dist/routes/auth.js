@@ -21,18 +21,47 @@ const auth_1 = require("../middlewares/auth");
 dotenv_1.default.config();
 const authRouter = express_1.default.Router();
 //Fix this type error later
-//@ts-ignore
-authRouter.get("/me", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.token;
-    if (!token) {
-        return res.status(401).json({ message: "not loged in " });
-    }
+//@ts-ignore  
+authRouter.post("/reconnection", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const user = jsonwebtoken_1.default.verify(token, process.env.JWT_KEY);
-        res.json(user);
+        const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
+        if (!refreshToken) {
+            res.status(401).json({ error: "You need to login again (error=RT12)" });
+            return;
+        }
+        const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+        const _id = decoded._id;
+        if (!_id) {
+            res.status(403).json({ error: "Invalid refresh token" });
+            return;
+        }
+        const user = yield db_1.User.findById(_id);
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+        // Generate a new access token
+        const newAccessToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_KEY, { expiresIn: "30m" });
+        const sendingUser = {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            address: user.address,
+            contact: user.contact,
+            currentDonation: user.currentDonation,
+            currentRent: user.currentRent,
+            monthRent: user.monthRent,
+            totalDonation: user.totalDonation,
+            role: user.role,
+            shopName: user.shopName,
+            monthStatus: user.monthstatus
+        };
+        return res.json({ msg: sendingUser, token: newAccessToken });
     }
-    catch (e) {
-        res.status(401).json({ message: "Invalid token" });
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal server error" });
     }
 }));
 authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -52,9 +81,12 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
             res.status(400).json({ error: "Invalid credentials" });
             return;
         }
-        const token = jsonwebtoken_1.default.sign({ _id: user._id.toString() }, process.env.JWT_KEY);
-        res.cookie("token", token, {
-            expires: new Date(Date.now() + 10000000)
+        const accessToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_KEY, { expiresIn: "30m" });
+        const refreshToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_REFRESH_KEY, { expiresIn: "7d" });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            // secure:true //after HTTPS certification,
+            sameSite: "strict"
         });
         const sendingUser = {
             _id: user._id,
@@ -72,7 +104,7 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
         };
         console.log(user === null || user === void 0 ? void 0 : user.monthstatus);
         console.log(sendingUser.monthStatus);
-        res.json({ msg: sendingUser });
+        res.json({ msg: sendingUser, token: accessToken });
         return;
     }
     catch (err) {

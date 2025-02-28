@@ -66,6 +66,50 @@ return;
 };
 
 
+
+export const verifyAcessToken=  (req:AuthRequest,res:Response,next:NextFunction)=>{
+    try{
+        const token =req.headers.authorization?.split(" ")[1];
+        if(!token){
+            res.status(401).send("Unauthorized");
+            return;
+        }
+        jwt.verify(token, process.env.JWT_KEY as string,async (err,decoded:any)=>{
+            if(err || !decoded?._id) {res.status(403).json({error:"invalid Token"})
+            return;}
+
+            const _id=decoded._id;
+            const user = await User.findById(_id).lean();
+            if (!user) {
+                throw new Error("User not found");
+            }
+            req.user = {
+                id:user._id.toString() ?? "",
+                username: user.username ?? "",
+                email: user.email ?? "",
+                contact: user.contact ?? "",
+                role: user.role ?? "",
+                shopName: user.shopName ?? "",
+                monthRent: user.monthRent ?? "",
+                currentRent: user.currentRent ?? "",
+                currentDonation: user.currentDonation ?? "",
+                totalDonation: user.totalDonation ?? "",
+                address: user.address ?? "",
+            };
+            
+            next();
+
+
+        });
+
+
+
+    }catch(err){
+        res.status(500).json({error:"Internal Server Error"})
+    }
+}
+
+
 export const checkAdmin = async(req:AuthRequest, res:Response, next:NextFunction)=>{
     try{
         if(req.user && req.user.role!="admin" ){

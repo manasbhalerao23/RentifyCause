@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import express from "express"
 import {User} from "../models/db"
-import jwt from "jsonwebtoken"
+import jwt, { JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
 import {Request , Response, Router} from "express"
 import { send } from "process"
@@ -10,19 +10,57 @@ dotenv.config()
 
 const authRouter= express.Router();
 //Fix this type error later
-//@ts-ignore
-authRouter.get("/me",userAuth, async(req: Request,res: Response) => {
-  const token = req.cookies.token;
-  if(!token){
-    return res.status(401).json({message: "not loged in "});
+//@ts-ignore  
+authRouter.post("/reconnection", async (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      res.status(401).json({ error: "You need to login again (error=RT12)" });
+      return 
+    }
+
+    
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as JwtPayload;
+    const _id = (decoded as JwtPayload)._id;
+    
+      if (!_id) {
+        res.status(403).json({ error: "Invalid refresh token" });
+        return 
+      }
+    
+
+    const user = await User.findById(_id);
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return
+    }
+
+    // Generate a new access token
+    const newAccessToken = jwt.sign({ _id: user._id }, process.env.JWT_KEY as string, { expiresIn: "30m" });
+
+    const sendingUser = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      address: user.address,
+      contact: user.contact,
+      currentDonation: user.currentDonation,
+      currentRent: user.currentRent,
+      monthRent: user.monthRent,
+      totalDonation: user.totalDonation,
+      role: user.role,
+      shopName: user.shopName,
+      monthStatus: user.monthstatus
+    };
+
+    return res.json({ msg: sendingUser, token: newAccessToken });
+  } catch (err) {
+    console.log(err);
+    
+    res.status(500).json({ error: "Internal server error" });
   }
-  try{
-    const user = jwt.verify(token, process.env.JWT_KEY as string);
-    res.json(user);
-  }catch(e){
-    res.status(401).json({message: "Invalid token"});
-  }
-})
+});
+
 
 
 authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
@@ -49,11 +87,18 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
        res.status(400).json({ error: "Invalid credentials" });
        return;
       }
-      const token= jwt.sign({_id:user._id.toString()},process.env.JWT_KEY as string);
 
-      res.cookie("token",token,{
-        expires: new Date(Date.now()+10000000)
-      })
+  const accessToken= jwt.sign({_id:user._id},process.env.JWT_KEY as string, {expiresIn:"30m"});
+  const refreshToken= jwt.sign({_id:user._id},process.env.JWT_REFRESH_KEY as string, {expiresIn:"7d"});
+
+  res.cookie("refreshToken",refreshToken,{
+    httpOnly:true,
+    // secure:true //after HTTPS certification,
+    sameSite:"strict"
+  })
+
+
+  
       const sendingUser={
         _id:user._id,
         username:user.username,
@@ -71,7 +116,7 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
       }
     console.log(user?.monthstatus);
 console.log(sendingUser.monthStatus);
-      res.json({ msg:sendingUser });
+      res.json({ msg:sendingUser, token:accessToken });
       return;
 
 

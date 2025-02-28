@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkAdmin = exports.userAuth = void 0;
+exports.checkAdmin = exports.verifyAcessToken = exports.userAuth = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../models/db");
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -55,6 +55,46 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.userAuth = userAuth;
+const verifyAcessToken = (req, res, next) => {
+    var _a;
+    try {
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+        if (!token) {
+            res.status(401).send("Unauthorized");
+            return;
+        }
+        jsonwebtoken_1.default.verify(token, process.env.JWT_KEY, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+            if (err || !(decoded === null || decoded === void 0 ? void 0 : decoded._id)) {
+                res.status(403).json({ error: "invalid Token" });
+                return;
+            }
+            const _id = decoded._id;
+            const user = yield db_1.User.findById(_id).lean();
+            if (!user) {
+                throw new Error("User not found");
+            }
+            req.user = {
+                id: (_a = user._id.toString()) !== null && _a !== void 0 ? _a : "",
+                username: (_b = user.username) !== null && _b !== void 0 ? _b : "",
+                email: (_c = user.email) !== null && _c !== void 0 ? _c : "",
+                contact: (_d = user.contact) !== null && _d !== void 0 ? _d : "",
+                role: (_e = user.role) !== null && _e !== void 0 ? _e : "",
+                shopName: (_f = user.shopName) !== null && _f !== void 0 ? _f : "",
+                monthRent: (_g = user.monthRent) !== null && _g !== void 0 ? _g : "",
+                currentRent: (_h = user.currentRent) !== null && _h !== void 0 ? _h : "",
+                currentDonation: (_j = user.currentDonation) !== null && _j !== void 0 ? _j : "",
+                totalDonation: (_k = user.totalDonation) !== null && _k !== void 0 ? _k : "",
+                address: (_l = user.address) !== null && _l !== void 0 ? _l : "",
+            };
+            next();
+        }));
+    }
+    catch (err) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+exports.verifyAcessToken = verifyAcessToken;
 const checkAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (req.user && req.user.role != "admin") {

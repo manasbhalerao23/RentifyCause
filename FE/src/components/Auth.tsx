@@ -14,6 +14,7 @@ function AuthForm() {
     const [address, setaddress] = useState("");
     const [shopName, setshopName] = useState("");
     const [email, setemail] = useState("");
+    const [accessToken, setAccessToken] = useState("");
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
@@ -24,39 +25,10 @@ function AuthForm() {
         setpassword("");
     };
 
-  useEffect(() => {
-    const checkauth = async() => {
-        try{
-            const res = await axios.get(`${BACKEND_URL}/auth/me`, {withCredentials: true});
-            console.log(res);
-            if(res.data.user){
-                const data= res.data.msg;
-            const user = {
-                _id:data._id,//
-                username:data.username,//
-                email:data.email,//
-                address:data.address,//
-                contact:data.contact,//
-                currentDonation:data.currentDonation,//
-                currentRent:data.currentRent,//
-                monthRent:data.monthRent,//
-                totalDonation:data.totalDonation,//
-                role:data.role,//
-                shopName:data.shopName,
-                language:"English",
-                monthStatus:data.monthStatus
-            }
-            dispatch(setUser(user));
-            console.log("disp");
-            }
-        }
-        catch(e){
-            console.log(e);
-        }
-    };
-    checkauth();
-}, [dispatch, navigate]);
+ 
     
+
+
 
     const handleSubmit =  async(e: { preventDefault: () => void; }) => {
         e.preventDefault();
@@ -79,7 +51,7 @@ function AuthForm() {
                     {username,password},
                     {withCredentials: true}
                 );
-                console.log(res.data.msg);
+                console.log(res.data);
                 const data= res.data.msg;
                 const user= {
                     _id:data._id,//
@@ -98,6 +70,7 @@ function AuthForm() {
                 }
             dispatch(setUser(user));
             console.log(user);
+            setAccessToken(res.data.token);
 
                 navigate('/card');
             }
