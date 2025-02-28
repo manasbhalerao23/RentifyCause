@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import {  useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { useDispatch} from "react-redux";
@@ -22,16 +22,49 @@ function AuthForm() {
         setisLogin(!isLogin);
         setusername("");
         setpassword("");
-    }
+    };
 
+  useEffect(() => {
+    const checkauth = async() => {
+        try{
+            const res = await axios.get(`${BACKEND_URL}/auth/me`, {withCredentials: true});
+            console.log(res);
+            if(res.data.user){
+                const data= res.data.msg;
+            const user = {
+                _id:data._id,//
+                username:data.username,//
+                email:data.email,//
+                address:data.address,//
+                contact:data.contact,//
+                currentDonation:data.currentDonation,//
+                currentRent:data.currentRent,//
+                monthRent:data.monthRent,//
+                totalDonation:data.totalDonation,//
+                role:data.role,//
+                shopName:data.shopName,
+                language:"English",
+                monthStatus:data.monthStatus
+            }
+            dispatch(setUser(user));
+            console.log("disp");
+            }
+        }
+        catch(e){
+            console.log(e);
+        }
+    };
+    checkauth();
+}, [dispatch, navigate]);
+    
 
     const handleSubmit =  async(e: { preventDefault: () => void; }) => {
         e.preventDefault();
         if(!isLogin){
             try{
                 const res = await axios.post(`${BACKEND_URL}/auth/signup`,
-                    {username,password,contact,address,shopName,email}
-                    // {withCredentials: true}
+                    {username,password,contact,address,shopName,email},
+                    {withCredentials: true}
                 );
                 console.log(res?.data);
                 setisLogin(!isLogin);
@@ -63,8 +96,8 @@ function AuthForm() {
                     language:"English",
                     monthStatus:data.monthStatus
                 }
-dispatch(setUser(user));
-console.log(user);
+            dispatch(setUser(user));
+            console.log(user);
 
                 navigate('/card');
             }

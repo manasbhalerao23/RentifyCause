@@ -9,6 +9,20 @@ import { AuthRequest, userAuth } from "../middlewares/auth"
 dotenv.config()
 
 const authRouter= express.Router();
+//Fix this type error later
+//@ts-ignore
+authRouter.get("/me",userAuth, async(req: Request,res: Response) => {
+  const token = req.cookies.token;
+  if(!token){
+    return res.status(401).json({message: "not loged in "});
+  }
+  try{
+    const user = jwt.verify(token, process.env.JWT_KEY as string);
+    res.json(user);
+  }catch(e){
+    res.status(401).json({message: "Invalid token"});
+  }
+})
 
 
 authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{

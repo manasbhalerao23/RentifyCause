@@ -20,6 +20,21 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = require("../middlewares/auth");
 dotenv_1.default.config();
 const authRouter = express_1.default.Router();
+//Fix this type error later
+//@ts-ignore
+authRouter.get("/me", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({ message: "not loged in " });
+    }
+    try {
+        const user = jsonwebtoken_1.default.verify(token, process.env.JWT_KEY);
+        res.json(user);
+    }
+    catch (e) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+}));
 authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;

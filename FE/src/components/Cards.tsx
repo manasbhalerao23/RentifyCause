@@ -14,7 +14,7 @@ const userInfo = useSelector((store: RootState)=>store.cart)
    
 const getData = async ()=>{
     try{
-      console.log(userInfo);
+      //console.log(userInfo);
       
         const res = await axios.get(`${BACKEND_URL}/blog/all`);
         //console.log(res);
