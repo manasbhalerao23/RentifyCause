@@ -123,8 +123,7 @@ export async function generateRentInvoice(data: {
     // "Sign. of Receiver" text centered below the line
     page.drawText("Sign. of Receiver", { x: signLineX + 25, y: signY - 40, size: fontSize, font });
 
-    const filePath = `C:/Users/vjais/OneDrive/Desktop/Donation Platform/Blog_web/BE/src/utils/rent_invoice_${data.receiptNo}.pdf`;
-    
+    const filePath = `${invoiceDir}/rent_invoice_${data.receiptNo}.pdf`;
     const pdfBytes = await pdfDoc.save();
     fs.writeFileSync(filePath, pdfBytes);
     console.log(`PDF Generated: ${filePath}`);
