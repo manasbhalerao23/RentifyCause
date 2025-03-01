@@ -13,7 +13,7 @@
     async function uploadToCloudinary(filePath:string) {
         try {
             const result = await cloudinary.uploader.upload(filePath, {
-                resource_type: "raw", // Important for PDFs
+                resource_type: "auto", // Important for PDFs
                 folder: "invoices" // Optional folder in Cloudinary
             });
             return result.secure_url; // Return Cloudinary URL
