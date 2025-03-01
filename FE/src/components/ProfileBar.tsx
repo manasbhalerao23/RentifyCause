@@ -24,7 +24,7 @@ const dispatch = useDispatch();
     const navigate = useNavigate()
     const handleLogout = async() =>{
   try{
-const res= await axios.post(`${BACKEND_URL}/auth/logout`,{},{
+ await axios.post(`${BACKEND_URL}/auth/logout`,{},{
   headers:{authorization: `Bearer ${tokenInfo}`},
   withCredentials:true
 })
