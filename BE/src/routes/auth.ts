@@ -206,11 +206,12 @@ res.send("User added "+ sendingUser)
     }
 })
 
-authRouter.post("/logout", async (req:Request, res:Response) => {
-res.cookie("token", null, {
-  expires: new Date(Date.now()),
-});
-res.send("User Logged Out Successful!");
+authRouter.post("/logout", userAuth,async (req:Request, res:Response) => {
+  res.cookie("refreshToken", "", {
+    httpOnly: true,
+    expires: new Date(0), 
+  });
+res.json({msg :"User Logged Out Successful!"} );
 
 
 });

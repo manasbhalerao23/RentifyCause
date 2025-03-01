@@ -15,6 +15,9 @@ declare global {
 const Rent = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector((store: RootState) => store.cart);
+  const tokenInfo = useSelector((store:RootState) => store.auth);
+console.log(tokenInfo);
+
   console.log(userInfo);
 const [rcpt, setRcpt]=useState("");
 const [orderInfo,setOrderInfo]=useState("")
@@ -22,7 +25,7 @@ const [orderInfo,setOrderInfo]=useState("")
     const res = await axios.post(
       `${BACKEND_URL}/auth/getInfo`,
       { id: userInfo._id },
-      { withCredentials: true }
+      { headers: {authorization: `Bearer ${tokenInfo}`} }
     );
     const user = res.data;
     console.log(user?.msg);
@@ -37,11 +40,13 @@ const [orderInfo,setOrderInfo]=useState("")
         alert("Please select number of Months");
         return;
       }
+console.log(tokenInfo);
 
       const order = await axios.post(
         `${BACKEND_URL}/payment/create`,
         { num: num },
-        { withCredentials: true }
+        { headers: {authorization: `Bearer ${tokenInfo}`}
+         }
       );
 
       const { amount, currency, orderId, keyId, notes } = order.data;

@@ -20,11 +20,13 @@ dotenv_1.default.config();
 const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     try {
-        const { token } = req.cookies;
-        if (!token) {
+        const authHeader = req.headers.authorization;
+        console.log(authHeader);
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             res.status(401).send("Please login!");
             return;
         }
+        const token = authHeader.split(" ")[1];
         const decodedObj = jsonwebtoken_1.default.verify(token, process.env.JWT_KEY);
         // Ensure decodedObj is an object with _id
         if (typeof decodedObj === "string") {

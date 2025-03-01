@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch} from "react-redux";
 import {  setUser } from "../Utils/cartSlice";
 import {motion, AnimatePresence } from "framer-motion";
+import { addToken } from "../Utils/authSlice";
 
 function AuthForm() {
     const [isLogin, setisLogin] = useState(false);
@@ -14,7 +15,6 @@ function AuthForm() {
     const [address, setaddress] = useState("");
     const [shopName, setshopName] = useState("");
     const [email, setemail] = useState("");
-    const [accessToken, setAccessToken] = useState("");
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
@@ -70,7 +70,7 @@ function AuthForm() {
                 }
             dispatch(setUser(user));
             console.log(user);
-            setAccessToken(res.data.token);
+            dispatch(addToken(res.data.token))
 
                 navigate('/card');
             }

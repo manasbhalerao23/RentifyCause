@@ -7,6 +7,7 @@ import axios from 'axios';
 import { BACKEND_URL } from '../config';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../Utils/cartSlice';
+import { addToken } from '../Utils/authSlice';
 
 
 const Body = () => {
@@ -38,6 +39,9 @@ const data= res.data.msg;
                     monthStatus:data.monthStatus
                 }
             dispatch(setUser(user));
+            dispatch(addToken(res.data.token))
+            console.log(res.data.token);
+            
 }catch(err){
     console.log("Cant Authneticate! Login again"+err);
     

@@ -26,12 +26,14 @@ export interface AuthRequest extends Request {
 
 export const userAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-        const { token } = req.cookies;
-        if (!token) {
+        const authHeader =req.headers.authorization; 
+        console.log(authHeader);
+        
+        if (!authHeader || !authHeader.startsWith("Bearer ")    ) {
 res.status(401).send("Please login!");
 return;
         }
-
+        const token = authHeader.split(" ")[1];
         const decodedObj = jwt.verify(token, process.env.JWT_KEY as string);
 
         // Ensure decodedObj is an object with _id

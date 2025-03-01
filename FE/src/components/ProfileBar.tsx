@@ -1,6 +1,12 @@
-import { useSelector } from "react-redux"
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "../Utils/store"
 import { X } from "lucide-react";
+import axios from "axios";
+import { BACKEND_URL } from "../config";
+import { removeToken } from "../Utils/authSlice";
+import { useNavigate } from "react-router-dom";
+import { clearUser } from "../Utils/cartSlice";
 
 
 interface ProfileBarProps {
@@ -10,6 +16,29 @@ interface ProfileBarProps {
 
 function ProfileBar({closeSidebar}: ProfileBarProps) {
     const userInfo = useSelector((store:RootState) => store.cart);
+    const tokenInfo= useSelector((store:RootState)=>store.auth);
+    // console.log(tokenInfo);
+    
+
+const dispatch = useDispatch();
+    const navigate = useNavigate()
+    const handleLogout = async() =>{
+  try{
+const res= await axios.post(`${BACKEND_URL}/auth/logout`,{},{
+  headers:{authorization: `Bearer ${tokenInfo}`},
+  withCredentials:true
+})
+dispatch(removeToken());
+dispatch(clearUser())
+navigate("/")
+window.location.reload();
+
+
+
+  }catch(err){
+    console.error(err);
+  }
+}
 
     return(
         <div className="fixed top-0 right-0 h-96 w-64 bg-white shadow-lg p-5 transition-transform transform translate-x-0 z-50 rounded-l-lg">
@@ -33,7 +62,7 @@ function ProfileBar({closeSidebar}: ProfileBarProps) {
         </div>
         
       </div>
-      <button className="mt-5 w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer">
+      <button onClick={handleLogout} className="mt-5 w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer">
         Logout
       </button>
     </div>

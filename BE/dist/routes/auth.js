@@ -175,10 +175,11 @@ authRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         console.log(err);
     }
 }));
-authRouter.post("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.cookie("token", null, {
-        expires: new Date(Date.now()),
+authRouter.post("/logout", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.cookie("refreshToken", "", {
+        httpOnly: true,
+        expires: new Date(0),
     });
-    res.send("User Logged Out Successful!");
+    res.json({ msg: "User Logged Out Successful!" });
 }));
 exports.default = authRouter;
