@@ -18,6 +18,7 @@ const auth_1 = require("../middlewares/auth");
 const razorpay_1 = __importDefault(require("../config/razorpay"));
 const db_1 = require("../models/db");
 const razorpay_utils_1 = require("razorpay/dist/utils/razorpay-utils");
+const invoiceGeneration_1 = require("../utils/invoiceGeneration");
 dotenv_1.default.config();
 const paymentRouter = express_1.default.Router();
 // username: string;
@@ -65,8 +66,8 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
         }
         const months_paid = user.monthstatus;
         const payablemonths = getmonths(months_paid, num);
-        console.log(months_paid);
-        console.log(payablemonths);
+        // console.log(months_paid);
+        // console.log(payablemonths);
         user.save();
         console.log(user.monthstatus);
         if (payablemonths === 0) {
@@ -109,7 +110,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
     }
 }));
 paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     try {
         const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
         const isWebhookValid = (0, razorpay_utils_1.validateWebhookSignature)(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
@@ -158,6 +159,31 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
         user.set("monthstatus", paid_months);
         user.rentPaidUntil = new Date(Date.now());
         yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
+        if (paymentDetails.status == "captured") {
+            // receiptNo: string;
+            // orderId: string;
+            // date: string;
+            // tenantName: string;
+            // propertyAddress: string;
+            // monthsPaid: number;
+            // monthlyRent: number;
+            // totalRent: number;
+            // paymentMode: string;
+            // transactionId: string;
+            const data = {
+                receiptNo: (_d = payment.receipt) !== null && _d !== void 0 ? _d : "",
+                orderId: payment.orderId,
+                date: new Date(Date.now()),
+                tenantName: (_e = user.username) !== null && _e !== void 0 ? _e : "",
+                propertyAddress: (_f = user.address) !== null && _f !== void 0 ? _f : "",
+                monthsPaid: (_j = (_h = (_g = payment.notes) === null || _g === void 0 ? void 0 : _g.months_paid) === null || _h === void 0 ? void 0 : _h.toString()) !== null && _j !== void 0 ? _j : "",
+                monthlyRent: (_k = user.monthRent.toString()) !== null && _k !== void 0 ? _k : "",
+                totalRent: (_l = payment.amount.toString()) !== null && _l !== void 0 ? _l : "",
+                paymentMode: (_m = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _m !== void 0 ? _m : "",
+                transactionId: (_o = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _o !== void 0 ? _o : ""
+            };
+            yield (0, invoiceGeneration_1.generateRentInvoice)(data);
+        }
         //DATE MANIPULATION LOGIC 
         //return success response to razorpay
         // if (req.body.event == "payment.captured") {

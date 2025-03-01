@@ -5,6 +5,7 @@ import razorpayInstance from "../config/razorpay"
 import { Response } from "express";
 import {paymentModel, User} from "../models/db"
 import { validateWebhookSignature } from 'razorpay/dist/utils/razorpay-utils';
+import { generateRentInvoice } from "../utils/invoiceGeneration";
 
 dotenv.config()
 
@@ -61,8 +62,8 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
         
         const months_paid = user.monthstatus;
         const payablemonths = getmonths(months_paid,num);
-console.log(months_paid);
-console.log(payablemonths);
+// console.log(months_paid);
+// console.log(payablemonths);
 
 user.save();
 console.log(user.monthstatus);
@@ -105,7 +106,6 @@ console.log(user.monthstatus);
         
 
 
-
         res.send({...savePayment.toJSON(),keyId:process.env.RAZORPAY_KEY_ID,receiptId:receiptID})
         return;
         
@@ -139,6 +139,7 @@ console.log(paymentDetails);
 
 
 
+
 const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
 console.log(payment);
 if(!payment){
@@ -147,6 +148,7 @@ if(!payment){
 }
 payment.status= paymentDetails.status;
 await payment.save();
+
 
 
 console.log(payment);
@@ -190,8 +192,34 @@ user.rentPaidUntil=new Date(Date.now());
 
     await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
 
-//DATE MANIPULATION LOGIC 
 
+    if(paymentDetails.status=="captured"){
+        // receiptNo: string;
+        // orderId: string;
+        // date: string;
+        // tenantName: string;
+        // propertyAddress: string;
+        // monthsPaid: number;
+        // monthlyRent: number;
+        // totalRent: number;
+        // paymentMode: string;
+        // transactionId: string;
+        const data = {
+            receiptNo:payment.receipt ?? "",
+            orderId: payment.orderId ,
+            date: new Date(Date.now()),
+            tenantName: user.username ?? "",
+            propertyAddress:user.address  ?? "",
+            monthsPaid:payment.notes?.months_paid?.toString() ?? "",
+            monthlyRent:user.monthRent.toString() ?? "",
+            totalRent:payment.amount.toString() ?? "",
+            paymentMode:paymentDetails?.method.toString() ?? "",
+            transactionId:paymentDetails?.id.toString() ?? ""
+        }
+        await generateRentInvoice(data);
+    }
+
+//DATE MANIPULATION LOGIC 
 
  
 //return success response to razorpay
@@ -202,7 +230,7 @@ user.rentPaidUntil=new Date(Date.now());
     // if (req.body.event == "payment.failed") {
 
     // }
- res.status(200).json({ msg: "Webhook recieved successfully" });
+ res.status(200).json({msg:"Webhook recieved successfully"});
  return;
 
 
