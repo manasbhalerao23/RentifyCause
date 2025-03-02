@@ -15,33 +15,31 @@ declare global {
 const Rent = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector((store: RootState) => store.cart);
-  const tokenInfo = useSelector((store:RootState) => store.auth);
-console.log(tokenInfo);
+  const tokenInfo = useSelector((store: RootState) => store.auth);
+  console.log(tokenInfo);
 
   console.log(userInfo);
-const [rcpt, setRcpt]=useState("");
-const [orderInfo,setOrderInfo]=useState("")
-const [url,setUrl] = useState("")
-const [downloadUrl, setDownloadUrl] = useState("")
-const [orderId, setOrderId] =useState("")
-  const gettingNewData = async () => {
+  const [rcpt, setRcpt] = useState("");
+  const [orderInfo, setOrderInfo] = useState("");
+  const [url, setUrl] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState("");
+  const gettingNewData = async (orderId: string) => {
+    console.log("order" + orderId);
+
     const res = await axios.post(
       `${BACKEND_URL}/auth/getInfo`,
-      { id: userInfo._id , 
-        orderId:orderId
-      },
-      { headers: {authorization: `Bearer ${tokenInfo}`} }
+      { id: userInfo._id, orderId: orderId },
+      { headers: { authorization: `Bearer ${tokenInfo}` } }
     );
     const data = res.data;
     console.log(data);
-    console.log("order" +orderId);
-    console.log(data?.downloadUrl+ " --- "+data?.Url);
-    
-    
+    console.log("order" + orderId);
+    console.log(data?.downloadUrl + " --- " + data?.Url);
+
     console.log(data?.msg);
     dispatch(setUser(data?.msg));
-    setDownloadUrl(data.downloadUrl)
-    setUrl(data.Url)  
+    setDownloadUrl(data.downloadUrl);
+    setUrl(data.Url);
   };
 
   const [num, setNum] = useState(0);
@@ -53,7 +51,7 @@ const [orderId, setOrderId] =useState("")
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-};
+  };
 
   const handleRent = async () => {
     try {
@@ -61,17 +59,15 @@ const [orderId, setOrderId] =useState("")
         alert("Please select number of Months");
         return;
       }
-console.log(tokenInfo);
+      console.log(tokenInfo);
 
       const order = await axios.post(
         `${BACKEND_URL}/payment/create`,
         { num: num },
-        { headers: {authorization: `Bearer ${tokenInfo}`}
-         }
+        { headers: { authorization: `Bearer ${tokenInfo}` } }
       );
 
       const { amount, currency, orderId, keyId, notes } = order.data;
-      setOrderId(orderId)
 
       const options = {
         key: keyId,
@@ -86,13 +82,14 @@ console.log(tokenInfo);
           contact: notes.contact,
         },
         theme: { color: "#F37254" },
-        handler: gettingNewData,
+        handler: function () {
+          gettingNewData(orderId);
+        },
       };
-      console.log("ORDER")
-      console.log(order)
-      setOrderInfo(order.data.orderId)
-      setRcpt(order.data.receiptId)
-
+      console.log("ORDER");
+      console.log(order);
+      setOrderInfo(order.data.orderId);
+      setRcpt(order.data.receiptId);
 
       const rzp = new window.Razorpay(options);
       rzp.open();
@@ -112,7 +109,9 @@ console.log(tokenInfo);
             <p>Contact: {userInfo.contact}</p>
           </div>
           <div>
-            <p className="text-lg font-semibold">Shop Name: {userInfo.shopName}</p>
+            <p className="text-lg font-semibold">
+              Shop Name: {userInfo.shopName}
+            </p>
             <p>Address: {userInfo.address}</p>
             <p>Total Donation: {userInfo.totalDonation}</p>
           </div>
@@ -130,32 +129,58 @@ console.log(tokenInfo);
           <div>
             <h3 className="text-lg font-bold mb-3">Months Paid</h3>
             <div className="grid grid-cols-4 gap-2">
-              {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map(
-                (month, index) => (
-                  <div
-                    key={index}
-                    className={`p-3 rounded-md text-center shadow-md font-medium ${
-                      userInfo.monthStatus[index] ? "bg-green-300 border-2 border-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    {month}
+              {[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ].map((month, index) => (
+                <div
+                  key={index}
+                  className={`p-3 rounded-md text-center shadow-md font-medium ${
+                    userInfo.monthStatus[index]
+                      ? "bg-green-300 border-2 border-blue-600"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  {month}
+                </div>
+              ))}
+              <div className="mx-10">
+                {url ? (
+                  <div>
+                    <button
+                      onClick={handleDownload}
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-
+    2 px-4 rounded"
+                    >
+                      {" "}
+                      Download{" "}
+                    </button>
                   </div>
-                )
-              )}
-<div className="mx-10">
- {url ? <div>
-    <button onClick={handleDownload} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-
-    2 px-4 rounded"> Download </button>
-      </div> : <div></div>}
-</div>
-
+                ) : (
+                  <div></div>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex flex-col justify-between">
-          <p className="text-lg font-semibold">Month Rent: {Number(userInfo.monthRent) * num}</p>
-<p className="text-lg font-semibold">Fine: -</p>
-<p className="text-lg font-semibold">Order ID: {orderInfo || "N/A"}</p>
-<p className="text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
+            <p className="text-lg font-semibold">
+              Month Rent: {Number(userInfo.monthRent) * num}
+            </p>
+            <p className="text-lg font-semibold">Fine: -</p>
+            <p className="text-lg font-semibold">
+              Order ID: {orderInfo || "N/A"}
+            </p>
+            <p className="text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
             <div className="mt-4">
               <h3 className="text-lg font-bold">Number of Months</h3>
               <div className="flex gap-4 mt-2">
@@ -164,7 +189,9 @@ console.log(tokenInfo);
                     key={value}
                     onClick={() => setNum(value)}
                     className={`cursor-pointer p-3 rounded-md shadow-md font-semibold w-12 text-center ${
-                      num === value ? "bg-green-300 border-2 border-blue-600" : "bg-gray-200"
+                      num === value
+                        ? "bg-green-300 border-2 border-blue-600"
+                        : "bg-gray-200"
                     }`}
                   >
                     {value}
