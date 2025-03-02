@@ -212,7 +212,7 @@ user.rentPaidUntil=new Date(Date.now());
             propertyAddress:user.address  ?? "",
             monthsPaid:payment.notes?.months_paid?.toString() ?? "",
             monthlyRent:user.monthRent.toString() ?? "",
-            totalRent:payment.amount.toString() ?? "",
+            totalRent:(payment.amount/100).toString() ?? "",
             paymentMode:paymentDetails?.method.toString() ?? "",
             transactionId:paymentDetails?.id.toString() ?? ""
         }
@@ -250,7 +250,7 @@ user.rentPaidUntil=new Date(Date.now());
         // save the invoice in the database
         await invoice.save();
 
-        
+     
 
     }
 

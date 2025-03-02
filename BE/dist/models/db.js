@@ -134,6 +134,15 @@ const InvoiceSchema = new mongoose_1.Schema({
     date: {
         type: Date,
         required: true
+    },
+    downloadUrl: {
+        type: String,
     }
 }, { timestamps: true });
+InvoiceSchema.pre("save", function (next) {
+    if (this.url) {
+        this.downloadUrl = this.url.replace("/upload/", "/upload/fl_attachment/");
+    }
+    next();
+});
 exports.InvoiceModel = (0, mongoose_1.model)('Invoice', InvoiceSchema);

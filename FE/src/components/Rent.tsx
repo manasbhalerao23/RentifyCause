@@ -21,18 +21,31 @@ console.log(tokenInfo);
   console.log(userInfo);
 const [rcpt, setRcpt]=useState("");
 const [orderInfo,setOrderInfo]=useState("")
+const [url,setUrl] = useState("")
+const [downloadUrl, setDownloadUrl] = useState("")
   const gettingNewData = async () => {
     const res = await axios.post(
       `${BACKEND_URL}/auth/getInfo`,
       { id: userInfo._id },
       { headers: {authorization: `Bearer ${tokenInfo}`} }
     );
-    const user = res.data;
-    console.log(user?.msg);
-    dispatch(setUser(user?.msg));
+    const data = res.data;
+    console.log(data?.msg);
+    dispatch(setUser(data?.msg));
+    setDownloadUrl(data.downloadUrl)
+    setUrl(data.Url)  
   };
 
   const [num, setNum] = useState(0);
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.setAttribute("download", "invoice.pdf"); // Optional: Suggests a filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
 
   const handleRent = async () => {
     try {
@@ -120,6 +133,13 @@ console.log(tokenInfo);
                   </div>
                 )
               )}
+<div className="mx-10">
+ {url ? <div>
+    <button onClick={handleDownload} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-
+    2 px-4 rounded"> Download </button>
+      </div> : <div></div>}
+</div>
+
             </div>
           </div>
           <div className="flex flex-col justify-between">
@@ -127,7 +147,6 @@ console.log(tokenInfo);
 <p className="text-lg font-semibold">Fine: -</p>
 <p className="text-lg font-semibold">Order ID: {orderInfo || "N/A"}</p>
 <p className="text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
-
             <div className="mt-4">
               <h3 className="text-lg font-bold">Number of Months</h3>
               <div className="flex gap-4 mt-2">

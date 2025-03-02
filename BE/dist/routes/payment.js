@@ -178,7 +178,7 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
                 propertyAddress: (_f = user.address) !== null && _f !== void 0 ? _f : "",
                 monthsPaid: (_j = (_h = (_g = payment.notes) === null || _g === void 0 ? void 0 : _g.months_paid) === null || _h === void 0 ? void 0 : _h.toString()) !== null && _j !== void 0 ? _j : "",
                 monthlyRent: (_k = user.monthRent.toString()) !== null && _k !== void 0 ? _k : "",
-                totalRent: (_l = payment.amount.toString()) !== null && _l !== void 0 ? _l : "",
+                totalRent: (_l = (payment.amount / 100).toString()) !== null && _l !== void 0 ? _l : "",
                 paymentMode: (_m = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _m !== void 0 ? _m : "",
                 transactionId: (_o = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _o !== void 0 ? _o : ""
             };

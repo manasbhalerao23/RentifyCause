@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import express from "express"
-import {User} from "../models/db"
+import {InvoiceModel, User} from "../models/db"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
 import {Request , Response, Router} from "express"
@@ -133,7 +133,7 @@ console.log(sendingUser.monthStatus);
 authRouter.post("/getInfo",userAuth,async (req:AuthRequest, res:Response)=>{
   try{
 
-    const {id}= req.body;
+    const {id, orderId}= req.body;
     if(!id){
       res.status(400).json({ error: "Id not found" });
       return;
@@ -159,7 +159,13 @@ authRouter.post("/getInfo",userAuth,async (req:AuthRequest, res:Response)=>{
       monthStatus:user.monthstatus
 
     }
-    res.json({ msg:sendingUser });
+let order;
+    if(orderId){
+       order= await InvoiceModel.findOne({orderId:orderId});
+
+    }
+
+    res.json({ msg:sendingUser, downloadUrl:order?.downloadUrl, Url: order?.url });
     return;
 
 

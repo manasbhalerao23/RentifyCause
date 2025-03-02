@@ -151,10 +151,19 @@ const InvoiceSchema= new Schema({
     date:{
         type:Date,
         required:true
+    },
+    downloadUrl:{
+        type:String,
     }
 
 
 },{timestamps:true})
+InvoiceSchema.pre("save",function(next){
+    if (this.url) {
+        this.downloadUrl = this.url.replace("/upload/", "/upload/fl_attachment/");
+    }
+    next();
+})
 export const InvoiceModel=model('Invoice',InvoiceSchema)
 
 

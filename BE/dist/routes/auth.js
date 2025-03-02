@@ -114,7 +114,7 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
 }));
 authRouter.post("/getInfo", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.body;
+        const { id, orderId } = req.body;
         if (!id) {
             res.status(400).json({ error: "Id not found" });
             return;
@@ -138,7 +138,11 @@ authRouter.post("/getInfo", auth_1.userAuth, (req, res) => __awaiter(void 0, voi
             shopName: user.shopName,
             monthStatus: user.monthstatus
         };
-        res.json({ msg: sendingUser });
+        let order;
+        if (orderId) {
+            order = yield db_1.InvoiceModel.findOne({ orderId: orderId });
+        }
+        res.json({ msg: sendingUser, downloadUrl: order === null || order === void 0 ? void 0 : order.downloadUrl, Url: order === null || order === void 0 ? void 0 : order.url });
         return;
     }
     catch (err) {
