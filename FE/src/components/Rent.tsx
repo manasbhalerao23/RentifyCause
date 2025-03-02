@@ -30,6 +30,8 @@ const [downloadUrl, setDownloadUrl] = useState("")
       { headers: {authorization: `Bearer ${tokenInfo}`} }
     );
     const data = res.data;
+    console.log(data);
+    
     console.log(data?.msg);
     dispatch(setUser(data?.msg));
     setDownloadUrl(data.downloadUrl)
