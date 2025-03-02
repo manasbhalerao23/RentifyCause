@@ -23,7 +23,8 @@ const [rcpt, setRcpt]=useState("");
 const [orderInfo,setOrderInfo]=useState("")
 const [url,setUrl] = useState("")
 const [downloadUrl, setDownloadUrl] = useState("")
-  const gettingNewData = async (orderId:string) => {
+const [orderId, setOrderId] =useState("")
+  const gettingNewData = async () => {
     const res = await axios.post(
       `${BACKEND_URL}/auth/getInfo`,
       { id: userInfo._id , 
@@ -70,6 +71,7 @@ console.log(tokenInfo);
       );
 
       const { amount, currency, orderId, keyId, notes } = order.data;
+      setOrderId(orderId)
 
       const options = {
         key: keyId,
@@ -84,11 +86,11 @@ console.log(tokenInfo);
           contact: notes.contact,
         },
         theme: { color: "#F37254" },
-        handler: gettingNewData(order.data.orderId),
+        handler: gettingNewData,
       };
       console.log("ORDER")
       console.log(order)
-      console.log(order.data.orderId);
+      console.log();
       setOrderInfo(order.data.orderId)
       setRcpt(order.data.receiptId)
 
