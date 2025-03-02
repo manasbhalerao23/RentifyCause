@@ -182,7 +182,38 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
                 paymentMode: (_m = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _m !== void 0 ? _m : "",
                 transactionId: (_o = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _o !== void 0 ? _o : ""
             };
-            yield (0, invoiceGeneration_1.generateRentInvoice)(data);
+            const url = yield (0, invoiceGeneration_1.generateRentInvoice)(data);
+            //lets create an entry in invoiceModel from db.ts now
+            // userId:{
+            //     type:Schema.Types.ObjectId ,
+            //     ref:"User",
+            //     required:true
+            // },
+            // receiptId:{
+            //     type:String,
+            //     required:true
+            // },
+            // url:{
+            //     type:String,
+            //     required:true
+            // },
+            // orderId:{
+            //     type:String,
+            //     required:true,
+            // },
+            // date:{
+            //     type:Date,
+            //     required:true
+            // }
+            const invoice = new db_1.InvoiceModel({
+                receiptId: data.receiptNo,
+                orderId: data.orderId,
+                date: data.date,
+                userId: user._id,
+                url: url
+            });
+            // save the invoice in the database
+            yield invoice.save();
         }
         //DATE MANIPULATION LOGIC 
         //return success response to razorpay

@@ -127,3 +127,37 @@ PaymentSchema.pre("save", function (next) {
 });
 
 export const paymentModel= model('Payment',PaymentSchema)
+
+
+
+const InvoiceSchema= new Schema({
+    userId:{
+        type:Schema.Types.ObjectId ,
+        ref:"User",
+        required:true
+    },
+    receiptId:{
+        type:String,
+        required:true
+    },
+    url:{
+        type:String,
+        required:true
+    },
+    orderId:{
+        type:String,
+        required:true,
+    },
+    date:{
+        type:Date,
+        required:true
+    }
+
+
+},{timestamps:true})
+export const InvoiceModel=model('Invoice',InvoiceSchema)
+
+
+
+
+

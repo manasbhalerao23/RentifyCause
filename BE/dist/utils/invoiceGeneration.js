@@ -15,9 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateRentInvoice = generateRentInvoice;
 const pdf_lib_1 = require("pdf-lib");
 const fs_1 = __importDefault(require("fs"));
+const cloudinary_1 = __importDefault(require("./cloudinary"));
 const invoiceDir = "./invoices";
 if (!fs_1.default.existsSync(invoiceDir)) {
     fs_1.default.mkdirSync(invoiceDir);
+}
+function uploadToCloudinary(filePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const result = yield cloudinary_1.default.uploader.upload(filePath, {
+                resource_type: "raw", // Important for PDFs
+                folder: "invoices", // Optional folder in Cloudinary
+                format: "pdf"
+            });
+            return result.secure_url; // Return Cloudinary URL
+        }
+        catch (error) {
+            console.error("Cloudinary Upload Error:", error);
+            return null;
+        }
+    });
 }
 function generateRentInvoice(data) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -105,10 +122,19 @@ function generateRentInvoice(data) {
         });
         // "Sign. of Receiver" text centered below the line
         page.drawText("Sign. of Receiver", { x: signLineX + 25, y: signY - 40, size: fontSize, font });
-        const filePath = `C:/Users/vjais/OneDrive/Desktop/Donation Platform/Blog_web/BE/src/utils/rent_invoice_${data.receiptNo}.pdf`;
+        const filePath = `${invoiceDir}/rent_invoice_${data.receiptNo}.pdf`;
         const pdfBytes = yield pdfDoc.save();
         fs_1.default.writeFileSync(filePath, pdfBytes);
         console.log(`PDF Generated: ${filePath}`);
-        return filePath;
+        const cloudinaryUrl = yield uploadToCloudinary(filePath);
+        fs_1.default.unlinkSync(filePath);
+        if (cloudinaryUrl) {
+            console.log(`Invoice uploaded to Cloudinary: ${cloudinaryUrl}`);
+            return cloudinaryUrl;
+        }
+        else {
+            console.error("Failed to upload PDF to Cloudinary.");
+            return null;
+        }
     });
 }

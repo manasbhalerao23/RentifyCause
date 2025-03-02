@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import { AuthRequest, userAuth } from "../middlewares/auth";
 import razorpayInstance from "../config/razorpay"
 import { Response } from "express";
-import {paymentModel, User} from "../models/db"
+import {InvoiceModel, paymentModel, User} from "../models/db"
 import { validateWebhookSignature } from 'razorpay/dist/utils/razorpay-utils';
 import { generateRentInvoice } from "../utils/invoiceGeneration";
 
@@ -216,7 +216,42 @@ user.rentPaidUntil=new Date(Date.now());
             paymentMode:paymentDetails?.method.toString() ?? "",
             transactionId:paymentDetails?.id.toString() ?? ""
         }
-        await generateRentInvoice(data);
+        const url = await generateRentInvoice(data);
+
+        //lets create an entry in invoiceModel from db.ts now
+        // userId:{
+        //     type:Schema.Types.ObjectId ,
+        //     ref:"User",
+        //     required:true
+        // },
+        // receiptId:{
+        //     type:String,
+        //     required:true
+        // },
+        // url:{
+        //     type:String,
+        //     required:true
+        // },
+        // orderId:{
+        //     type:String,
+        //     required:true,
+        // },
+        // date:{
+        //     type:Date,
+        //     required:true
+        // }
+        const invoice = new InvoiceModel({
+            receiptId: data.receiptNo,
+            orderId: data.orderId,
+            date: data.date,
+            userId: user._id,
+            url: url
+        });
+        // save the invoice in the database
+        await invoice.save();
+
+        
+
     }
 
 //DATE MANIPULATION LOGIC 
