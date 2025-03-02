@@ -90,7 +90,6 @@ console.log(tokenInfo);
       };
       console.log("ORDER")
       console.log(order)
-      console.log();
       setOrderInfo(order.data.orderId)
       setRcpt(order.data.receiptId)
 
