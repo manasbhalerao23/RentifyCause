@@ -23,10 +23,13 @@ const [rcpt, setRcpt]=useState("");
 const [orderInfo,setOrderInfo]=useState("")
 const [url,setUrl] = useState("")
 const [downloadUrl, setDownloadUrl] = useState("")
+const [orderId, setOrderId] =useState("")
   const gettingNewData = async () => {
     const res = await axios.post(
       `${BACKEND_URL}/auth/getInfo`,
-      { id: userInfo._id },
+      { id: userInfo._id , 
+        orderId:orderId
+      },
       { headers: {authorization: `Bearer ${tokenInfo}`} }
     );
     const data = res.data;
@@ -84,7 +87,7 @@ console.log(tokenInfo);
       console.log(order);
       setOrderInfo(order.data.orderId)
       setRcpt(order.data.receiptId)
-
+      setOrderId(orderId)
 
 
       const rzp = new window.Razorpay(options);
