@@ -34,6 +34,9 @@ const [orderId, setOrderId] =useState("")
     );
     const data = res.data;
     console.log(data);
+    console.log("order" +orderId);
+    console.log(data?.downloadUrl+ " --- "+data?.Url);
+    
     
     console.log(data?.msg);
     dispatch(setUser(data?.msg));
@@ -84,7 +87,9 @@ console.log(tokenInfo);
         theme: { color: "#F37254" },
         handler: gettingNewData,
       };
-      console.log(order);
+      console.log("ORDER")
+      console.log(order)
+      console.log(order.data.orderId);
       setOrderInfo(order.data.orderId)
       setRcpt(order.data.receiptId)
       setOrderId(orderId)
