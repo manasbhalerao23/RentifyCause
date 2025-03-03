@@ -260,11 +260,11 @@ if(payment.notes?.paymentType=="donation"){
         currBlog.donationRecieved+= payment.amount/100;
         await currBlog.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
 
-        
+
      }
 }else{
 
-
+    if(paymentDetails.status=="captured"){
 
     const user = await User.findById(payment.notes?.userId);
     console.log("user");
@@ -304,7 +304,7 @@ user.rentPaidUntil=new Date(Date.now());
     await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
 
 
-    if(paymentDetails.status=="captured"){
+   
         // receiptNo: string;
         // orderId: string;
         // date: string;
