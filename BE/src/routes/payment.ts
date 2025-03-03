@@ -98,7 +98,8 @@ console.log(user.monthstatus);
             amount:order.amount,
             currency: order.currency,
             receipt:order.receipt,
-            notes:order.notes
+            notes:order.notes,
+            
 
         })
         const savePayment= await payment.save();
@@ -228,6 +229,95 @@ await payment.save();
 
 console.log(payment);
 console.log(payment.notes?.userId);
+if(payment.notes?.paymentType=="donation"){
+    if(paymentDetails.status=="captured"){
+        const user = await User.findById(payment.notes?.userId);
+     console.log("user");
+     
+     if(!user){
+         console.log("user");
+         
+         res.status(200).json({message: "No user found"});
+         return ;
+     }
+ 
+    
+     user.totalDonation+=payment.amount/100;
+     
+ 
+    
+ 
+     await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
+        //  // receiptNo: string;
+        //  // orderId: string;
+        //  // date: string;
+        //  // tenantName: string;
+        //  // propertyAddress: string;
+        //  // monthsPaid: number;
+        //  // monthlyRent: number;
+        //  // totalRent: number;
+        //  // paymentMode: string;
+        //  // transactionId: string;
+        //  const data = {
+        //      receiptNo:payment.receipt ?? "",
+        //      orderId: payment.orderId ,
+        //      date: new Date(Date.now()),
+        //      tenantName: user.username ?? "",
+        //      propertyAddress:user.address  ?? "",
+        //      monthsPaid:payment.notes?.months_paid?.toString() ?? "",
+        //      monthlyRent:user.monthRent.toString() ?? "",
+        //      totalRent:(payment.amount/100).toString() ?? "",
+        //      paymentMode:paymentDetails?.method.toString() ?? "",
+        //      transactionId:paymentDetails?.id.toString() ?? ""
+        //  }
+        //  const url = await generateRentInvoice(data);
+ 
+        //  //lets create an entry in invoiceModel from db.ts now
+        //  // userId:{
+        //  //     type:Schema.Types.ObjectId ,
+        //  //     ref:"User",
+        //  //     required:true
+        //  // },
+        //  // receiptId:{
+        //  //     type:String,
+        //  //     required:true
+        //  // },
+        //  // url:{
+        //  //     type:String,
+        //  //     required:true
+        //  // },
+        //  // orderId:{
+        //  //     type:String,
+        //  //     required:true,
+        //  // },
+        //  // date:{
+        //  //     type:Date,
+        //  //     required:true
+        //  // }
+        //  const invoice = new InvoiceModel({
+        //      receiptId: data.receiptNo,
+        //      orderId: data.orderId,
+        //      date: data.date,
+        //      userId: user._id,
+        //      url: url
+        //  });
+        //  // save the invoice in the database
+        //  await invoice.save();
+        const blogId= payment.notes?.donationId
+        const currBlog= await BlogsModel.findById(blogId);
+        if(!currBlog){
+         res.status(200).json({message: "No Blog found"});
+         return;
+
+        }
+      
+        currBlog.donationRecieved+= payment.amount/100;
+        
+      
+ 
+     }
+}else{
+
 
 
     const user = await User.findById(payment.notes?.userId);
@@ -328,7 +418,7 @@ user.rentPaidUntil=new Date(Date.now());
      
 
     }
-
+}
 //DATE MANIPULATION LOGIC 
 
  
@@ -393,92 +483,7 @@ paymentRouter.post("/donation/payment/webhook", async (req,res): Promise<void> =
      
  
  
-     if(paymentDetails.status=="captured"){
-        const user = await User.findById(payment.notes?.userId);
-     console.log("user");
-     
-     if(!user){
-         console.log("user");
-         
-         res.status(200).json({message: "No user found"});
-         return ;
-     }
- 
     
-     user.totalDonation+=payment.amount/100;
-     
- 
-    
- 
-     await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
-        //  // receiptNo: string;
-        //  // orderId: string;
-        //  // date: string;
-        //  // tenantName: string;
-        //  // propertyAddress: string;
-        //  // monthsPaid: number;
-        //  // monthlyRent: number;
-        //  // totalRent: number;
-        //  // paymentMode: string;
-        //  // transactionId: string;
-        //  const data = {
-        //      receiptNo:payment.receipt ?? "",
-        //      orderId: payment.orderId ,
-        //      date: new Date(Date.now()),
-        //      tenantName: user.username ?? "",
-        //      propertyAddress:user.address  ?? "",
-        //      monthsPaid:payment.notes?.months_paid?.toString() ?? "",
-        //      monthlyRent:user.monthRent.toString() ?? "",
-        //      totalRent:(payment.amount/100).toString() ?? "",
-        //      paymentMode:paymentDetails?.method.toString() ?? "",
-        //      transactionId:paymentDetails?.id.toString() ?? ""
-        //  }
-        //  const url = await generateRentInvoice(data);
- 
-        //  //lets create an entry in invoiceModel from db.ts now
-        //  // userId:{
-        //  //     type:Schema.Types.ObjectId ,
-        //  //     ref:"User",
-        //  //     required:true
-        //  // },
-        //  // receiptId:{
-        //  //     type:String,
-        //  //     required:true
-        //  // },
-        //  // url:{
-        //  //     type:String,
-        //  //     required:true
-        //  // },
-        //  // orderId:{
-        //  //     type:String,
-        //  //     required:true,
-        //  // },
-        //  // date:{
-        //  //     type:Date,
-        //  //     required:true
-        //  // }
-        //  const invoice = new InvoiceModel({
-        //      receiptId: data.receiptNo,
-        //      orderId: data.orderId,
-        //      date: data.date,
-        //      userId: user._id,
-        //      url: url
-        //  });
-        //  // save the invoice in the database
-        //  await invoice.save();
-        const blogId= payment.notes?.donationId
-        const currBlog= await BlogsModel.findById(blogId);
-        if(!currBlog){
-         res.status(200).json({message: "No Blog found"});
-         return;
-
-        }
-      
-        currBlog.donationRecieved+= payment.amount/100;
-        
-      
- 
-     }
  
  //DATE MANIPULATION LOGIC 
  
