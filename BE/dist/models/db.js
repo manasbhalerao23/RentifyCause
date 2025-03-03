@@ -46,7 +46,10 @@ const BlogsSchema = new mongoose_1.Schema({
     dateTime: { type: Date, required: true, default: Date.now },
     location: { type: String, required: true },
     body: { type: String, required: true },
-    images: [{ type: String }]
+    images: [{ type: String }],
+    donationRecieved: { type: Number,
+        default: 0
+    }
 });
 exports.BlogsModel = (0, mongoose_1.model)('Blogs', BlogsSchema);
 //payments
@@ -97,6 +100,9 @@ const PaymentSchema = new mongoose_1.Schema({
         },
         months_paid: {
             type: Number
+        },
+        donationId: {
+            type: mongoose_1.Schema.Types.ObjectId,
         }
     },
     paymentMethod: {

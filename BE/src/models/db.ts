@@ -53,7 +53,10 @@ const BlogsSchema = new Schema({
     dateTime : {type: Date, required: true, default: Date.now},
     location : {type: String, required: true},
     body: { type: String, required: true },
-    images: [{ type: String }]
+    images: [{ type: String }],
+    donationRecieved: {type:Number,
+        default:0
+    }
 })
 
 export const BlogsModel = model('Blogs', BlogsSchema);
@@ -108,7 +111,11 @@ const PaymentSchema=new Schema({
                 },
             months_paid:{
                 type: Number
+            },
+            donationId:{
+                type: Schema.Types.ObjectId,
             }
+
         },
         paymentMethod:{
             type:String,
