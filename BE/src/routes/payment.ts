@@ -248,61 +248,7 @@ if(payment.notes?.paymentType=="donation"){
     
  
      await user.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
-        //  // receiptNo: string;
-        //  // orderId: string;
-        //  // date: string;
-        //  // tenantName: string;
-        //  // propertyAddress: string;
-        //  // monthsPaid: number;
-        //  // monthlyRent: number;
-        //  // totalRent: number;
-        //  // paymentMode: string;
-        //  // transactionId: string;
-        //  const data = {
-        //      receiptNo:payment.receipt ?? "",
-        //      orderId: payment.orderId ,
-        //      date: new Date(Date.now()),
-        //      tenantName: user.username ?? "",
-        //      propertyAddress:user.address  ?? "",
-        //      monthsPaid:payment.notes?.months_paid?.toString() ?? "",
-        //      monthlyRent:user.monthRent.toString() ?? "",
-        //      totalRent:(payment.amount/100).toString() ?? "",
-        //      paymentMode:paymentDetails?.method.toString() ?? "",
-        //      transactionId:paymentDetails?.id.toString() ?? ""
-        //  }
-        //  const url = await generateRentInvoice(data);
- 
-        //  //lets create an entry in invoiceModel from db.ts now
-        //  // userId:{
-        //  //     type:Schema.Types.ObjectId ,
-        //  //     ref:"User",
-        //  //     required:true
-        //  // },
-        //  // receiptId:{
-        //  //     type:String,
-        //  //     required:true
-        //  // },
-        //  // url:{
-        //  //     type:String,
-        //  //     required:true
-        //  // },
-        //  // orderId:{
-        //  //     type:String,
-        //  //     required:true,
-        //  // },
-        //  // date:{
-        //  //     type:Date,
-        //  //     required:true
-        //  // }
-        //  const invoice = new InvoiceModel({
-        //      receiptId: data.receiptNo,
-        //      orderId: data.orderId,
-        //      date: data.date,
-        //      userId: user._id,
-        //      url: url
-        //  });
-        //  // save the invoice in the database
-        //  await invoice.save();
+      
         const blogId= payment.notes?.donationId
         const currBlog= await BlogsModel.findById(blogId);
         if(!currBlog){
@@ -312,9 +258,9 @@ if(payment.notes?.paymentType=="donation"){
         }
       
         currBlog.donationRecieved+= payment.amount/100;
+        await currBlog.save().then(()=>console.log("Updated")).catch(err=>console.log(err));
+
         
-      
- 
      }
 }else{
 
@@ -445,70 +391,6 @@ user.rentPaidUntil=new Date(Date.now());
 })
 
 
-paymentRouter.post("/donation/payment/webhook", async (req,res): Promise<void> => {
-    try {
-     const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
- const isWebhookValid=validateWebhookSignature(JSON.stringify(req.body),
-  webhookSignature as string, 
-  process.env.RAZORPAY_WEBHOOK_SECRET as string
- )
- if(!isWebhookValid){
-      res.status(400).json({error: "Invalid webhook signature"})
-      return;
- }
- console.log(isWebhookValid);
- 
- //update payment status in db
- const paymentDetails=req.body.payload.payment.entity;
- console.log(paymentDetails);
- 
- 
- 
- 
- const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
- console.log(payment);
- if(!payment){
-     res.status(200).json({msg:"No such Order"})
-     return;
- }
- payment.status= paymentDetails.status;
- await payment.save();
- 
- 
- 
- console.log(payment);
- console.log(payment.notes?.userId);
- 
- 
-     
- 
- 
-    
- 
- //DATE MANIPULATION LOGIC 
- 
-  
- //return success response to razorpay
-     // if (req.body.event == "payment.captured") {
- 
-     // }
- 
-     // if (req.body.event == "payment.failed") {
- 
-     // }
-  res.status(200).json({msg:"Webhook recieved successfully"});
-  return;
- 
- 
- }
-  catch(err){
-     console.log(err);
-     res.status(500).json({ msg: err });
-     return;
-  }
- 
- 
- })
 
 
 export default paymentRouter;
