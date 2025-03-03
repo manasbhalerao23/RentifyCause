@@ -96,7 +96,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
             amount: order.amount,
             currency: order.currency,
             receipt: order.receipt,
-            notes: order.notes
+            notes: order.notes,
         });
         const savePayment = yield payment.save();
         console.log(savePayment);
@@ -165,7 +165,7 @@ paymentRouter.post("/payment/create/donate/:Did", auth_1.userAuth, (req, res) =>
     }
 }));
 paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
     try {
         const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
         const isWebhookValid = (0, razorpay_utils_1.validateWebhookSignature)(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
@@ -187,198 +187,111 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
         yield payment.save();
         console.log(payment);
         console.log((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId);
-        const user = yield db_1.User.findById((_b = payment.notes) === null || _b === void 0 ? void 0 : _b.userId);
-        console.log("user");
-        if (!user) {
-            console.log("user");
-            res.status(200).json({ message: "No user found" });
-            return;
-        }
-        let paid_months = user.monthstatus; //arr
-        let monthsupdate = (_c = payment.notes) === null || _c === void 0 ? void 0 : _c.months_paid; //months payment
-        console.log("arr" + paid_months);
-        console.log("Months update " + monthsupdate);
-        const currentmonth = new Date().getMonth();
-        console.log("curr" + currentmonth);
-        for (let i = 0; i < paid_months.length; i++) {
-            if (!paid_months[i] && i <= currentmonth && monthsupdate > 0) {
-                paid_months[i] = true;
-                monthsupdate--;
-            }
-            if (monthsupdate == 0) {
-                break;
-            }
-        }
-        console.log("updated arr" + paid_months);
-        // user.monthstatus = paid_months;
-        user.set("monthstatus", paid_months);
-        user.rentPaidUntil = new Date(Date.now());
-        yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
-        if (paymentDetails.status == "captured") {
-            // receiptNo: string;
-            // orderId: string;
-            // date: string;
-            // tenantName: string;
-            // propertyAddress: string;
-            // monthsPaid: number;
-            // monthlyRent: number;
-            // totalRent: number;
-            // paymentMode: string;
-            // transactionId: string;
-            const data = {
-                receiptNo: (_d = payment.receipt) !== null && _d !== void 0 ? _d : "",
-                orderId: payment.orderId,
-                date: new Date(Date.now()),
-                tenantName: (_e = user.username) !== null && _e !== void 0 ? _e : "",
-                propertyAddress: (_f = user.address) !== null && _f !== void 0 ? _f : "",
-                monthsPaid: (_j = (_h = (_g = payment.notes) === null || _g === void 0 ? void 0 : _g.months_paid) === null || _h === void 0 ? void 0 : _h.toString()) !== null && _j !== void 0 ? _j : "",
-                monthlyRent: (_k = user.monthRent.toString()) !== null && _k !== void 0 ? _k : "",
-                totalRent: (_l = (payment.amount / 100).toString()) !== null && _l !== void 0 ? _l : "",
-                paymentMode: (_m = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _m !== void 0 ? _m : "",
-                transactionId: (_o = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _o !== void 0 ? _o : ""
-            };
-            const url = yield (0, invoiceGeneration_1.generateRentInvoice)(data);
-            //lets create an entry in invoiceModel from db.ts now
-            // userId:{
-            //     type:Schema.Types.ObjectId ,
-            //     ref:"User",
-            //     required:true
-            // },
-            // receiptId:{
-            //     type:String,
-            //     required:true
-            // },
-            // url:{
-            //     type:String,
-            //     required:true
-            // },
-            // orderId:{
-            //     type:String,
-            //     required:true,
-            // },
-            // date:{
-            //     type:Date,
-            //     required:true
-            // }
-            const invoice = new db_1.InvoiceModel({
-                receiptId: data.receiptNo,
-                orderId: data.orderId,
-                date: data.date,
-                userId: user._id,
-                url: url
-            });
-            // save the invoice in the database
-            yield invoice.save();
-        }
-        //DATE MANIPULATION LOGIC 
-        //return success response to razorpay
-        // if (req.body.event == "payment.captured") {
-        // }
-        // if (req.body.event == "payment.failed") {
-        // }
-        res.status(200).json({ msg: "Webhook recieved successfully" });
-        return;
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ msg: err });
-        return;
-    }
-}));
-paymentRouter.post("/donation/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
-    try {
-        const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
-        const isWebhookValid = (0, razorpay_utils_1.validateWebhookSignature)(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
-        if (!isWebhookValid) {
-            res.status(400).json({ error: "Invalid webhook signature" });
-            return;
-        }
-        console.log(isWebhookValid);
-        //update payment status in db
-        const paymentDetails = req.body.payload.payment.entity;
-        console.log(paymentDetails);
-        const payment = yield db_1.paymentModel.findOne({ orderId: paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.order_id });
-        console.log(payment);
-        if (!payment) {
-            res.status(200).json({ msg: "No such Order" });
-            return;
-        }
-        payment.status = paymentDetails.status;
-        yield payment.save();
-        console.log(payment);
-        console.log((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId);
-        if (paymentDetails.status == "captured") {
-            const user = yield db_1.User.findById((_b = payment.notes) === null || _b === void 0 ? void 0 : _b.userId);
-            console.log("user");
-            if (!user) {
+        if (((_b = payment.notes) === null || _b === void 0 ? void 0 : _b.paymentType) == "donation") {
+            if (paymentDetails.status == "captured") {
+                const user = yield db_1.User.findById((_c = payment.notes) === null || _c === void 0 ? void 0 : _c.userId);
                 console.log("user");
-                res.status(200).json({ message: "No user found" });
-                return;
+                if (!user) {
+                    console.log("user");
+                    res.status(200).json({ message: "No user found" });
+                    return;
+                }
+                user.totalDonation += payment.amount / 100;
+                yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
+                const blogId = (_d = payment.notes) === null || _d === void 0 ? void 0 : _d.donationId;
+                const currBlog = yield db_1.BlogsModel.findById(blogId);
+                if (!currBlog) {
+                    res.status(200).json({ message: "No Blog found" });
+                    return;
+                }
+                currBlog.donationRecieved += payment.amount / 100;
+                yield currBlog.save().then(() => console.log("Updated")).catch(err => console.log(err));
             }
-            user.totalDonation += payment.amount / 100;
-            yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
-            //  // receiptNo: string;
-            //  // orderId: string;
-            //  // date: string;
-            //  // tenantName: string;
-            //  // propertyAddress: string;
-            //  // monthsPaid: number;
-            //  // monthlyRent: number;
-            //  // totalRent: number;
-            //  // paymentMode: string;
-            //  // transactionId: string;
-            //  const data = {
-            //      receiptNo:payment.receipt ?? "",
-            //      orderId: payment.orderId ,
-            //      date: new Date(Date.now()),
-            //      tenantName: user.username ?? "",
-            //      propertyAddress:user.address  ?? "",
-            //      monthsPaid:payment.notes?.months_paid?.toString() ?? "",
-            //      monthlyRent:user.monthRent.toString() ?? "",
-            //      totalRent:(payment.amount/100).toString() ?? "",
-            //      paymentMode:paymentDetails?.method.toString() ?? "",
-            //      transactionId:paymentDetails?.id.toString() ?? ""
-            //  }
-            //  const url = await generateRentInvoice(data);
-            //  //lets create an entry in invoiceModel from db.ts now
-            //  // userId:{
-            //  //     type:Schema.Types.ObjectId ,
-            //  //     ref:"User",
-            //  //     required:true
-            //  // },
-            //  // receiptId:{
-            //  //     type:String,
-            //  //     required:true
-            //  // },
-            //  // url:{
-            //  //     type:String,
-            //  //     required:true
-            //  // },
-            //  // orderId:{
-            //  //     type:String,
-            //  //     required:true,
-            //  // },
-            //  // date:{
-            //  //     type:Date,
-            //  //     required:true
-            //  // }
-            //  const invoice = new InvoiceModel({
-            //      receiptId: data.receiptNo,
-            //      orderId: data.orderId,
-            //      date: data.date,
-            //      userId: user._id,
-            //      url: url
-            //  });
-            //  // save the invoice in the database
-            //  await invoice.save();
-            const blogId = (_c = payment.notes) === null || _c === void 0 ? void 0 : _c.donationId;
-            const currBlog = yield db_1.BlogsModel.findById(blogId);
-            if (!currBlog) {
-                res.status(200).json({ message: "No Blog found" });
-                return;
+        }
+        else {
+            if (paymentDetails.status == "captured") {
+                const user = yield db_1.User.findById((_e = payment.notes) === null || _e === void 0 ? void 0 : _e.userId);
+                console.log("user");
+                if (!user) {
+                    console.log("user");
+                    res.status(200).json({ message: "No user found" });
+                    return;
+                }
+                let paid_months = user.monthstatus; //arr
+                let monthsupdate = (_f = payment.notes) === null || _f === void 0 ? void 0 : _f.months_paid; //months payment
+                console.log("arr" + paid_months);
+                console.log("Months update " + monthsupdate);
+                const currentmonth = new Date().getMonth();
+                console.log("curr" + currentmonth);
+                for (let i = 0; i < paid_months.length; i++) {
+                    if (!paid_months[i] && i <= currentmonth && monthsupdate > 0) {
+                        paid_months[i] = true;
+                        monthsupdate--;
+                    }
+                    if (monthsupdate == 0) {
+                        break;
+                    }
+                }
+                console.log("updated arr" + paid_months);
+                // user.monthstatus = paid_months;
+                user.set("monthstatus", paid_months);
+                user.rentPaidUntil = new Date(Date.now());
+                yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
+                // receiptNo: string;
+                // orderId: string;
+                // date: string;
+                // tenantName: string;
+                // propertyAddress: string;
+                // monthsPaid: number;
+                // monthlyRent: number;
+                // totalRent: number;
+                // paymentMode: string;
+                // transactionId: string;
+                const data = {
+                    receiptNo: (_g = payment.receipt) !== null && _g !== void 0 ? _g : "",
+                    orderId: payment.orderId,
+                    date: new Date(Date.now()),
+                    tenantName: (_h = user.username) !== null && _h !== void 0 ? _h : "",
+                    propertyAddress: (_j = user.address) !== null && _j !== void 0 ? _j : "",
+                    monthsPaid: (_m = (_l = (_k = payment.notes) === null || _k === void 0 ? void 0 : _k.months_paid) === null || _l === void 0 ? void 0 : _l.toString()) !== null && _m !== void 0 ? _m : "",
+                    monthlyRent: (_o = user.monthRent.toString()) !== null && _o !== void 0 ? _o : "",
+                    totalRent: (_p = (payment.amount / 100).toString()) !== null && _p !== void 0 ? _p : "",
+                    paymentMode: (_q = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _q !== void 0 ? _q : "",
+                    transactionId: (_r = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _r !== void 0 ? _r : ""
+                };
+                const url = yield (0, invoiceGeneration_1.generateRentInvoice)(data);
+                //lets create an entry in invoiceModel from db.ts now
+                // userId:{
+                //     type:Schema.Types.ObjectId ,
+                //     ref:"User",
+                //     required:true
+                // },
+                // receiptId:{
+                //     type:String,
+                //     required:true
+                // },
+                // url:{
+                //     type:String,
+                //     required:true
+                // },
+                // orderId:{
+                //     type:String,
+                //     required:true,
+                // },
+                // date:{
+                //     type:Date,
+                //     required:true
+                // }
+                const invoice = new db_1.InvoiceModel({
+                    receiptId: data.receiptNo,
+                    orderId: data.orderId,
+                    date: data.date,
+                    userId: user._id,
+                    url: url
+                });
+                // save the invoice in the database
+                yield invoice.save();
             }
-            currBlog.donationRecieved += payment.amount / 100;
         }
         //DATE MANIPULATION LOGIC 
         //return success response to razorpay

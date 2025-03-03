@@ -1,40 +1,50 @@
-import { ChangeEvent, ReactNode, useState } from "react";
+import axios from "axios";
+import React, { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import { BACKEND_URL } from "../config";
 
 function AdminPage(){
-    // const Records = ; from BE
-    //sample data
-    const reservationsData = [
-        {
-          id: 1,
-          shop_name: "mnnc",
-          rent: "5253",
-          address: "ajbcau",
-          owner: "ajbwec",
-          mobile: "+652522359",
-          payment: "24200"
-        },
-        {
-            id: 2,
-            shop_name: "mnnsvsc",
-            rent: "3525",
-            address: "ajwgsu",
-            owner: "gwgsec",
-            mobile: "+6012636789",
-            payment: "24567"
-        },
-      ];
-    
-    const [search, setsearch] = useState("");
+
+  const [search, setsearch] = useState("");
     const[sortcol, setsortcol] = useState<string | null>(null);
     const [sortorder, setsortorder] = useState("Asc");
-    const [records, setrecords] = useState(reservationsData);//BE data go here
+    const [records, setrecords] = useState<any[]>([]);
+    const [selectedmonth, setselectedmonth] = useState(0);
+
+
+  useEffect(() => {
+    const fetchedRecords = async() => {
+      try{
+        const response = await axios.get(`${BACKEND_URL}/admin/getall`,{
+          withCredentials: true
+        });
+        //console.log(response.data.DatatoSend);
+        if (Array.isArray(response.data.DatatoSend)) {
+          //console.log("ddd");
+          setrecords(response.data.DatatoSend); 
+        }
+        //console.log(records);
+        //setrecords(response.data);
+      }
+      catch(e){
+        console.log(e);
+      }
+    };
+    fetchedRecords();
+  }, []);
+    
+
+    const handlemonthsort = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setselectedmonth(parseInt(event.target.value));
+    };
+
+    const filteredusers = records.filter((user) => user.monthstatus[selectedmonth]);
 
     const handlesearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setsearch(event.target.value);
       };
     
-      const filteredRecords = records.filter((res: { shop_name: string; }) =>
-        res.shop_name.toLowerCase().includes(search.toLowerCase())
+      const filteredRecords = records.filter((res: { shopName?: string; }) => res.shopName &&
+        res.shopName.toLowerCase().includes(search.toLowerCase())
       );
     
       //sort in onclick name
@@ -64,23 +74,73 @@ function AdminPage(){
           <h2 className="text-lg font-semibold">Pending</h2>
           <p className="text-xl font-bold">123</p>
         </Card>
-        <Card className="p-4 flex-1 text-center">
+        {/* <Card className="p-4 flex-1 text-center">
           <h2 className="text-lg font-semibold">Confirmed</h2>
           <p className="text-xl font-bold">123</p>
-        </Card>
+        </Card> */}
         <Card className="p-4 flex-1 text-center">
           <h2 className="text-lg font-semibold">Completed</h2>
           <p className="text-xl font-bold">146</p>
         </Card>
       </div>
+      <div className="flex items-center space-x-4">
       <Input
         type="text"
         placeholder="Search Record"
         value={search}
         onChange={handlesearch}
-        className="mb-4 w-full p-2 border rounded"
+        className="mb-4 p-2 border rounded"
       />
-      <Table className="w-full mt-4">
+      <div className="flex items-center space-x-1">
+      <label>Select Month</label>
+      <select value={selectedmonth} onChange={handlemonthsort} className="p-2 border rounded">
+        {
+          [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ].map((month, index) => (
+            <option key={index} value={index}>
+              {month}
+            </option>
+          ))
+        }
+      </select>
+      </div>
+      </div>
+      
+      {filteredusers.length > 0 ? (
+      <Table className="w-full mt-4 border-collapse">
+      <Thead>
+        <Tr className="bg-gray-200">
+          <Th className="p-2">No.</Th>
+          <Th className="p-2">Username</Th>
+          <Th className="p-2">Shop Name</Th>
+          <Th className="p-2">Payment Status</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+        {filteredusers.map((user, index) => (
+          <tr key={user._id} className="border-b">
+            <td className="p-2">{index + 1}</td>
+            <td className="p-2">{user.username}</td>
+            <td className="p-2">{user.shopName}</td>
+            <td className="p-2 text-green-600 font-semibold">Paid</td>
+          </tr>
+        ))}
+      </Tbody>
+    </Table>
+      ) : (
+        <Table className="w-full mt-4">
         <Thead>
           <Tr>
             <Th onClick={() => handlesort("id")}>No.</Th>
@@ -94,18 +154,20 @@ function AdminPage(){
         </Thead>
         <Tbody>
           {filteredRecords.map((res, index) => (
-            <Tr key={res.id}>
+            <Tr key={res.id || index}>
               <Td>{index + 1}</Td>
-              <Td>{res.shop_name}</Td>
-              <Td>{res.rent}</Td>
+              <Td>{res.shopName}</Td>
+              <Td>{res.currentRent}</Td>
               <Td>{res.address}</Td>
-              <Td>{res.owner}</Td>
-              <Td>{res.mobile}</Td>
-              <Td className="text-green-600 font-semibold">{res.payment}</Td>
+              <Td>{res.username}</Td>
+              <Td>{res.contact}</Td>
+              <Td className={res.receipt ? "text-green-600 font-semibold cursor-pointer hover:text-green-500" : "text-red-600 font-semibold"}>{res.receipt ? res.receipt : "Not Paid"}</Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+      )}
+      
         </div>
     )
 }

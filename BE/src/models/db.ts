@@ -9,7 +9,7 @@ const UserSchema = new Schema({
         default:"user"
     },
     contact: {type: String},
-    address: {type: String},
+    address: {type: String}, 
     shopName: {type: String},
     monthRent: {type: Number,
         default: 2000
@@ -74,7 +74,7 @@ const PaymentSchema=new Schema({
         status:{
             type:String,
             required:true
-        },
+        }, 
         amount:{
             type:Number,
             required:true

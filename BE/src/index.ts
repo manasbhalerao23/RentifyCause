@@ -8,6 +8,7 @@ import {Request, Response} from "express";
 import authRouter from "./routes/auth"
 import blogRouter from "./routes/blog";
 import paymentRouter from "./routes/payment";
+import adminrouter from "./routes/admin";
 
 
 const app = express();
@@ -26,6 +27,7 @@ app.get("/",async (req:Request,res:Response)=>{
 app.use("/auth", authRouter);
 app.use("/blog",blogRouter);
 app.use("/",paymentRouter);
+app.use("/admin", adminrouter);
 
 
 async function main() {

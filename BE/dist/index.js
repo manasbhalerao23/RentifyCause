@@ -21,6 +21,7 @@ dotenv_1.default.config();
 const auth_1 = __importDefault(require("./routes/auth"));
 const blog_1 = __importDefault(require("./routes/blog"));
 const payment_1 = __importDefault(require("./routes/payment"));
+const admin_1 = __importDefault(require("./routes/admin"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
@@ -34,6 +35,7 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 app.use("/auth", auth_1.default);
 app.use("/blog", blog_1.default);
 app.use("/", payment_1.default);
+app.use("/admin", admin_1.default);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield mongoose_1.default.connect(process.env.MONGO_URL);

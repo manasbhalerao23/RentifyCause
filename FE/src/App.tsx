@@ -11,13 +11,14 @@ import { Provider } from "react-redux";
 import store from "./Utils/store";
 import Rent from "./components/Rent";
 import ProfilePage from "./components/ProfileBar";
+import AdminPage from "./components/Admin";
 function App() {
   
   return (
     <Provider store={store}>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Body/>}>
+        <Route path="/" element={<AdminPage/>}>
             {/* Children Routes */}
         <Route index element={<DashBoard/>}/>
 
