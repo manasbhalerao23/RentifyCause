@@ -118,7 +118,7 @@ function AdminPage(){
       </div>
       </div>
       
-      {filteredusers.length > 0 ? (
+      {filteredusers.length >= 0 ? (
       <Table className="w-full mt-4 border-collapse">
       <Thead>
         <Tr className="bg-gray-200">
