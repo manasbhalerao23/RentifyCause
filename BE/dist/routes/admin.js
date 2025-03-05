@@ -15,6 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../models/db");
 const adminrouter = express_1.default.Router();
+adminrouter.get("/getpaydetails", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userreceipt = req.query.rec; //check
+    try {
+        const paydetail = yield db_1.paymentModel.findOne({ receipt: userreceipt });
+        res.json({ paydetail });
+    }
+    catch (e) {
+        console.log(e);
+        res.status(500).json({ message: "Error while fetching" });
+    }
+}));
 adminrouter.get("/getall", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield db_1.User.find();

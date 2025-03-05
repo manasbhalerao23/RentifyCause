@@ -12,16 +12,18 @@ import store from "./Utils/store";
 import Rent from "./components/Rent";
 import ProfilePage from "./components/ProfileBar";
 import AdminPage from "./components/Admin";
+import OpenReceipt from "./components/OpenReceipt";
 function App() {
   
   return (
     <Provider store={store}>
     <BrowserRouter>
       <Routes>
+      <Route path="/receipt" element={<OpenReceipt/>}/>
         <Route path="/" element={<AdminPage/>}>
+        
             {/* Children Routes */}
         <Route index element={<DashBoard/>}/>
-
           <Route path="/auth" element={<AuthForm/>}/>
           <Route path="/createBlog" element={<CreateBlog/>}/>
           <Route path="/card" element={<Cards/>} />

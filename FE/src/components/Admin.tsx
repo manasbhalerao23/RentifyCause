@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
+import { useNavigate } from "react-router-dom";
 
 function AdminPage(){
 
@@ -9,6 +10,12 @@ function AdminPage(){
     const [sortorder, setsortorder] = useState("Asc");
     const [records, setrecords] = useState<any[]>([]);
     const [selectedmonth, setselectedmonth] = useState(0);
+
+    const navigate = useNavigate();
+
+    const paymentOpen = (receipt: any) => {
+      navigate("/receipt", {replace: true, state: {receipt}});
+    };
 
 
   useEffect(() => {
@@ -134,7 +141,7 @@ function AdminPage(){
             <td className="p-2">{index + 1}</td>
             <td className="p-2">{user.username}</td>
             <td className="p-2">{user.shopName}</td>
-            <td className="p-2 text-green-600 font-semibold">Paid</td>
+            <td className="p-2 text-green-600 font-semibold hover:text-green-500 cursor-pointer" onClick={() => paymentOpen(user.receipt)}>{user.receipt}</td>
           </tr>
         ))}
       </Tbody>
@@ -161,7 +168,11 @@ function AdminPage(){
               <Td>{res.address}</Td>
               <Td>{res.username}</Td>
               <Td>{res.contact}</Td>
-              <Td className={res.receipt ? "text-green-600 font-semibold cursor-pointer hover:text-green-500" : "text-red-600 font-semibold"}>{res.receipt ? res.receipt : "Not Paid"}</Td>
+              <td onClick={() => {
+                if(res.receipt){
+                  paymentOpen(res.receipt)
+                }
+              }} className={res.receipt ? "text-green-600 font-semibold cursor-pointer hover:text-green-500" : "text-red-600 font-semibold"}>{res.receipt ? res.receipt : "Not Paid"}</td>
             </Tr>
           ))}
         </Tbody>

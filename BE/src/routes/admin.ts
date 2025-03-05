@@ -4,6 +4,20 @@ import { paymentModel, User } from "../models/db";
 
 const adminrouter = express.Router();
 
+adminrouter.get("/getpaydetails", async (req, res) => {
+    const userreceipt = req.query.rec;//check
+    try{
+        const paydetail = await paymentModel.findOne({receipt: userreceipt});
+        res.json({paydetail});
+    }
+    catch(e){
+        console.log(e);
+        res.status(500).json({message: "Error while fetching"});
+    }
+});
+
+
+
 adminrouter.get("/getall", async (req, res) => {
     try{
         const users = await User.find();
