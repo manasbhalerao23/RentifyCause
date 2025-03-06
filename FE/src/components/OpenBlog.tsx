@@ -20,7 +20,7 @@ export const OpenBlog = () => {
   const [location, setLocation] = useState("");
   const [rcpt, setRcpt] = useState("");
   const [orderInfo, setOrderInfo] = useState("");
-  const { blogId } = useParams();
+  const { blogId } = useParams();C
   const [num, setNum]=useState<number>();
   const tokenInfo = useSelector((store: RootState) => store.auth);
 

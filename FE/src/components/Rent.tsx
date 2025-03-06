@@ -129,7 +129,7 @@ const Rent = () => {
           <div>
             <h3 className="text-lg font-bold mb-3">Months Paid</h3>
             <div className="grid grid-cols-4 gap-2">
-              {[
+              { [
                 "January",
                 "February",
                 "March",

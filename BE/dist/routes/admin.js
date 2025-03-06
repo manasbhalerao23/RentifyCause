@@ -49,4 +49,45 @@ adminrouter.get("/getall", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
+adminrouter.get("/getInfo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        const payments = yield db_1.paymentModel.find({ "notes.userId": id });
+        const orderIds = payments.map(p => p.orderId); // Extract orderIds from payments
+        const invoicesUrl = yield db_1.InvoiceModel.find({ orderId: { $in: orderIds } }) // Find invoices for the orderIds
+            .select("orderId url downloadUrl"); // Only select required fields
+        // Merge invoices into payments
+        const paymentsWithInvoices = payments.map(payment => {
+            const invoice = invoicesUrl.find(inv => inv.orderId === payment.orderId);
+            return Object.assign(Object.assign({}, payment.toObject()), { url: invoice ? invoice.url : null, downloadUrl: invoice ? invoice.downloadUrl : null });
+        });
+        const invoices = yield db_1.InvoiceModel.find({ userId: id });
+        const user = yield db_1.User.findById(id);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        const { _id, username, totalDonation, shopName, role, monthstatus, monthRent, email, currentRent, contact, address } = user;
+        const DatatoSend = {
+            _id,
+            username,
+            totalDonation,
+            shopName,
+            role,
+            monthstatus,
+            monthRent,
+            email,
+            currentRent,
+            contact,
+            address
+        };
+        res.send({ payments: paymentsWithInvoices, invoices: invoices, user: DatatoSend });
+        return;
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error while fetching user info" });
+        return;
+    }
+}));
 exports.default = adminrouter;

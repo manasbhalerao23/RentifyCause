@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
+import { Link } from "react-router-dom";
 
 const AdminTest = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -92,6 +93,7 @@ const AdminTest = () => {
       {/* Records Grid */}
       <div className="grid grid-cols-5 gap-4 p-10">
         {filteredRecords.map((e, idx) => (
+            <Link to= {`/admin/view/${e._id}`}>
           <div
             className={`w-64 h-auto border p-2 ${
               selectedmonth !== "Select Month"
@@ -108,6 +110,7 @@ const AdminTest = () => {
             <div>address= {e.address}</div>
             <div>monthly rent= {e.currentRent}</div>
           </div>
+          </Link>
         ))}
       </div>
     </div>

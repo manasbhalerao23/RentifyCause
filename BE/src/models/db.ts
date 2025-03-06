@@ -154,6 +154,7 @@ const InvoiceSchema= new Schema({
     orderId:{
         type:String,
         required:true,
+       
     },
     date:{
         type:Date,

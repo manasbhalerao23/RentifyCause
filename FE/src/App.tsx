@@ -14,6 +14,7 @@ import ProfilePage from "./components/ProfileBar";
 import AdminPage from "./components/Admin";
 import OpenReceipt from "./components/OpenReceipt";
 import AdminTest from "./components/AdminTest";
+import AdminView from "./components/AdminView";
 function App() {
   return (
     <Provider store={store}>
@@ -41,6 +42,7 @@ function App() {
                 />
               }
             />
+            <Route path="/admin/view/:userId" element={<AdminView />} />
             <Route path="/adminTest" element={<AdminTest/>}/>
           </Route>
         </Routes>

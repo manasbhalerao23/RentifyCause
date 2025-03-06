@@ -1,6 +1,6 @@
 
 import express from "express";
-import { paymentModel, User } from "../models/db";
+import { InvoiceModel, paymentModel, User } from "../models/db";
 
 const adminrouter = express.Router();
 
@@ -41,6 +41,68 @@ adminrouter.get("/getall", async (req, res) => {
             message: "error while fetching users"
         });
     }
+})
+
+
+adminrouter.get("/getInfo/:id", async (req, res) => {
+try{
+    const id = req.params.id;
+    const payments = await paymentModel.find({ "notes.userId": id });
+
+const orderIds = payments.map(p => p.orderId); // Extract orderIds from payments
+
+const invoicesUrl = await InvoiceModel.find({ orderId: { $in: orderIds } }) // Find invoices for the orderIds
+  .select("orderId url downloadUrl"); // Only select required fields
+
+// Merge invoices into payments
+const paymentsWithInvoices = payments.map(payment => {
+  const invoice = invoicesUrl.find(inv => inv.orderId === payment.orderId);
+  return {
+    ...payment.toObject(),
+    url: invoice ? invoice.url : null,
+    downloadUrl: invoice ? invoice.downloadUrl : null
+  };
+});
+    const invoices= await InvoiceModel.find({userId:id});
+
+    const user = await User.findById(id);
+    if(!user){
+        res.status(404).json({message: "User not found"});
+        return ;
+    }
+    const {
+        _id,
+        username,
+        totalDonation,
+        shopName,
+        role,
+        monthstatus,
+        monthRent,
+        email,
+        currentRent,
+        contact,
+        address
+    } = user
+    const DatatoSend = {
+        _id,
+        username,
+        totalDonation,
+        shopName,
+        role,
+        monthstatus,
+        monthRent,
+        email,
+        currentRent,
+        contact,
+        address}
+    res.send({payments:paymentsWithInvoices, invoices:invoices, user:DatatoSend});
+    return;
+
+}catch(err){
+    console.log(err);
+    res.status(500).json({message: "Error while fetching user info"});
+    return;
+}
 })
 
 export default adminrouter;
