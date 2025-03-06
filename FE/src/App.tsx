@@ -13,31 +13,38 @@ import Rent from "./components/Rent";
 import ProfilePage from "./components/ProfileBar";
 import AdminPage from "./components/Admin";
 import OpenReceipt from "./components/OpenReceipt";
+import AdminTest from "./components/AdminTest";
 function App() {
-  
   return (
     <Provider store={store}>
-    <BrowserRouter>
-      <Routes>
-      <Route path="/receipt" element={<OpenReceipt/>}/>
-        <Route path="/" element={<AdminPage/>}>
-        
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Body />}>
             {/* Children Routes */}
-        <Route index element={<DashBoard/>}/>
-          <Route path="/auth" element={<AuthForm/>}/>
-          <Route path="/createBlog" element={<CreateBlog/>}/>
-          <Route path="/card" element={<Cards/>} />
-          <Route path="/test" element={ <Test/> }/>
-        {/* </Route> */}
-        <Route path="/openBlog/:blogId" element={<OpenBlog/>}/>
-        <Route path="/rent" element={<Rent/>}/>
-        <Route path="/profile" element={<ProfilePage closeSidebar={function (): void {
-              throw new Error("Function not implemented.");
-            } }/>}/>
-        
-        </Route>
-      </Routes>
-    </BrowserRouter>
+            <Route path="/receipt" element={<OpenReceipt />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route index element={<DashBoard />} />
+            <Route path="/auth" element={<AuthForm />} />
+            <Route path="/createBlog" element={<CreateBlog />} />
+            <Route path="/card" element={<Cards />} />
+            <Route path="/test" element={<Test />} />
+            {/* </Route> */}
+            <Route path="/openBlog/:blogId" element={<OpenBlog />} />
+            <Route path="/rent" element={<Rent />} />
+            <Route
+              path="/profile"
+              element={
+                <ProfilePage
+                  closeSidebar={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+              }
+            />
+            <Route path="/adminTest" element={<AdminTest/>}/>
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </Provider>
   );
 }

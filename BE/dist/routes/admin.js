@@ -29,22 +29,17 @@ adminrouter.get("/getpaydetails", (req, res) => __awaiter(void 0, void 0, void 0
 adminrouter.get("/getall", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield db_1.User.find();
-        const ids = users.map((_id) => (_id));
-        //console.log(ids);
-        const payments = yield Promise.all(ids.map((_id) => __awaiter(void 0, void 0, void 0, function* () {
-            return db_1.paymentModel.findOne({ "notes.userId": _id, status: "captured" }).select("receipt notes.userId"); //add rent type here
-        })));
-        const paymentMap = new Map(payments.map((p) => { var _a; return [(_a = p === null || p === void 0 ? void 0 : p.notes) === null || _a === void 0 ? void 0 : _a.userId.toString(), p === null || p === void 0 ? void 0 : p.receipt]; }));
         //can add more if needed
         //console.log(users);
-        const DatatoSend = users.map(({ username, contact, address, shopName, currentRent, _id, monthstatus }) => ({
+        const DatatoSend = users.map(({ username, contact, address, shopName, currentRent, _id, monthstatus, email }) => ({
             username,
             contact,
             address,
             shopName,
             currentRent,
             monthstatus,
-            receipt: paymentMap.get(_id.toString()) || null
+            _id,
+            email
         }));
         res.json({ DatatoSend });
     }
