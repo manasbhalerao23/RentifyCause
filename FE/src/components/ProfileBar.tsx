@@ -7,8 +7,7 @@ import { BACKEND_URL } from "../config";
 import { removeToken } from "../Utils/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { clearUser } from "../Utils/cartSlice";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useRef } from "react";
 
 interface ProfileBarProps {
     closeSidebar: () => void;
@@ -19,6 +18,7 @@ interface ProfileBarProps {
     const userInfo = useSelector((store: RootState) => store.cart);
     const tokenInfo = useSelector((store: RootState) => store.auth);
     const [role,setRole]=useState("");
+    const sidebarRef = useRef<HTMLDivElement>(null);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -41,7 +41,19 @@ setRole(res.data.role);
 
     }
     fetchDetails();
-})
+}, []);
+
+useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+            closeSidebar();
+        }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
+}, [closeSidebar]);
 
     const handleLogout = async () => {
         try {
@@ -58,7 +70,7 @@ setRole(res.data.role);
     };
 
     return (
-      <div className="fixed top-0 right-0 w-96 sm:w-72 bg-white shadow-2xl p-6 transition-transform transform translate-x-0 z-50 rounded-l-lg flex flex-col min-h-[80vh]">
+      <div ref={sidebarRef} className="fixed top-0 right-0 w-96 sm:w-72 bg-white shadow-2xl p-6 transition-transform transform translate-x-0 z-50 rounded-l-lg flex flex-col min-h-[80vh]">
       {/* Close Button */}
       <button className="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition duration-300" onClick={closeSidebar}>
           <X size={24} />

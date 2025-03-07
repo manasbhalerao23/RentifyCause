@@ -95,7 +95,7 @@ function Header() {
       </button>
 
       {/* Donate Button */}
-      <div className="py-1 grid grid-cols-2 gap-1">
+      {userInfo.role ? <div className="py-1 grid grid-cols-2 gap-1">
       <Link to="/card">
       <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
    Donate
@@ -108,7 +108,7 @@ function Header() {
 </button>
 
       </Link> : <div></div>}
-</div>
+</div> : <div className="py-7"></div>}
 
    </div>
 
