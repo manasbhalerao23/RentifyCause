@@ -34,8 +34,7 @@ interface Payment {
 }
 
 const AdminView = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [invoices, setInvoices] = useState([]);
+  const [, setInvoices] = useState([]);
   const [payment, setPayment] = useState<Payment[]>([]);
   const [user, setUser] = useState<User>({});
   const tokenInfo = useSelector((store: RootState) => store.auth);
