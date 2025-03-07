@@ -26,7 +26,6 @@ const paymentRouter= express.Router();
 const getmonths = (months_paid: boolean [], num: number) => {
     let months = 0;
     const currentmonth = new Date().getMonth();
-    console.log("current"+ currentmonth);
     
 
     for(let i=0; i < months_paid.length; i++){
@@ -66,7 +65,6 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
 // console.log(payablemonths);
 
 user.save();
-console.log(user.monthstatus);
 
         if(payablemonths === 0){
             res.status(200).json({
@@ -103,7 +101,6 @@ console.log(user.monthstatus);
 
         })
         const savePayment= await payment.save();
-        console.log(savePayment);
         
 
 
@@ -178,7 +175,6 @@ user.save();
 
         })
         const savePayment= await payment.save();
-        console.log(savePayment);
         
 
 
@@ -207,17 +203,14 @@ if(!isWebhookValid){
      res.status(400).json({error: "Invalid webhook signature"})
      return;
 }
-console.log(isWebhookValid);
 
 //update payment status in db
 const paymentDetails=req.body.payload.payment.entity;
-console.log(paymentDetails);
 
 
 
 
 const payment= await paymentModel.findOne({orderId:paymentDetails?.order_id});
-console.log(payment);
 if(!payment){
     res.status(200).json({msg:"No such Order"})
     return;
@@ -227,15 +220,11 @@ await payment.save();
 
 
 
-console.log(payment);
-console.log(payment.notes?.userId);
 if(payment.notes?.paymentType=="donation"){
     if(paymentDetails.status=="captured"){
         const user = await User.findById(payment.notes?.userId);
-     console.log("user");
      
      if(!user){
-         console.log("user");
          
          res.status(200).json({message: "No user found"});
          return ;
@@ -267,10 +256,8 @@ if(payment.notes?.paymentType=="donation"){
     if(paymentDetails.status=="captured"){
 
     const user = await User.findById(payment.notes?.userId);
-    console.log("user");
     
     if(!user){
-        console.log("user");
         
         res.status(200).json({message: "No user found"});
         return ;
@@ -278,12 +265,9 @@ if(payment.notes?.paymentType=="donation"){
 
     let paid_months = user.monthstatus;//arr
     let monthsupdate = payment.notes?.months_paid;//months payment
-    console.log("arr" +paid_months );
-    console.log("Months update "+ monthsupdate);
     
 
     const currentmonth = new Date().getMonth();  
-    console.log("curr"+currentmonth);
     
     for(let i=0; i < paid_months.length; i++){  
         if(!paid_months[i] && i <= currentmonth && monthsupdate as number > 0){
@@ -295,7 +279,6 @@ if(payment.notes?.paymentType=="donation"){
             break;
         }
     }
-    console.log("updated arr"+paid_months);
     
     // user.monthstatus = paid_months;
     user.set("monthstatus", paid_months) 

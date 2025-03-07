@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../Utils/store";
 
 const AdminTest = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [records, setRecords] = useState<any[]>([]);
   const [selectedmonth, setselectedmonth] = useState("Select Month");
   const [searchTerm, setSearchTerm] = useState("");

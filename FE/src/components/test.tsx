@@ -5,8 +5,9 @@ const TransliterateInput = () => {
   const [text, setText] = useState("");
   const [lastTranslatedWord, setLastTranslatedWord] = useState("");
 
-  const handleChange = async (e: { target: { value: any; }; }) => {
-    let inputText = e.target.value;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = async (e: { target: { value: any}}) => {
+    const inputText = e.target.value;
 
     // Check if user added a space (word completed)
     if (inputText.endsWith(" ")) {

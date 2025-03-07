@@ -27,7 +27,6 @@ export interface AuthRequest extends Request {
 export const userAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const authHeader =req.headers.authorization; 
-        console.log(authHeader);
         
         if (!authHeader || !authHeader.startsWith("Bearer ")    ) {
 res.status(401).send("Please login!");
@@ -73,7 +72,6 @@ return;
 export const verifyAcessToken=  (req:AuthRequest,res:Response,next:NextFunction)=>{
     try{
         const token =req.headers.authorization?.split(" ")[1];
-        console.log(token);
         
         if(!token){
             res.status(401).send("Unauthorized");

@@ -27,21 +27,42 @@ authRouter.post("/reconnection", (req, res) => __awaiter(void 0, void 0, void 0,
     try {
         const refreshToken = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
         if (!refreshToken) {
-            res.status(401).json({ error: "You need to login again (error=RT12)" });
-            return;
+            return res.status(401).json({ error: "You need to login again (error=RT12)" });
         }
-        const decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+        let decoded;
+        try {
+            decoded = jsonwebtoken_1.default.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+        }
+        catch (err) {
+            if (err.name === "TokenExpiredError") {
+                return res.status(403).json({ error: "Refresh token expired. Please log in again." });
+            }
+            return res.status(403).json({ error: "Invalid refresh token." });
+        }
         const _id = decoded._id;
         if (!_id) {
-            res.status(403).json({ error: "Invalid refresh token" });
-            return;
+            return res.status(403).json({ error: "Invalid refresh token" });
         }
+        // Find user in the database
         const user = yield db_1.User.findById(_id);
         if (!user) {
-            res.status(404).json({ error: "User not found" });
-            return;
+            return res.status(404).json({ error: "User not found" });
         }
-        // Generate a new access token
+        // ✅ Optionally: Check if refresh token is stored in DB before issuing a new one
+        if (user.refreshToken !== refreshToken) {
+            return res.status(403).json({ error: "Refresh token is no longer valid. Please log in again." });
+        }
+        // Generate new refresh token
+        const newRefreshToken = jsonwebtoken_1.default.sign({ _id }, process.env.JWT_REFRESH_KEY, { expiresIn: "1d" });
+        // ✅ Store the new refresh token in DB (or Redis)
+        user.refreshToken = newRefreshToken;
+        yield user.save();
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Enable in production
+            sameSite: "strict"
+        });
+        // Generate new access token
         const newAccessToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_KEY, { expiresIn: "30m" });
         const sendingUser = {
             _id: user._id,
@@ -57,21 +78,19 @@ authRouter.post("/reconnection", (req, res) => __awaiter(void 0, void 0, void 0,
             shopName: user.shopName,
             monthStatus: user.monthstatus
         };
-        return res.json({ msg: sendingUser, token: newAccessToken });
+        return res.json({ user: sendingUser, accessToken: newAccessToken });
     }
     catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Internal server error" });
+        console.error("Error in reconnection API:", err);
+        return res.status(500).json({ error: "Internal server error" });
     }
 }));
 authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
-        console.log(username);
-        let user = yield db_1.User.findOne({ $or: [{ username },
+        const user = yield db_1.User.findOne({ $or: [{ username },
                 { email: username }
             ] });
-        console.log(user);
         if (!user) {
             res.status(400).json({ error: "Not Found User" });
             return;
@@ -82,12 +101,14 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
             return;
         }
         const accessToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_KEY, { expiresIn: "30m" });
-        const refreshToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_REFRESH_KEY, { expiresIn: "7d" });
+        const refreshToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_REFRESH_KEY, { expiresIn: "1d" });
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             // secure:true //after HTTPS certification,
             sameSite: "strict"
         });
+        user.refreshToken = refreshToken;
+        yield user.save();
         const sendingUser = {
             _id: user._id,
             username: user.username,
@@ -102,8 +123,6 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
             shopName: user.shopName,
             monthStatus: user.monthstatus
         };
-        console.log(user === null || user === void 0 ? void 0 : user.monthstatus);
-        console.log(sendingUser.monthStatus);
         res.json({ msg: sendingUser, token: accessToken });
         return;
     }

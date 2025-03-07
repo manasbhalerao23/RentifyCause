@@ -17,7 +17,6 @@ if(req.files){
     // Keep Cloudinary connection "warm" on server start
 
     for (const file of req.files as Express.Multer.File[]) {
-        console.log(file);
         
         try {
           const result = await cloudinary.uploader.upload(file.path, {
@@ -40,7 +39,6 @@ if(req.files){
 
     
     const {heading, dateTime, location, body}= req.body;
-    console.log(heading, dateTime, location,body);
     
 const blog= new BlogsModel({
     heading:heading,

@@ -21,7 +21,6 @@ const userAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     try {
         const authHeader = req.headers.authorization;
-        console.log(authHeader);
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             res.status(401).send("Please login!");
             return;
@@ -61,7 +60,6 @@ const verifyAcessToken = (req, res, next) => {
     var _a;
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-        console.log(token);
         if (!token) {
             res.status(401).send("Unauthorized");
             return;

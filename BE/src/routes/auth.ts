@@ -15,27 +15,49 @@ authRouter.post("/reconnection", async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
-      res.status(401).json({ error: "You need to login again (error=RT12)" });
-      return 
+      return res.status(401).json({ error: "You need to login again (error=RT12)" });
     }
 
-    
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as JwtPayload;
-    const _id = (decoded as JwtPayload)._id;
-    
-      if (!_id) {
-        res.status(403).json({ error: "Invalid refresh token" });
-        return 
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as JwtPayload;
+    } catch (err: any) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(403).json({ error: "Refresh token expired. Please log in again." });
       }
-    
+      return res.status(403).json({ error: "Invalid refresh token." });
+    }
 
+    const _id = decoded._id;
+    if (!_id) {
+      return res.status(403).json({ error: "Invalid refresh token" });
+    }
+
+    // Find user in the database
     const user = await User.findById(_id);
     if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Generate a new access token
+    // ✅ Optionally: Check if refresh token is stored in DB before issuing a new one
+    if (user.refreshToken !== refreshToken) {
+      return res.status(403).json({ error: "Refresh token is no longer valid. Please log in again." });
+    }
+
+    // Generate new refresh token
+    const newRefreshToken = jwt.sign({ _id }, process.env.JWT_REFRESH_KEY as string, { expiresIn: "1d" });
+
+    // ✅ Store the new refresh token in DB (or Redis)
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Enable in production
+      sameSite: "strict"
+    });
+
+    // Generate new access token
     const newAccessToken = jwt.sign({ _id: user._id }, process.env.JWT_KEY as string, { expiresIn: "30m" });
 
     const sendingUser = {
@@ -53,11 +75,10 @@ authRouter.post("/reconnection", async (req: Request, res: Response) => {
       monthStatus: user.monthstatus
     };
 
-    return res.json({ msg: sendingUser, token: newAccessToken });
+    return res.json({ user: sendingUser, accessToken: newAccessToken });
   } catch (err) {
-    console.log(err);
-    
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error in reconnection API:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -67,14 +88,12 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
   try{
     const {username, password} = req.body;
     
-    console.log(username);
     
-    let user = await User.findOne(
+    const user = await User.findOne(
       {$or:[{username},
         {email:username}
       ]}
     );
-    console.log(user);
     
     
     if(!user){
@@ -89,7 +108,7 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
       }
 
   const accessToken= jwt.sign({_id:user._id},process.env.JWT_KEY as string, {expiresIn:"30m"});
-  const refreshToken= jwt.sign({_id:user._id},process.env.JWT_REFRESH_KEY as string, {expiresIn:"7d"});
+  const refreshToken= jwt.sign({_id:user._id},process.env.JWT_REFRESH_KEY as string, {expiresIn:"1d"});
 
   res.cookie("refreshToken",refreshToken,{
     httpOnly:true,
@@ -97,6 +116,8 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
     sameSite:"strict"
   })
 
+  user.refreshToken = refreshToken;
+  await user.save();
 
   
       const sendingUser={
@@ -114,8 +135,6 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
         monthStatus:user.monthstatus
 
       }
-    console.log(user?.monthstatus);
-console.log(sendingUser.monthStatus);
       res.json({ msg:sendingUser, token:accessToken });
       return;
 

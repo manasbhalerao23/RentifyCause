@@ -34,7 +34,6 @@ const paymentRouter = express_1.default.Router();
 const getmonths = (months_paid, num) => {
     let months = 0;
     const currentmonth = new Date().getMonth();
-    console.log("current" + currentmonth);
     for (let i = 0; i < months_paid.length; i++) {
         if (!months_paid[i] && i <= currentmonth) {
             months++;
@@ -69,7 +68,6 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
         // console.log(months_paid);
         // console.log(payablemonths);
         user.save();
-        console.log(user.monthstatus);
         if (payablemonths === 0) {
             res.status(200).json({
                 message: "no dues"
@@ -99,7 +97,6 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
             notes: order.notes,
         });
         const savePayment = yield payment.save();
-        console.log(savePayment);
         res.send(Object.assign(Object.assign({}, savePayment.toJSON()), { keyId: process.env.RAZORPAY_KEY_ID, receiptId: receiptID }));
         return;
     }
@@ -154,7 +151,6 @@ paymentRouter.post("/payment/create/donate/:Did", auth_1.userAuth, (req, res) =>
             notes: order.notes
         });
         const savePayment = yield payment.save();
-        console.log(savePayment);
         res.send(Object.assign(Object.assign({}, savePayment.toJSON()), { keyId: process.env.RAZORPAY_KEY_ID, receiptId: receiptID }));
         return;
     }
@@ -165,7 +161,7 @@ paymentRouter.post("/payment/create/donate/:Did", auth_1.userAuth, (req, res) =>
     }
 }));
 paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     try {
         const webhookSignature = req.get("X-Razorpay-Signature"); // or req.headers["X-Razorpay-Signature"]
         const isWebhookValid = (0, razorpay_utils_1.validateWebhookSignature)(JSON.stringify(req.body), webhookSignature, process.env.RAZORPAY_WEBHOOK_SECRET);
@@ -173,32 +169,25 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
             res.status(400).json({ error: "Invalid webhook signature" });
             return;
         }
-        console.log(isWebhookValid);
         //update payment status in db
         const paymentDetails = req.body.payload.payment.entity;
-        console.log(paymentDetails);
         const payment = yield db_1.paymentModel.findOne({ orderId: paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.order_id });
-        console.log(payment);
         if (!payment) {
             res.status(200).json({ msg: "No such Order" });
             return;
         }
         payment.status = paymentDetails.status;
         yield payment.save();
-        console.log(payment);
-        console.log((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.userId);
-        if (((_b = payment.notes) === null || _b === void 0 ? void 0 : _b.paymentType) == "donation") {
+        if (((_a = payment.notes) === null || _a === void 0 ? void 0 : _a.paymentType) == "donation") {
             if (paymentDetails.status == "captured") {
-                const user = yield db_1.User.findById((_c = payment.notes) === null || _c === void 0 ? void 0 : _c.userId);
-                console.log("user");
+                const user = yield db_1.User.findById((_b = payment.notes) === null || _b === void 0 ? void 0 : _b.userId);
                 if (!user) {
-                    console.log("user");
                     res.status(200).json({ message: "No user found" });
                     return;
                 }
                 user.totalDonation += payment.amount / 100;
                 yield user.save().then(() => console.log("Updated")).catch(err => console.log(err));
-                const blogId = (_d = payment.notes) === null || _d === void 0 ? void 0 : _d.donationId;
+                const blogId = (_c = payment.notes) === null || _c === void 0 ? void 0 : _c.donationId;
                 const currBlog = yield db_1.BlogsModel.findById(blogId);
                 if (!currBlog) {
                     res.status(200).json({ message: "No Blog found" });
@@ -210,19 +199,14 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
         }
         else {
             if (paymentDetails.status == "captured") {
-                const user = yield db_1.User.findById((_e = payment.notes) === null || _e === void 0 ? void 0 : _e.userId);
-                console.log("user");
+                const user = yield db_1.User.findById((_d = payment.notes) === null || _d === void 0 ? void 0 : _d.userId);
                 if (!user) {
-                    console.log("user");
                     res.status(200).json({ message: "No user found" });
                     return;
                 }
                 let paid_months = user.monthstatus; //arr
-                let monthsupdate = (_f = payment.notes) === null || _f === void 0 ? void 0 : _f.months_paid; //months payment
-                console.log("arr" + paid_months);
-                console.log("Months update " + monthsupdate);
+                let monthsupdate = (_e = payment.notes) === null || _e === void 0 ? void 0 : _e.months_paid; //months payment
                 const currentmonth = new Date().getMonth();
-                console.log("curr" + currentmonth);
                 for (let i = 0; i < paid_months.length; i++) {
                     if (!paid_months[i] && i <= currentmonth && monthsupdate > 0) {
                         paid_months[i] = true;
@@ -232,7 +216,6 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
                         break;
                     }
                 }
-                console.log("updated arr" + paid_months);
                 // user.monthstatus = paid_months;
                 user.set("monthstatus", paid_months);
                 user.rentPaidUntil = new Date(Date.now());
@@ -248,16 +231,16 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
                 // paymentMode: string;
                 // transactionId: string;
                 const data = {
-                    receiptNo: (_g = payment.receipt) !== null && _g !== void 0 ? _g : "",
+                    receiptNo: (_f = payment.receipt) !== null && _f !== void 0 ? _f : "",
                     orderId: payment.orderId,
                     date: new Date(Date.now()),
-                    tenantName: (_h = user.username) !== null && _h !== void 0 ? _h : "",
-                    propertyAddress: (_j = user.address) !== null && _j !== void 0 ? _j : "",
-                    monthsPaid: (_m = (_l = (_k = payment.notes) === null || _k === void 0 ? void 0 : _k.months_paid) === null || _l === void 0 ? void 0 : _l.toString()) !== null && _m !== void 0 ? _m : "",
-                    monthlyRent: (_o = user.monthRent.toString()) !== null && _o !== void 0 ? _o : "",
-                    totalRent: (_p = (payment.amount / 100).toString()) !== null && _p !== void 0 ? _p : "",
-                    paymentMode: (_q = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _q !== void 0 ? _q : "",
-                    transactionId: (_r = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _r !== void 0 ? _r : ""
+                    tenantName: (_g = user.username) !== null && _g !== void 0 ? _g : "",
+                    propertyAddress: (_h = user.address) !== null && _h !== void 0 ? _h : "",
+                    monthsPaid: (_l = (_k = (_j = payment.notes) === null || _j === void 0 ? void 0 : _j.months_paid) === null || _k === void 0 ? void 0 : _k.toString()) !== null && _l !== void 0 ? _l : "",
+                    monthlyRent: (_m = user.monthRent.toString()) !== null && _m !== void 0 ? _m : "",
+                    totalRent: (_o = (payment.amount / 100).toString()) !== null && _o !== void 0 ? _o : "",
+                    paymentMode: (_p = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.method.toString()) !== null && _p !== void 0 ? _p : "",
+                    transactionId: (_q = paymentDetails === null || paymentDetails === void 0 ? void 0 : paymentDetails.id.toString()) !== null && _q !== void 0 ? _q : ""
                 };
                 const url = yield (0, invoiceGeneration_1.generateRentInvoice)(data);
                 //lets create an entry in invoiceModel from db.ts now

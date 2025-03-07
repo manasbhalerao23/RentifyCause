@@ -46,8 +46,7 @@ setRole(res.data.role);
     const handleLogout = async () => {
         try {
             await axios.post(`${BACKEND_URL}/auth/logout`, {}, {
-                headers: { authorization: `Bearer ${tokenInfo?.token}` },
-                withCredentials: true
+                headers: { authorization: `Bearer ${tokenInfo?.token}` }
             });
             dispatch(removeToken());
             dispatch(clearUser());

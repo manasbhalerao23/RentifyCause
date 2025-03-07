@@ -27,6 +27,9 @@ const UserSchema = new Schema({
     },
     monthstatus: { type: [Boolean],
         default: ()=> [true,false,false,false,false,false,false,false,false,false,false,false]
+    },
+    refreshToken:{
+        type:String
     }
     },{ timestamps: true }
 );

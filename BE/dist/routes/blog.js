@@ -26,7 +26,6 @@ blogRouter.post("/create", auth_1.verifyAcessToken, auth_1.checkAdmin, multer_1.
         if (req.files) {
             // Keep Cloudinary connection "warm" on server start
             for (const file of req.files) {
-                console.log(file);
                 try {
                     const result = yield cloudinary_1.default.uploader.upload(file.path, {
                         resource_type: "auto",
@@ -45,7 +44,6 @@ blogRouter.post("/create", auth_1.verifyAcessToken, auth_1.checkAdmin, multer_1.
         // console.log(req.files);
         // console.log(req.body);
         const { heading, dateTime, location, body } = req.body;
-        console.log(heading, dateTime, location, body);
         const blog = new db_1.BlogsModel({
             heading: heading,
             dateTime: dateTime,
