@@ -11,7 +11,7 @@ import { Provider } from "react-redux";
 import store from "./Utils/store";
 import Rent from "./components/Rent";
 import ProfilePage from "./components/ProfileBar";
-import AdminPage from "./components/Admin";
+//import AdminPage from "./components/Admin";
 import OpenReceipt from "./components/OpenReceipt";
 import AdminTest from "./components/AdminTest";
 import AdminView from "./components/AdminView";
@@ -23,7 +23,7 @@ function App() {
           <Route path="/" element={<Body />}>
             {/* Children Routes */}
             <Route path="/receipt" element={<OpenReceipt />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<AdminTest />} />
             <Route index element={<DashBoard />} />
             <Route path="/auth" element={<AuthForm />} />
             <Route path="/createBlog" element={<CreateBlog />} />

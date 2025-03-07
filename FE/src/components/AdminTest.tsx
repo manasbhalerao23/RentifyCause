@@ -62,7 +62,7 @@ const AdminTest = () => {
   });
 
   return (
-    <div>
+    <div className="p-6 max-w-6xl mx-auto">
       {/* Search Bar */}
       <div className="mb-4">
         <input
@@ -70,17 +70,17 @@ const AdminTest = () => {
           placeholder="Search by name or shop name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-2 border rounded w-full"
+          className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
 
       {/* Month Selection */}
-      <div className="flex items-center space-x-1">
-        <label>Select Month</label>
+      <div className="flex items-center space-x-3 mb-6">
+        <label className="text-lg font-semibold">Select Month:</label>
         <select
           value={selectedmonth}
           onChange={handlemonthsort}
-          className="p-2 border rounded"
+          className="p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
           {["Select Month", ...Object.keys(obj)].map((month, index) => (
             <option key={index} value={month}>
@@ -91,24 +91,24 @@ const AdminTest = () => {
       </div>
 
       {/* Records Grid */}
-      <div className="grid grid-cols-5 gap-4 p-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredRecords.map((e, idx) => (
-            <Link to= {`/admin/view/${e._id}`}>
+            <Link to= {`/admin/view/${e._id}`} key={idx}>
           <div
-            className={`w-64 h-auto border p-2 ${
+            className={`p-4 rounded-lg shadow-lg border transition-transform transform hover:scale-105 ${
               selectedmonth !== "Select Month"
                 ? e.monthstatus?.[obj[selectedmonth]]
-                  ? "bg-green-400"
-                  : "bg-red-400"
+                  ? "bg-green-200"
+                  : "bg-red-200"
                 : "bg-white"
             }`}
             key={idx}
           >
-            <div>name= {e.username}</div>
-            <div>contact= {e.contact}</div>
-            <div>shop name= {e.shopName}</div>
-            <div>address= {e.address}</div>
-            <div>monthly rent= {e.currentRent}</div>
+            <p className="text-lg font-semibold">{e.username}</p>
+            <p className="text-sm text-gray-600">📞 {e.contact}</p>
+            <p className="text-sm text-gray-600">🏪 {e.shopName}</p>
+            <p className="text-sm text-gray-600">📍 {e.address}</p>
+            <p className="text-sm font-semibold">💰 Rent: {e.currentRent}</p>
           </div>
           </Link>
         ))}
