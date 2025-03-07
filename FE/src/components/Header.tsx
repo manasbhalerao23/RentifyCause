@@ -44,19 +44,7 @@ function Header() {
 
                {/* Buttons & Profile */}
                <div className="flex space-x-2 sm:space-x-4 items-center">
-                  {userInfo.role === "Admin" ? (
-                     <Link to="/createBlog">
-                        <button className="bg-red-600 text-white px-4 py-2 rounded-3xl hover:bg-teal-500 transition-all duration-300">
-                           Create Blog
-                        </button>
-                     </Link>
-                  ) : userInfo.role === "user" ? (
-                     <Link to="/rent">
-                        <button className="bg-red-600 text-white px-4 py-2 rounded-3xl hover:bg-teal-500 transition-all duration-300">
-                           Rent
-                        </button>
-                     </Link>
-                  ) : null}
+                  
 
                   {userInfo.username ? (
                      <button className="relative rounded-md flex gap-1 font-medium cursor-pointer" onClick={() => setprofileopen(true)}>
@@ -95,7 +83,7 @@ function Header() {
       </button>
 
       {/* Donate Button */}
-      {userInfo.role ? <div className="py-1 grid grid-cols-2 gap-1">
+      {userInfo.role ? <div className="py-1 grid grid-cols-2 gap-2">
       <Link to="/card">
       <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
    Donate
@@ -107,7 +95,11 @@ function Header() {
    Create Blog
 </button>
 
-      </Link> : <div></div>}
+      </Link> :  <Link to="/rent">
+      <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
+      Rent
+      </button>
+                     </Link>}
 </div> : <div className="py-7"></div>}
 
    </div>
