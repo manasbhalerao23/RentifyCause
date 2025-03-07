@@ -1,10 +1,11 @@
 
 import express from "express";
 import { InvoiceModel, paymentModel, User } from "../models/db";
+import { checkAdmin, verifyAcessToken } from "../middlewares/auth";
 
 const adminrouter = express.Router();
 
-adminrouter.get("/getpaydetails", async (req, res) => {
+adminrouter.get("/getpaydetails",verifyAcessToken ,checkAdmin ,async (req, res) => {
     const userreceipt = req.query.rec;//check
     try{
         const paydetail = await paymentModel.findOne({receipt: userreceipt});
@@ -18,7 +19,7 @@ adminrouter.get("/getpaydetails", async (req, res) => {
 
 
 
-adminrouter.get("/getall", async (req, res) => {
+adminrouter.get("/getall" ,verifyAcessToken ,checkAdmin, async (req, res) => {
     try{
         const users = await User.find();
        
@@ -44,7 +45,7 @@ adminrouter.get("/getall", async (req, res) => {
 })
 
 
-adminrouter.get("/getInfo/:id", async (req, res) => {
+adminrouter.get("/getInfo/:id" ,verifyAcessToken ,checkAdmin, async (req, res) => {
 try{
     const id = req.params.id;
     const payments = await paymentModel.find({ "notes.userId": id });

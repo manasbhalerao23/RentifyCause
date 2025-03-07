@@ -16,27 +16,19 @@ const Rent = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector((store: RootState) => store.cart);
   const tokenInfo = useSelector((store: RootState) => store.auth);
-  console.log(tokenInfo);
 
-  console.log(userInfo);
   const [rcpt, setRcpt] = useState("");
   const [orderInfo, setOrderInfo] = useState("");
   const [url, setUrl] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
-  const gettingNewData = async (orderId: string) => {
-    console.log("order" + orderId);
 
+  const gettingNewData = async (orderId: string) => {
     const res = await axios.post(
       `${BACKEND_URL}/auth/getInfo`,
       { id: userInfo._id, orderId: orderId },
-      { headers: { authorization: `Bearer ${tokenInfo}` } }
+      { headers: { authorization: `Bearer ${tokenInfo.token}` } }
     );
     const data = res.data;
-    console.log(data);
-    console.log("order" + orderId);
-    console.log(data?.downloadUrl + " --- " + data?.Url);
-
-    console.log(data?.msg);
     dispatch(setUser(data?.msg));
     setDownloadUrl(data.downloadUrl);
     setUrl(data.Url);
@@ -47,26 +39,23 @@ const Rent = () => {
   const handleDownload = () => {
     const link = document.createElement("a");
     link.href = downloadUrl;
-    link.setAttribute("download", "invoice.pdf"); // Optional: Suggests a filename
+    link.setAttribute("download", "invoice.pdf");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const handleRent = async () => {
+    if (num === 0) {
+      alert("Please select number of Months");
+      return;
+    }
     try {
-      if (num === 0) {
-        alert("Please select number of Months");
-        return;
-      }
-      console.log(tokenInfo);
-
       const order = await axios.post(
         `${BACKEND_URL}/payment/create`,
         { num: num },
-        { headers: { authorization: `Bearer ${tokenInfo}` } }
+        { headers: { authorization: `Bearer ${tokenInfo.token}` } }
       );
-
       const { amount, currency, orderId, keyId, notes } = order.data;
 
       const options = {
@@ -86,8 +75,6 @@ const Rent = () => {
           gettingNewData(orderId);
         },
       };
-      console.log("ORDER");
-      console.log(order);
       setOrderInfo(order.data.orderId);
       setRcpt(order.data.receiptId);
 
@@ -99,10 +86,10 @@ const Rent = () => {
   };
 
   return (
-    <div className="container mx-auto p-5 h-screen flex flex-col gap-6 bg-gray-100 shadow-lg rounded-xl">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="w-full max-w-7xl bg-red-100 mx-auto p-5 h-screen flex flex-col gap-6  shadow-lg rounded-xl px-6 md:px-12 lg:px-24 xl:px-32">
+      <div className=" bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4">User Info</h2>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <p className="text-lg font-semibold">Name: {userInfo.username}</p>
             <p>Email: {userInfo.email}</p>
@@ -125,24 +112,11 @@ const Rent = () => {
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4">Rent Info</h2>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-bold mb-3">Months Paid</h3>
-            <div className="grid grid-cols-4 gap-2">
-              { [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ].map((month, index) => (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              {[...Array(12)].map((_, index) => (
                 <div
                   key={index}
                   className={`p-3 rounded-md text-center shadow-md font-medium ${
@@ -151,26 +125,20 @@ const Rent = () => {
                       : "bg-gray-200"
                   }`}
                 >
-                  {month}
+                  {new Date(0, index).toLocaleString("default", {
+                    month: "long",
+                  })}
                 </div>
               ))}
-              <div className="mx-10">
-                {url ? (
-                  <div>
-                    <button
-                      onClick={handleDownload}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-
-    2 px-4 rounded"
-                    >
-                      {" "}
-                      Download{" "}
-                    </button>
-                  </div>
-                ) : (
-                  <div></div>
-                )}
-              </div>
             </div>
+            {url && (
+              <button
+                onClick={handleDownload}
+                className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Download Invoice
+              </button>
+            )}
           </div>
           <div className="flex flex-col justify-between">
             <p className="text-lg font-semibold">
@@ -181,25 +149,22 @@ const Rent = () => {
               Order ID: {orderInfo || "N/A"}
             </p>
             <p className="text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
-            <div className="mt-4">
-              <h3 className="text-lg font-bold">Number of Months</h3>
-              <div className="flex gap-4 mt-2">
-                {[1, 2, 3].map((value) => (
-                  <div
-                    key={value}
-                    onClick={() => setNum(value)}
-                    className={`cursor-pointer p-3 rounded-md shadow-md font-semibold w-12 text-center ${
-                      num === value
-                        ? "bg-green-300 border-2 border-blue-600"
-                        : "bg-gray-200"
-                    }`}
-                  >
-                    {value}
-                  </div>
-                ))}
-              </div>
+            <h3 className="text-lg font-bold mt-4">Number of Months</h3>
+            <div className="flex gap-4 mt-2">
+              {[1, 2, 3].map((value) => (
+                <div
+                  key={value}
+                  onClick={() => setNum(value)}
+                  className={`cursor-pointer p-3 rounded-md shadow-md font-semibold w-12 text-center ${
+                    num === value
+                      ? "bg-green-300 border-2 border-blue-600"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  {value}
+                </div>
+              ))}
             </div>
-
             <button
               onClick={handleRent}
               className="mt-6 p-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-500 transition"

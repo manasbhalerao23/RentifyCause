@@ -33,6 +33,7 @@ export const userAuth = async (req: AuthRequest, res: Response, next: NextFuncti
 res.status(401).send("Please login!");
 return;
         }
+        
         const token = authHeader.split(" ")[1];
         const decodedObj = jwt.verify(token, process.env.JWT_KEY as string);
 
@@ -72,6 +73,8 @@ return;
 export const verifyAcessToken=  (req:AuthRequest,res:Response,next:NextFunction)=>{
     try{
         const token =req.headers.authorization?.split(" ")[1];
+        console.log(token);
+        
         if(!token){
             res.status(401).send("Unauthorized");
             return;
@@ -115,7 +118,7 @@ export const verifyAcessToken=  (req:AuthRequest,res:Response,next:NextFunction)
 export const checkAdmin = async(req:AuthRequest, res:Response, next:NextFunction)=>{
     try{
         if(req.user && req.user.role!="admin" ){
-            res.status(403).send("You are not an admin");
+            res.status(403).send("Auth error A-404");
             return;
         }
         else{

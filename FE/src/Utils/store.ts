@@ -7,6 +7,7 @@ const store= configureStore({
         auth:authSlice
         
     },
+    // devTools:false
 });
 
 

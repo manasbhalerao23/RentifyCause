@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.InvoiceModel = exports.paymentModel = exports.BlogsModel = exports.AdminModel = exports.User = void 0;
+exports.InvoiceModel = exports.paymentModel = exports.BlogsModel = exports.User = void 0;
 const mongoose_1 = require("mongoose");
 //users
 const UserSchema = new mongoose_1.Schema({
@@ -32,14 +32,6 @@ const UserSchema = new mongoose_1.Schema({
     }
 }, { timestamps: true });
 exports.User = (0, mongoose_1.model)('User', UserSchema);
-//admin
-const AdminSchema = new mongoose_1.Schema({
-    username: { type: String, unique: true },
-    password: { type: String },
-    contact: { type: String },
-    role: { type: String, required: true }
-});
-exports.AdminModel = (0, mongoose_1.model)('Admin', AdminSchema);
 //blogs
 const BlogsSchema = new mongoose_1.Schema({
     heading: { type: String, required: true },

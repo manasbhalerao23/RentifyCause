@@ -61,6 +61,7 @@ const verifyAcessToken = (req, res, next) => {
     var _a;
     try {
         const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+        console.log(token);
         if (!token) {
             res.status(401).send("Unauthorized");
             return;
@@ -100,7 +101,7 @@ exports.verifyAcessToken = verifyAcessToken;
 const checkAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (req.user && req.user.role != "admin") {
-            res.status(403).send("You are not an admin");
+            res.status(403).send("Auth error A-404");
             return;
         }
         else {

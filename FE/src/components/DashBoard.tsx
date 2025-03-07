@@ -118,7 +118,7 @@ function DashBoard() {
         }
     ];
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [menuOpen, setMenuOpen] = useState(false);
+   
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -129,48 +129,7 @@ function DashBoard() {
 
     return (
         <div className="min-h-screen bg-white w-full">
-            {/* Navigation Bar */}
-            <nav className="bg-white shadow-md">
-                <div className="container mx-auto px-4 flex items-center justify-between py-4">
-                    <div className="text-2xl font-bold text-red-600">
-                        Red Cross
-                    </div>
-
-                    {/* Desktop Links */}
-                    <div className="hidden md:flex space-x-6">
-                        <Link to="/" className="text-gray-700 hover:text-red-600">Home</Link>
-                        <a href="#" className="text-gray-700 hover:text-red-600">About Us</a>
-                        <Link to="/card" className="text-gray-700 hover:text-red-600">Services</Link>
-                        <a href="#" className="text-gray-700 hover:text-red-600">Contact</a>
-                    </div>
-
-                    {/* Mobile Menu Button */}
-                    <button
-                        className="md:hidden text-red-600 text-2xl"
-                        onClick={() => setMenuOpen(!menuOpen)}
-                    >
-                        ☰
-                    </button>
-
-                    {/* Donate Button */}
-                    <button className="hidden md:block animate-pulse bg-red-600 text-white px-6 p-2 rounded-full hover:bg-teal-500 transition-all duration-500 cursor-pointer">
-                        Donate
-                    </button>
-                </div>
-
-                {/* Mobile Menu */}
-                {menuOpen && (
-                    <div className="md:hidden bg-white border-t shadow-md">
-                        <div className="flex flex-col items-center space-y-4 py-4">
-                            <Link to="/" className="text-gray-700 hover:text-red-600">Home</Link>
-                            <a href="#" className="text-gray-700 hover:text-red-600">About Us</a>
-                            <Link to="/card" className="text-gray-700 hover:text-red-600">Services</Link>
-                            <a href="#" className="text-gray-700 hover:text-red-600">Contact</a>
-                        </div>
-                    </div>
-                )}
-            </nav>
-
+            
             {/* Slideshow Section */}
             <section className="relative h-[400px] md:h-[600px] overflow-hidden">
                 <div className="relative w-full h-full">

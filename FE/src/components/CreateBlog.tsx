@@ -5,6 +5,8 @@ import { ReactTransliterate } from "react-transliterate";
 import "react-transliterate/dist/index.css";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+import { useSelector } from "react-redux";
+import { RootState } from "../Utils/store";
   
 const BlogEditor = () => {
   const [images, setImages] = useState<File[]>();
@@ -17,6 +19,9 @@ const BlogEditor = () => {
   const [transliterateText, setTransliterateText] = useState("");
   const [blogContent, setBlogContent] = useState(""); // Store blog content separately
   const [imageUpload, setImageUpload]=useState(false);
+    const tokenInfo = useSelector((store: RootState) => store.auth);
+    
+  
 
   // Handle file selection
   const handleFileChange = (event:React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +79,9 @@ const BlogEditor = () => {
       }
       
       const response = await axios.post( `${BACKEND_URL}/blog/create`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data" ,
+          authorization: `Bearer ${tokenInfo.token}`
+        },
       });
 
       alert("Blog submitted successfully!");

@@ -4,16 +4,18 @@ import DOMPurify from "dompurify";
 import { BlogData } from '../Types';
 import { BACKEND_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../Utils/store';
 
 export const Cards = () => {
 const [apiData,setApiData]=useState<BlogData[]>([]);
 const navigate = useNavigate();
-   
+const tokenInfo = useSelector((store: RootState) => store.auth);
 const getData = async ()=>{
     try{
       //console.log(userInfo);
       
-        const res = await axios.get(`${BACKEND_URL}/blog/all`);
+        const res = await axios.get(`${BACKEND_URL}/blog/all`,{ headers: { authorization: `Bearer ${tokenInfo.token}` } });
         //console.log(res);
         //chack for apidata is always an array
         setApiData(Array.isArray(res.data) ? res.data : []);
@@ -34,7 +36,7 @@ const getData = async ()=>{
 
 useEffect(()=>{
   getData();
-},[])
+},[tokenInfo.token])
 
 
 

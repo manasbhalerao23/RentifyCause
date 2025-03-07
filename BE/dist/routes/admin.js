@@ -14,8 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../models/db");
+const auth_1 = require("../middlewares/auth");
 const adminrouter = express_1.default.Router();
-adminrouter.get("/getpaydetails", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+adminrouter.get("/getpaydetails", auth_1.verifyAcessToken, auth_1.checkAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userreceipt = req.query.rec; //check
     try {
         const paydetail = yield db_1.paymentModel.findOne({ receipt: userreceipt });
@@ -26,7 +27,7 @@ adminrouter.get("/getpaydetails", (req, res) => __awaiter(void 0, void 0, void 0
         res.status(500).json({ message: "Error while fetching" });
     }
 }));
-adminrouter.get("/getall", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+adminrouter.get("/getall", auth_1.verifyAcessToken, auth_1.checkAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield db_1.User.find();
         //can add more if needed
@@ -49,7 +50,7 @@ adminrouter.get("/getall", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
-adminrouter.get("/getInfo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+adminrouter.get("/getInfo/:id", auth_1.verifyAcessToken, auth_1.checkAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
         const payments = yield db_1.paymentModel.find({ "notes.userId": id });

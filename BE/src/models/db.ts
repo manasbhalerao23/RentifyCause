@@ -35,17 +35,6 @@ export const User = model('User', UserSchema);
 
 
 
-//admin
-const AdminSchema = new Schema({
-    username : {type: String, unique: true},
-    password : {type: String},
-    contact: {type: String},
-    role: {type: String, required:true}
-    }
-);
-
-export const AdminModel = model('Admin', AdminSchema);
-
 
 //blogs
 const BlogsSchema = new Schema({

@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
 import {Request , Response, Router} from "express"
 import { send } from "process"
-import { AuthRequest, userAuth } from "../middlewares/auth"
+import { AuthRequest, checkAdmin, userAuth, verifyAcessToken } from "../middlewares/auth"
 dotenv.config()
 
 const authRouter= express.Router();
@@ -130,7 +130,7 @@ console.log(sendingUser.monthStatus);
   }
 })
 
-authRouter.post("/getInfo",userAuth,async (req:AuthRequest, res:Response)=>{
+authRouter.post("/getInfo",userAuth,async (req:AuthRequest, res:Response)=>{ // RENT invoice getter
   try{
 
     const {id, orderId}= req.body;
@@ -222,5 +222,11 @@ res.json({msg :"User Logged Out Successful!"} );
 
 });
 
+
+authRouter.get("/userInfo", verifyAcessToken,async (req:AuthRequest, res:Response) => {
+  res.json({role: req.user?.role})
+  return;
+
+});
 
 export default authRouter;

@@ -186,4 +186,9 @@ authRouter.post("/logout", auth_1.userAuth, (req, res) => __awaiter(void 0, void
     });
     res.json({ msg: "User Logged Out Successful!" });
 }));
+authRouter.get("/userInfo", auth_1.verifyAcessToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    res.json({ role: (_a = req.user) === null || _a === void 0 ? void 0 : _a.role });
+    return;
+}));
 exports.default = authRouter;

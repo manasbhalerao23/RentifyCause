@@ -11,7 +11,6 @@ import 'swiper/css/pagination';
 import { useSelector } from "react-redux";
 import { RootState } from "../Utils/store";
 
-
 export const OpenBlog = () => {
   const [body, setBody] = useState("");
   const [dateTime, setDateTime] = useState("");
@@ -20,14 +19,13 @@ export const OpenBlog = () => {
   const [location, setLocation] = useState("");
   const [rcpt, setRcpt] = useState("");
   const [orderInfo, setOrderInfo] = useState("");
-  const { blogId } = useParams();C
-  const [num, setNum]=useState<number>();
+  const { blogId } = useParams();
+  const [num, setNum] = useState<number>();
   const tokenInfo = useSelector((store: RootState) => store.auth);
 
   const fetchblog = async () => {
-
     try {
-      const res = await axios.get(`${BACKEND_URL}/blog/open/${blogId}`);
+      const res = await axios.get(`${BACKEND_URL}/blog/open/${blogId}`,{ headers: { authorization: `Bearer ${tokenInfo.token}` } });
       console.log(res.data);
       const { body, dateTime, heading, images: fetched, location } = res.data;
 
@@ -35,21 +33,17 @@ export const OpenBlog = () => {
       setDateTime(dateTime);
       setHeading(heading);
       setImages(fetched);
-
       setLocation(location);
     } catch (e) {
       console.log(e);
     }
   };
 
-
-
   useEffect(() => {
     fetchblog();
-  }, []);
+  }, [tokenInfo.token]);
 
-
-  const handleDonation = async () =>{
+  const handleDonation = async () => {
     try {
       if (num === 0) {
         alert("Please select number of Months");
@@ -59,7 +53,7 @@ export const OpenBlog = () => {
       const order = await axios.post(
         `${BACKEND_URL}/payment/create/donate/${blogId}`,
         { num: num },
-        { headers: { authorization: `Bearer ${tokenInfo}` } }
+        { headers: { authorization: `Bearer ${tokenInfo.token}` } }
       );
 
       const { amount, currency, orderId, keyId, notes } = order.data;
@@ -77,12 +71,8 @@ export const OpenBlog = () => {
           contact: notes.contact,
         },
         theme: { color: "#F37254" },
-        // handler: function () {
-        //   gettingNewData(orderId);
-        // },
       };
-      console.log("ORDER");
-      console.log(order);
+
       setOrderInfo(order.data.orderId);
       setRcpt(order.data.receiptId);
 
@@ -91,92 +81,81 @@ export const OpenBlog = () => {
     } catch (err) {
       console.log(err);
     }
-  }
-  
+  };
+
   return (
-    <div className="grid  grid-cols-[33%_65%] gap-3 p-2 py-5">
-      <div className="w-full my-10 ">
+    <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-6 p-4 lg:p-6">
+      {/* Image Slider */}
+      <div className="w-full">
         <Swiper
           modules={[Navigation, Pagination]}
           spaceBetween={10}
           slidesPerView={1}
           navigation
           pagination={{ clickable: true }}
+          className="w-full max-h-72 md:max-h-96 rounded-lg"
         >
           {images.map((e, idx) => (
             <SwiperSlide key={idx}>
               <img
                 src={e}
                 alt={`Blog Image ${idx}`}
-                className=" w-full h-64 object-cover rounded-lg"
+                className="w-full h-64 md:h-80 lg:h-96 object-cover rounded-lg"
               />
             </SwiperSlide>
           ))}
         </Swiper>
-        </div>
+      </div>
 
-      <div className="max-w-sm w-full lg:max-w-full lg:flex">
-        
-        <div className="cursor-pointer border-red-300 border-2 bg-red-50 rounded-xl p-6 flex flex-col justify-between shadow-md transition-all duration-300 hover:bg-red-100 ">
-          <div className="mb-8">
-            {/* <p className="text-sm text-gray-600 flex items-center">
-                      <svg className="fill-current text-gray-500 w-3 h-3 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                        <path d="M4 8V6a6 6 0 1 1 12 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-8c0-1.1.9-2 2-2h1zm5 6.73V17h2v-2.27a2 2 0 1 0-2 0zM7 6v2h6V6a3 3 0 0 0-6 0z" />
-                      </svg>
-                      Members only
-                    </p> */}
-            <div className="text-gray-900 font-bold text-xl mb-2">
-              {heading}
-            </div>
-
+      {/* Blog Content */}
+      <div className="w-full">
+        <div className="border-2 border-red-300 bg-red-50 rounded-xl p-6 flex flex-col justify-between shadow-md transition-all duration-300 hover:bg-red-100">
+          <div>
+            <h2 className="text-gray-900 font-bold text-xl mb-3">{heading}</h2>
             <div
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
-              className="text-gray-700 text-base"
+              className="text-gray-700 text-sm md:text-base"
             />
           </div>
-          <div className="flex items-center">
-            <div className="text-sm">
-              <p className="text-gray-900 leading-none">{location}</p>
-              <p className="text-gray-600">{dateTime.toLocaleString().slice(0,10)}</p>
-            </div>
+
+          {/* Location and Date */}
+          <div className="mt-4 flex flex-col">
+            <p className="text-gray-900 font-semibold">{location}</p>
+            <p className="text-gray-600">{dateTime.toLocaleString().slice(0, 10)}</p>
           </div>
-          <div className="my-10">
-            <div>Donate Now!</div>
-         <div className="grid grid-cols-10 gap-4"> {[
-                10000,
-                7500,
-                5000,
-                2500,
-                1000,
-                750,
-                500,
-                250,
-                100,
-                50
+
+          {/* Donation Section */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-3">Donate Now!</h3>
+            <div className="grid grid-cols-5 md:grid-cols-10 gap-2 md:gap-4">
+              {[
+                10000, 7500, 5000, 2500, 1000, 750, 500, 250, 100, 50
               ].map((info, index) => (
                 <div
                   key={index}
-                  className={`p-3 rounded-md text-center shadow-md font-medium ${
-                      num === index
-                        ? "bg-green-300 border-2 border-blue-600"
-                        : "bg-gray-200"
-                    }`}
+                  className={`p-2 md:p-3 rounded-md text-center shadow-md font-medium text-sm md:text-base cursor-pointer ${
+                    num === index
+                      ? "bg-green-300 border-2 border-blue-600"
+                      : "bg-gray-200"
+                  }`}
                   onClick={() => setNum(index)}
-
                 >
                   {info}
                 </div>
-              ))}</div>
+              ))}
+            </div>
+
             <button
               onClick={handleDonation}
-              className="mt-6 p-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-500 transition"
+              className="mt-6 w-full md:w-auto p-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-blue-500 transition"
             >
               Donate
             </button>
-            <p className="text-lg font-semibold">
+
+            <p className="text-sm md:text-lg font-semibold mt-2">
               Order ID: {orderInfo || "N/A"}
             </p>
-            <p className="text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
+            <p className="text-sm md:text-lg font-semibold">Receipt ID: {rcpt || "N/A"}</p>
           </div>
         </div>
       </div>

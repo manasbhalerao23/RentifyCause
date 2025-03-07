@@ -1,14 +1,14 @@
 import express from "express"
 import { Request,Response } from "express";
 import {BlogsModel} from "../models/db"
-import { userAuth,AuthRequest, checkAdmin } from "../middlewares/auth";
+import { userAuth,AuthRequest, checkAdmin, verifyAcessToken } from "../middlewares/auth";
 import upload from "../middlewares/multer";
 import cloudinary from "../utils/cloudinary";
 const blogRouter= express.Router();
 
 
 
-blogRouter.post("/create",upload.array("images",6) ,async(req:AuthRequest,res:Response)=>{ // add middlewares later rn for testing we have removed it --NOTE
+blogRouter.post("/create",verifyAcessToken,checkAdmin,upload.array("images",6) ,async(req:AuthRequest,res:Response)=>{ // add middlewares later rn for testing we have removed it --NOTE
 try{
     let imgUrlArr:any=[];
     // console.log("Waiting 500ms to ensure files are ready...");
@@ -59,7 +59,7 @@ res.status(201).json(blog);
 });
 
 
-blogRouter.delete("/delete",userAuth,checkAdmin ,async (req:AuthRequest,res:Response)=>{
+blogRouter.delete("/delete",verifyAcessToken,checkAdmin ,async (req:AuthRequest,res:Response)=>{
     try{
         const id=req.body.id;
         const blog=await BlogsModel.findByIdAndDelete(id);
@@ -73,7 +73,7 @@ blogRouter.delete("/delete",userAuth,checkAdmin ,async (req:AuthRequest,res:Resp
                 }
 });
 
-blogRouter.get("/all" ,async (req: AuthRequest, res: Response) => { //,userAuth middleware ddaalna h for testing purposes its removed
+blogRouter.get("/all" ,verifyAcessToken,async (req: AuthRequest, res: Response) => { //,userAuth middleware ddaalna h for testing purposes its removed
     try {
         const blogs = await BlogsModel.find();
         if (!blogs || blogs.length === 0) {
@@ -87,7 +87,7 @@ blogRouter.get("/all" ,async (req: AuthRequest, res: Response) => { //,userAuth 
 });
 
 //check point for url
-blogRouter.get("/open/:blogId",async (req: Request, res: Response) => {
+blogRouter.get("/open/:blogId",verifyAcessToken,async (req: Request, res: Response) => {
     try{
         const {blogId} = req.params;
         //console.log(blogId);

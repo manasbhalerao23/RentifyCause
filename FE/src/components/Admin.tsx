@@ -8,13 +8,11 @@ function AdminPage(){
   const [search, setsearch] = useState("");
     const[sortcol, setsortcol] = useState<string | null>(null);
     const [sortorder, setsortorder] = useState("Asc");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [records, setrecords] = useState<any[]>([]);
     const [selectedmonth, setselectedmonth] = useState(0);
 
     const navigate = useNavigate();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const paymentOpen = (receipt: any) => {
       navigate("/receipt", {replace: true, state: {receipt}});
     };
@@ -105,7 +103,6 @@ function AdminPage(){
       <select value={selectedmonth} onChange={handlemonthsort} className="p-2 border rounded">
         {
           [
-            "Select Month",
             "January",
             "February",
             "March",
@@ -166,7 +163,7 @@ function AdminPage(){
           {filteredRecords.map((res, index) => (
             <Tr key={res.id || index}>
               <Td>{index + 1}</Td>
-              <Td>{res.shopName}  </Td>
+              <Td>{res.shopName}</Td>
               <Td>{res.currentRent}</Td>
               <Td>{res.address}</Td>
               <Td>{res.username}</Td>
