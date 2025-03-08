@@ -9,6 +9,7 @@ import authRouter from "./routes/auth"
 import blogRouter from "./routes/blog";
 import paymentRouter from "./routes/payment";
 import adminrouter from "./routes/admin";
+import "./schedular/cron";
 
 
 const app = express();

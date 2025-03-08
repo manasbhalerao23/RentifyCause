@@ -22,6 +22,7 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const blog_1 = __importDefault(require("./routes/blog"));
 const payment_1 = __importDefault(require("./routes/payment"));
 const admin_1 = __importDefault(require("./routes/admin"));
+require("./schedular/cron");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
