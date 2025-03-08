@@ -7,7 +7,6 @@ import { setUser } from "../Utils/cartSlice";
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Razorpay: any;
   }
 }
@@ -17,8 +16,10 @@ const Rent = () => {
   const userInfo = useSelector((store: RootState) => store.cart);
   const tokenInfo = useSelector((store: RootState) => store.auth);
 
-  const [rcpt, setRcpt] = useState("");
+  const [compartment, setCompartment] = useState(1); // Default to 2nd compartment
+  const [num, setNum] = useState(0);
   const [orderInfo, setOrderInfo] = useState("");
+  const [rcpt, setRcpt] = useState("");
   const [url, setUrl] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
 
@@ -33,8 +34,6 @@ const Rent = () => {
     setDownloadUrl(data.downloadUrl);
     setUrl(data.Url);
   };
-
-  const [num, setNum] = useState(0);
 
   const handleDownload = () => {
     const link = document.createElement("a");
@@ -86,8 +85,8 @@ const Rent = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl bg-red-100 mx-auto p-5 h-screen flex flex-col gap-6  shadow-lg rounded-xl px-6 md:px-12 lg:px-24 xl:px-32">
-      <div className=" bg-white p-6 rounded-lg shadow-md">
+    <div className="w-full max-w-7xl bg-red-100 mx-auto p-5 h-screen flex flex-col gap-6 shadow-lg rounded-xl px-6 md:px-12 lg:px-24 xl:px-32">
+      <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4">User Info</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
@@ -112,24 +111,43 @@ const Rent = () => {
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4">Rent Info</h2>
+        <div className="flex justify-center gap-4 mb-4">
+          {[0, 1, 2].map((index) => (
+            <button
+              key={index}
+              onClick={() => setCompartment(index)}
+              className={`px-4 py-2 rounded-md text-lg font-semibold shadow-md ${
+                compartment === index
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300"
+              }`}
+            >
+              Year {index + 1}
+            </button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h3 className="text-lg font-bold mb-3">Months Paid</h3>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {[...Array(12)].map((_, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-md text-center shadow-md font-medium ${
-                    userInfo.monthStatus[index]
-                      ? "bg-green-300 border-2 border-blue-600"
-                      : "bg-gray-200"
-                  }`}
-                >
-                  {new Date(0, index).toLocaleString("default", {
-                    month: "long",
-                  })}
-                </div>
-              ))}
+              {[...Array(12)].map((_, index) => {
+                const monthIndex = compartment * 12 + index;
+                return (
+                  <div
+                    key={monthIndex}
+                    className={`p-3 rounded-md text-center shadow-md font-medium ${
+                      userInfo.monthStatus[monthIndex]
+                        ? "bg-green-300 border-2 border-blue-600"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    {new Date(0, index).toLocaleString("default", {
+                      month: "long",
+                    })}
+                  </div>
+                );
+              })}
             </div>
             {url && (
               <button

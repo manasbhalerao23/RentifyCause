@@ -22,6 +22,7 @@ const dispatch= useDispatch()
     const TokenValidation= async ()=>{
 try{
 const res= await axios.post(`${BACKEND_URL}/auth/reconnection`,{},{withCredentials:true});
+console.log(res);
 
 const data= res.data.user;
                 const user= {

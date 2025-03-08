@@ -25,11 +25,11 @@ const paymentRouter= express.Router();
 
 const getmonths = (months_paid: boolean [], num: number) => {
     let months = 0;
-    const currentmonth = new Date().getMonth();
     
+console.log(months_paid);
 
     for(let i=0; i < months_paid.length; i++){
-        if(!months_paid[i] && i <= currentmonth){
+        if(!months_paid[i]){
             months++;
             if(months === num){
                 break;
@@ -267,10 +267,9 @@ if(payment.notes?.paymentType=="donation"){
     let monthsupdate = payment.notes?.months_paid;//months payment
     
 
-    const currentmonth = new Date().getMonth();  
     
     for(let i=0; i < paid_months.length; i++){  
-        if(!paid_months[i] && i <= currentmonth && monthsupdate as number > 0){
+        if(!paid_months[i] && monthsupdate as number > 0){
             paid_months[i] = true;
             (monthsupdate as number)--;
         }

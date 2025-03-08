@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_cron_1 = __importDefault(require("node-cron"));
 const db_1 = require("../models/db");
-node_cron_1.default.schedule("*/1 * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+node_cron_1.default.schedule("22 3 1 1 *", () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("Running cron job: Updating monthstatus and previousyear arrays");
         const users = yield db_1.User.find();
@@ -24,6 +24,10 @@ node_cron_1.default.schedule("*/1 * * * *", () => __awaiter(void 0, void 0, void
             user.previousyear = monthstatus.slice(0, 12);
             // Shifting the remaining months and fill with f
             user.monthstatus = [...monthstatus.slice(12), ...Array(12).fill(false)];
+            // if(user.monthstatus.length){
+            //     user.monthstatus=[true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
+            //     user.previousyear= [true,true,true,true,true,true,true,true,true,true,true,true]
+            // }
             yield user.save();
         }
         console.log("Cron job completed successfully");

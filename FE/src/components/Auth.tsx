@@ -33,7 +33,7 @@ function AuthForm() {
             try{
                 const res = await axios.post(`${BACKEND_URL}/auth/signup`,
                     {username,password,contact,address,shopName,email},
-                    //{withCredentials: true}
+                    {withCredentials: true}
                 );
                 console.log(res?.data);
                 setisLogin(!isLogin);
@@ -48,7 +48,7 @@ function AuthForm() {
             try{
                 const res = await axios.post(`${BACKEND_URL}/auth/login`,
                     {username,password},
-                    //{withCredentials: true}
+                    {withCredentials: true}
                 );
                 console.log(res.data);
                 const data= res.data.msg; 
