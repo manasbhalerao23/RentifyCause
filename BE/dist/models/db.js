@@ -28,7 +28,9 @@ const UserSchema = new mongoose_1.Schema({
     rentPaidUntil: { type: Date
     },
     monthstatus: { type: [Boolean],
-        default: () => [true, false, false, false, false, false, false, false, false, false, false, false]
+        default: () => [true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
+    },
+    previousyear: { type: [Boolean]
     },
     refreshToken: {
         type: String
