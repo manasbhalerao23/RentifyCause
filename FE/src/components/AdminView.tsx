@@ -53,7 +53,7 @@ const AdminView = () => {
     // fetch data from server
     const fetchingData = async () => {
       try {
-        console.log(userId);
+        // console.log(userId);
 
         const res = await axios.get(`${BACKEND_URL}/admin/getInfo/${userId}`, {
           headers: { authorization: `Bearer ${tokenInfo.token}` },
@@ -65,7 +65,9 @@ const AdminView = () => {
         console.log(err);
       }
     };
+    if(tokenInfo.token){
     fetchingData();
+    }
   }, [userId, tokenInfo.token]);
 
   return (

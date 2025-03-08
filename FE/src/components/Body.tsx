@@ -22,7 +22,8 @@ const dispatch= useDispatch()
     const TokenValidation= async ()=>{
 try{
 const res= await axios.post(`${BACKEND_URL}/auth/reconnection`,{},{withCredentials:true});
-const data= res.data.msg;
+
+const data= res.data.user;
                 const user= {
                     _id:data._id,//
                     username:data.username,//
@@ -39,8 +40,7 @@ const data= res.data.msg;
                     monthStatus:data.monthStatus
                 }
             dispatch(setUser(user));
-            dispatch(addToken(res.data.token))
-            console.log(res.data.token);
+            dispatch(addToken(res.data.accessToken))
             
 }catch(err){
     console.log("Cant Authneticate! Login again"+err);

@@ -44,8 +44,6 @@ function Header() {
 
                {/* Buttons & Profile */}
                <div className="flex space-x-2 sm:space-x-4 items-center">
-                  
-
                   {userInfo.username ? (
                      <button className="relative rounded-md flex gap-1 font-medium cursor-pointer" onClick={() => setprofileopen(true)}>
                         <Circle className="w-8 sm:w-10 h-8 sm:h-10 text-blue-500" />
@@ -65,55 +63,58 @@ function Header() {
 
             {/* Navigation Bar */}
             <nav className="bg-red-600 shadow-md">
-   <div className="container mx-auto px-4 flex items-center justify-between ">
-      {/* Desktop Links */}
-      <div className="hidden md:flex space-x-6 font-medium">
-         <Link to="/" className="text-gray-100 hover:text-red-300 transition-all duration-300">Home</Link>
-         <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">About Us</a>
-         <Link to="/card" className="text-gray-100 hover:text-red-300 transition-all duration-300">Services</Link>
-         <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">Contact</a>
-      </div>
+               <div className="container mx-auto px-4 flex items-center justify-between ">
+                  {/* Desktop Links */}
+                  <div className="hidden md:flex space-x-6 font-medium">
+                     <Link to="/" className="text-gray-100 hover:text-red-300 transition-all duration-300">Home</Link>
+                     <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">About Us</a>
+                     <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">Contact</a>
+                  </div>
 
-      {/* Mobile Menu Button */}
-      <button
-         className="md:hidden text-white text-2xl focus:outline-none"
-         onClick={() => setMenuOpen(!menuOpen)}
-      >
-         ☰
-      </button>
+                  {/* Mobile Menu Button */}
+                  <button className="md:hidden text-white text-2xl focus:outline-none" onClick={() => setMenuOpen(!menuOpen)}>
+                     ☰
+                  </button>
 
-      {/* Donate Button */}
-      {userInfo.role ? <div className="py-1 grid grid-cols-2 gap-2">
-      <Link to="/card">
-      <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
-   Donate
-</button>
+                  {/* Donate Button */}
+                  {userInfo.role ? (
+                     <div className="py-1 grid grid-cols-2 gap-2">
+                        <Link to="/card">
+                           <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
+                              Donate
+                           </button>
+                        </Link>
+                        {userInfo?.role == "admin" ? (
+                           <Link to="/createBlog">
+                              <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
+                                 Create Blog
+                              </button>
+                           </Link>
+                        ) : (
+                           <Link to="/rent">
+                              <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
+                                 Rent
+                              </button>
+                           </Link>
+                        )}
+                     </div>
+                  ) : (
+                     <div className="py-7"></div>
+                  )}
+               </div>
 
-      </Link>
-    {userInfo?.role=="admin" ?  <Link to="/createBlog">
-      <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
-   Create Blog
-</button>
+               {/* Mobile Menu */}
+               <div className={`md:hidden bg-red-600  shadow-md transition-all duration-300 ease-in-out ${menuOpen ? "max-h-60 opacity-100" : " max-h-0 opacity-0 overflow-hidden"}`}>
+                  <div className="flex flex-col divide-y-2 items-center space-y-4 py-4">
+                     <Link to="/" className="text-gray-100 hover:text-red-300 transition-all duration-300">Home</Link>
+                     <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">About Us</a>
+                     <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">Contact</a>
+                     {userInfo.role ? (<Link to="/card" className="text-gray-100 hover:text-red-300 transition-all duration-300 ">Donate</Link>) :   <></> }
+                     {userInfo.role=="admin" ? (<Link to="/createBlog" className="border-b-2 text-gray-100 hover:text-red-300 transition-all duration-300 ">Create Blog</Link>) :   <Link to="/rent" className="text-gray-100 hover:text-red-300 transition-all duration-300">Rent</Link>  }
 
-      </Link> :  <Link to="/rent">
-      <button className="hidden md:block bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-full shadow-lg border border-white hover:from-red-600 hover:to-red-800 transition-all duration-300 cursor-pointer">
-      Rent
-      </button>
-                     </Link>}
-</div> : <div className="py-7"></div>}
-
-   </div>
-
-   {/* Mobile Menu */}
-   <div className={`md:hidden bg-red-600 border-t shadow-md transition-all duration-300 ease-in-out ${menuOpen ? "max-h-60 opacity-100" : " max-h-0 opacity-0 overflow-hidden"}`}>
-      <div className="flex flex-col items-center space-y-4 py-4">
-         <Link to="/" className="text-gray-100 hover:text-red-300 transition-all duration-300">Home</Link>
-         <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">About Us</a>
-         <Link to="/card" className="text-gray-100 hover:text-red-300 transition-all duration-300">Services</Link>
-         <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">Contact</a>
-      </div>
-   </div>
-</nav>
+                  </div>
+               </div>
+            </nav>
          </header>
 
          {/* Profile Sidebar */}

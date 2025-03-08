@@ -16,12 +16,14 @@ const getData = async ()=>{
       //console.log(userInfo);
       
         const res = await axios.get(`${BACKEND_URL}/blog/all`,{ headers: { authorization: `Bearer ${tokenInfo.token}` } });
-        //console.log(res);
+        // console.log(res);
         //chack for apidata is always an array
+        
         setApiData(Array.isArray(res.data) ? res.data : []);
             }
             catch(err){
                 console.log(err);
+
               }
   }
 
@@ -35,7 +37,9 @@ const getData = async ()=>{
   }
 
 useEffect(()=>{
+  if(tokenInfo.token){
   getData();
+  }
 },[tokenInfo.token])
 
 

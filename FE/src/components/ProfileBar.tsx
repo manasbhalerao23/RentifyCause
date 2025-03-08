@@ -28,14 +28,14 @@ useEffect(()=>{
     
     const fetchDetails = async () =>{
         const token = tokenInfo.token;
-    console.log(token);
+    // console.log(token);
 
        const res= await axios.get(`${BACKEND_URL}/auth/userInfo`,{
             headers: {
                 'authorization': `Bearer ${token}`
                 }
                 })
-                console.log(res);
+                // console.log(res);
                 
 setRole(res.data.role);
 

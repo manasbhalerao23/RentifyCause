@@ -26,7 +26,7 @@ export const OpenBlog = () => {
   const fetchblog = async () => {
     try {
       const res = await axios.get(`${BACKEND_URL}/blog/open/${blogId}`,{ headers: { authorization: `Bearer ${tokenInfo.token}` } });
-      console.log(res.data);
+      // console.log(res.data);
       const { body, dateTime, heading, images: fetched, location } = res.data;
 
       setBody(body);
@@ -40,7 +40,9 @@ export const OpenBlog = () => {
   };
 
   useEffect(() => {
-    fetchblog();
+    if (tokenInfo.token) {
+      fetchblog();
+    }
   }, [tokenInfo.token]);
 
   const handleDonation = async () => {
