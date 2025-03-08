@@ -92,12 +92,12 @@ authRouter.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
                 { email: username }
             ] });
         if (!user) {
-            res.status(400).json({ error: "Not Found User" });
+            res.status(400).json({ message: "User Not Found" });
             return;
         }
         const isValidPassword = yield bcrypt_1.default.compare(password, user.password);
         if (!isValidPassword) {
-            res.status(400).json({ error: "Invalid credentials" });
+            res.status(400).json({ message: "Invalid credentials" });
             return;
         }
         const accessToken = jsonwebtoken_1.default.sign({ _id: user._id }, process.env.JWT_KEY, { expiresIn: "30m" });
@@ -195,7 +195,8 @@ authRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.send("User added " + sendingUser);
     }
     catch (err) {
-        console.log(err);
+        res.status(400).json({ message: "Error while signing up" });
+        //console.log(err);
     }
 }));
 authRouter.post("/logout", auth_1.userAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {   useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,8 @@ function AuthForm() {
     const [address, setaddress] = useState("");
     const [shopName, setshopName] = useState("");
     const [email, setemail] = useState("");
+    const [loginerr, setloginerr] = useState("");
+    const [signuperr, setsignuperr] = useState("");
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
@@ -24,11 +26,6 @@ function AuthForm() {
         setusername("");
         setpassword("");
     };
-
- 
-    
-
-
 
     const handleSubmit =  async(e: { preventDefault: () => void; }) => {
         e.preventDefault();
@@ -42,7 +39,9 @@ function AuthForm() {
                 setisLogin(!isLogin);
             }
             catch(e){
-                console.log(e);
+                const err = e as AxiosError<{message?: string}>
+                setsignuperr(err.response?.data?.message ?? "Error occured while Sign up");
+                //console.log(e);
             }
         }
         else{
@@ -52,7 +51,7 @@ function AuthForm() {
                     {withCredentials: true}
                 );
                 console.log(res.data);
-                const data= res.data.msg;
+                const data= res.data.msg; 
                 const user= {
                     _id:data._id,//
                     username:data.username,//
@@ -69,13 +68,15 @@ function AuthForm() {
                     monthStatus:data.monthStatus
                 }
             dispatch(setUser(user));
-            console.log(user);
+            //console.log(user);
             dispatch(addToken(res.data.token))
 
                 navigate('/card');
             }
             catch(e){
-                console.log(e);
+                const err = e as AxiosError<{message?: string}>
+                setloginerr(err.response?.data?.message ?? "Error occured while login")
+                //console.log(e);
             }
         }
     }
@@ -125,6 +126,10 @@ function AuthForm() {
                     </button>
                 </motion.form>
             </AnimatePresence>
+
+            {loginerr && <p className="text-red-500 text-center">{loginerr}</p>}
+            {signuperr && <p className="text-red-500 text-center">{signuperr}</p>}
+
             
             <p className="text-center mt-4 text-md">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
