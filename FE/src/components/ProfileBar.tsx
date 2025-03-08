@@ -57,9 +57,12 @@ useEffect(() => {
 
     const handleLogout = async () => {
         try {
-            await axios.post(`${BACKEND_URL}/auth/logout`, {}, {
-                headers: { authorization: `Bearer ${tokenInfo?.token}` }
+            const res= await axios.post(`${BACKEND_URL}/auth/logout`, {}, {
+                headers: { authorization: `Bearer ${tokenInfo?.token}` },
+                withCredentials:true
             });
+            console.log(res);
+            
             dispatch(removeToken());
             dispatch(clearUser());
             navigate("/");

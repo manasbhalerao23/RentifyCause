@@ -109,8 +109,18 @@ function Header() {
                      <Link to="/" className="text-gray-100 hover:text-red-300 transition-all duration-300">Home</Link>
                      <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">About Us</a>
                      <a href="#" className="text-gray-100 hover:text-red-300 transition-all duration-300">Contact</a>
-                     {userInfo.role ? (<Link to="/card" className="text-gray-100 hover:text-red-300 transition-all duration-300 ">Donate</Link>) :   <></> }
-                     {userInfo.role=="admin" ? (<Link to="/createBlog" className="border-b-2 text-gray-100 hover:text-red-300 transition-all duration-300 ">Create Blog</Link>) :   <Link to="/rent" className="text-gray-100 hover:text-red-300 transition-all duration-300">Rent</Link>  }
+                     {userInfo.role ? (
+  <>
+    <Link to="/card" className="text-gray-100 hover:text-red-300 transition-all duration-300">Donate</Link>
+    {userInfo.role === "admin" ? (
+      <Link to="/createBlog" className="border-b-2 text-gray-100 hover:text-red-300 transition-all duration-300">Create Blog</Link>
+    ) : (
+      <Link to="/rent" className="text-gray-100 hover:text-red-300 transition-all duration-300">Rent</Link>
+    )}
+  </>
+) : null}
+
+                     
 
                   </div>
                </div>
