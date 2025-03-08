@@ -98,12 +98,12 @@ authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
     
     if(!user){
     
-       res.status(400).json({ error: "Not Found User" });
+       res.status(400).json({ message: "User Not Found" });
        return;
     }
     const isValidPassword = await bcrypt.compare(password, user.password as string);
     if(!isValidPassword){
-       res.status(400).json({ error: "Invalid credentials" });
+       res.status(400).json({ message: "Invalid credentials" });
        return;
       }
 
@@ -226,7 +226,8 @@ const user = new User({
 
 res.send("User added "+ sendingUser)
     }catch(err){
-        console.log(err);
+      res.status(400).json({message: "Error while signing up"});
+        //console.log(err);
         
     }
 })
