@@ -83,12 +83,12 @@ const AdminTest = () => {
 
   const paidCount = filteredRecords.filter(
     (e) =>
-      selectedmonth !== "Select Month" && e.monthstatus?.[obj[selectedmonth]]
+      selectedmonth !== "Select Month" && e.monthstatus?.[obj[selectedmonth]+12]
   ).length;
 
   const unpaidCount = filteredRecords.filter(
     (e) =>
-      selectedmonth !== "Select Month" && !e.monthstatus?.[obj[selectedmonth]]
+      selectedmonth !== "Select Month" && !e.monthstatus?.[obj[selectedmonth]+12]
   ).length;
 
   const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
@@ -160,7 +160,7 @@ const AdminTest = () => {
             <div
               className={`p-5 rounded-xl border shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 ${
                 selectedmonth !== "Select Month"
-                  ? e.monthstatus?.[obj[selectedmonth]]
+                  ? e.monthstatus?.[obj[selectedmonth]+12]
                     ? "bg-green-200 border-green-400"
                     : "bg-red-200 border-red-400"
                   : "bg-white border-gray-300"
