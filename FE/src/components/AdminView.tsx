@@ -105,7 +105,7 @@ const AdminView = () => {
             >
               {"<"}
             </button>
-            <span className="text-xl font-semibold">Year- {new Date().getFullYear() + compartment - 1}</span>
+            <span className="text-xl font-semibold">Year {new Date().getFullYear() + compartment - 1}</span>
             <button
               onClick={() => setCompartment((prev) => Math.min(prev + 1, 2))}
               className="text-2xl font-bold bg-gray-300 px-4 py-2 rounded-lg shadow-md hover:bg-gray-400 transition"

@@ -118,7 +118,7 @@ const Rent = () => {
             <div>
               <h3 className="text-lg font-bold mb-3">Months Paid</h3>
               <h1 className="text-lg font-bold mb-3">
-                Year- {new Date().getFullYear() + compartment - 1}
+                Year {new Date().getFullYear() + compartment - 1}
               </h1>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
