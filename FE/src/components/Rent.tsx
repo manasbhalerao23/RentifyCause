@@ -128,10 +128,13 @@ const Rent = () => {
                   <div
                     key={monthIndex}
                     className={`p-3 rounded-md text-center shadow-md font-medium ${
-                      userInfo.monthStatus[monthIndex]
+                      userInfo.monthStatus[monthIndex] === true
                         ? "bg-green-300 border-2 border-blue-600"
-                        : "bg-gray-200"
+                        : userInfo.monthStatus[monthIndex] === false
+                          ? "bg-gray-200"
+                          : "bg-yellow-300 border-2 border-red-600" // If null, apply yellow background
                     }`}
+                    
                   >
                     {new Date(0, index).toLocaleString("default", {
                       month: "long",

@@ -33,8 +33,9 @@ const paymentRouter = express_1.default.Router();
 //     address?: string;
 const getmonths = (months_paid, num) => {
     let months = 0;
+    console.log(months_paid);
     for (let i = 0; i < months_paid.length; i++) {
-        if (!months_paid[i]) {
+        if (months_paid[i] == false) {
             months++;
             if (months === num) {
                 break;
@@ -206,7 +207,7 @@ paymentRouter.post("/payment/webhook", (req, res) => __awaiter(void 0, void 0, v
                 let paid_months = user.monthstatus; //arr
                 let monthsupdate = (_e = payment.notes) === null || _e === void 0 ? void 0 : _e.months_paid; //months payment
                 for (let i = 0; i < paid_months.length; i++) {
-                    if (!paid_months[i] && monthsupdate > 0) {
+                    if (paid_months[i] == false && monthsupdate > 0) {
                         paid_months[i] = true;
                         monthsupdate--;
                     }

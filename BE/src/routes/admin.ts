@@ -106,4 +106,55 @@ const paymentsWithInvoices = payments.map(payment => {
 }
 })
 
+
+    adminrouter.post("/extempt" ,async(req,res)=>{ //,verifyAcessToken,checkAdmin
+        try{
+            const id = req.body.id;
+            const changeMonth= req.body.index;
+            const user = await User.findById(id);
+            if(!user){
+                res.status(404).json({message: "User not found"});
+                return ;
+            }
+            // user.monthstatus[changeMonth]=null
+            if (changeMonth < 0 || changeMonth >= user.monthstatus.length) {
+                res.status(400).json({ message: "Invalid month index" });
+                return 
+            }
+
+            (user.monthstatus as (boolean | null)[])[changeMonth] = null;
+            await user.save();
+            const {
+                _id,
+                username,
+                totalDonation,
+                shopName,
+                role,
+                monthstatus,
+                monthRent,
+                email,
+                currentRent,
+                contact,
+                address
+            } = user
+            const DatatoSend = {
+                _id,
+                username,
+                totalDonation,
+                shopName,
+                role,
+                monthstatus,
+                monthRent,
+                email,
+                currentRent,
+                contact,
+                address}
+            res.send({user:DatatoSend});
+        }catch(err){
+            console.log(err);
+            res.status(500).json({message:"Error while doing the Task"})
+            return;
+        }
+    })
+
 export default adminrouter;

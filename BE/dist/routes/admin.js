@@ -91,4 +91,42 @@ adminrouter.get("/getInfo/:id", auth_1.verifyAcessToken, auth_1.checkAdmin, (req
         return;
     }
 }));
+adminrouter.post("/extempt", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.body.id;
+        const changeMonth = req.body.index;
+        const user = yield db_1.User.findById(id);
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        // user.monthstatus[changeMonth]=null
+        if (changeMonth < 0 || changeMonth >= user.monthstatus.length) {
+            res.status(400).json({ message: "Invalid month index" });
+            return;
+        }
+        user.monthstatus[changeMonth] = null;
+        yield user.save();
+        const { _id, username, totalDonation, shopName, role, monthstatus, monthRent, email, currentRent, contact, address } = user;
+        const DatatoSend = {
+            _id,
+            username,
+            totalDonation,
+            shopName,
+            role,
+            monthstatus,
+            monthRent,
+            email,
+            currentRent,
+            contact,
+            address
+        };
+        res.send({ user: DatatoSend });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error while doing the Task" });
+        return;
+    }
+}));
 exports.default = adminrouter;

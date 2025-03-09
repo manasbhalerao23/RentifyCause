@@ -83,12 +83,12 @@ const AdminTest = () => {
 
   const paidCount = filteredRecords.filter(
     (e) =>
-      selectedmonth !== "Select Month" && e.monthstatus?.[obj[selectedmonth]+12]
+      selectedmonth !== "Select Month" && e.monthstatus?.[obj[selectedmonth]+12]==true
   ).length;
 
   const unpaidCount = filteredRecords.filter(
     (e) =>
-      selectedmonth !== "Select Month" && !e.monthstatus?.[obj[selectedmonth]+12]
+      selectedmonth !== "Select Month" && e.monthstatus?.[obj[selectedmonth]+12]==false
   ).length;
 
   const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);

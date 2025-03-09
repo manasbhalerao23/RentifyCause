@@ -3,7 +3,7 @@ import { Request,Response } from "express";
 import {BlogsModel} from "../models/db"
 import { userAuth,AuthRequest, checkAdmin, verifyAcessToken } from "../middlewares/auth";
 import upload from "../middlewares/multer";
-import cloudinary from "../utils/cloudinary";
+import cloudinary, { deleteImage } from "../utils/cloudinary";
 const blogRouter= express.Router();
 
 
@@ -57,14 +57,20 @@ res.status(201).json(blog);
 });
 
 
-blogRouter.delete("/delete",verifyAcessToken,checkAdmin ,async (req:AuthRequest,res:Response)=>{
+blogRouter.delete("/delete/:id",verifyAcessToken,checkAdmin, async (req:AuthRequest,res:Response)=>{
     try{
-        const id=req.body.id;
+        const id=req.params.id;
         const blog=await BlogsModel.findByIdAndDelete(id);
         if(!blog){
              res.status(404).json({message:"Blog not found"})
              return;
             }
+blog.images.map((e)=>{
+    deleteImage(e)
+    
+})
+
+
             res.status(200).json(blog);
             }catch(err:any){
                 res.status(500).json({message:err.message});

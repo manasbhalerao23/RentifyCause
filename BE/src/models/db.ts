@@ -25,7 +25,8 @@ const UserSchema = new Schema({
     },
     rentPaidUntil: { type: Date 
     },
-    monthstatus: { type: [Boolean],
+    monthstatus: {
+        type: [{ type: Boolean, default: null }], // Allows Boolean and null
         default: ()=> [true,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false]
     },
     previousyear: { type: [Boolean]

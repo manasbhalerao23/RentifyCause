@@ -29,7 +29,7 @@ const getmonths = (months_paid: boolean [], num: number) => {
 console.log(months_paid);
 
     for(let i=0; i < months_paid.length; i++){
-        if(!months_paid[i]){
+        if(months_paid[i]==false){
             months++;
             if(months === num){
                 break;
@@ -269,7 +269,7 @@ if(payment.notes?.paymentType=="donation"){
 
     
     for(let i=0; i < paid_months.length; i++){  
-        if(!paid_months[i] && monthsupdate as number > 0){
+        if(paid_months[i]==false && monthsupdate as number > 0){
             paid_months[i] = true;
             (monthsupdate as number)--;
         }

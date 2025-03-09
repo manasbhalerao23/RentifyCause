@@ -42,3 +42,19 @@ return null;
 }
 
 }
+
+
+export const deleteImage = async (imageUrl:string) => {
+  try {
+    // Extract the public ID from the URL
+    
+    const publicId = imageUrl?.split('/')?.pop()?.split('.')[0]; // This extracts the public ID
+    if(!publicId){
+      throw new Error("Invalid Image URL");
+    }
+    // Delete the image from Cloudinary
+     await cloudinary.uploader.destroy(publicId);
+  } catch (error) {
+    console.error('Error deleting image:', error);
+  }
+};

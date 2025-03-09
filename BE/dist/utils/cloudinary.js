@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadOnCloudinary = void 0;
+exports.deleteImage = exports.uploadOnCloudinary = void 0;
 const cloudinary_1 = require("cloudinary");
 const fs_1 = __importDefault(require("fs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -51,3 +51,19 @@ const uploadOnCloudinary = (localFilePath) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.uploadOnCloudinary = uploadOnCloudinary;
+const deleteImage = (imageUrl) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        // Extract the public ID from the URL
+        const publicId = (_b = (_a = imageUrl === null || imageUrl === void 0 ? void 0 : imageUrl.split('/')) === null || _a === void 0 ? void 0 : _a.pop()) === null || _b === void 0 ? void 0 : _b.split('.')[0]; // This extracts the public ID
+        if (!publicId) {
+            throw new Error("Invalid Image URL");
+        }
+        // Delete the image from Cloudinary
+        yield cloudinary_1.v2.uploader.destroy(publicId);
+    }
+    catch (error) {
+        console.error('Error deleting image:', error);
+    }
+});
+exports.deleteImage = deleteImage;

@@ -38,8 +38,8 @@ const AdminView = () => {
   const [payment, setPayment] = useState<Payment[]>([]);
   const [user, setUser] = useState<User>({});
   const tokenInfo = useSelector((store: RootState) => store.auth);
-  const [compartment,setCompartment]=useState(1);
-
+  const [compartment, setCompartment] = useState(1);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const { userId } = useParams();
   const handleDownload = (url: string) => {
     const link = document.createElement("a");
@@ -66,37 +66,103 @@ const AdminView = () => {
         console.log(err);
       }
     };
-    if(tokenInfo.token){
-    fetchingData();
+    if (tokenInfo.token) {
+      fetchingData();
     }
   }, [userId, tokenInfo.token]);
 
+  const handleExtempt = async (id: string, index: number) => {
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/admin/extempt`,
+        {
+          id: id,
+          index: index,
+        },
+        {
+          headers: { authorization: `Bearer ${tokenInfo.token}` },
+        }
+      );
+      // console.log(res);
+      setUser(res.data.user);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Admin Dashboard</h1>
+      <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
+        Admin Dashboard
+      </h1>
       {/* User details */}
       <div className="grid md:grid-cols-2 gap-8">
         <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-md w-full">
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 w-full">
             {user ? (
               [
-                "January", "February", "March", "April", "May", "June", 
-                "July", "August", "September", "October", "November", "December"
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
               ].map((month, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg text-center text-white font-medium transition transform hover:scale-105 shadow-md ${
-                    user?.monthstatus?.[index + 12 * compartment] ? "bg-green-500" : "bg-gray-400"
+                  className={`cursor-pointer p-4 rounded-lg text-center text-white font-medium transition transform hover:scale-105 shadow-md ${
+                    user?.monthstatus?.[index + 12 * compartment] === true
+                      ? "bg-green-500"
+                      : user?.monthstatus?.[index + 12 * compartment] === false
+                      ? "bg-gray-400"
+                      : "bg-yellow-400" // If null, apply yellow background
                   }`}
+                  onClick={() => {
+                    handleExtempt(
+                      user?._id as string,
+                      (index + 12 * compartment) as number
+                    );
+                  }}
+                  onMouseEnter={() => setHoverIndex(index)}
+                  onMouseLeave={() => setHoverIndex(null)}
                 >
-                  {month}
+                  {/* {(hoverIndex === index && user?.monthstatus?.[index+12*compartment]==false ) ? "Extempt" : month} */}
+                  <span className=" relative inline-block w-full h-full flex items-center justify-center ">
+                    {/* Old text fades out */}
+                    <span
+                      className={`absolute inset-0 transition-opacity duration-300 ${
+                        hoverIndex === index
+                          ? "opacity-0 scale-90"
+                          : "opacity-100 scale-100"
+                      }`}
+                    >
+                      {month}
+                    </span>
+                    {/* New text fades in */}
+                    <span
+                      className={`absolute inset-0 transition-opacity duration-300 ${
+                        hoverIndex === index
+                          ? "opacity-100 scale-100"
+                          : "opacity-0 scale-90"
+                      }`}
+                    >
+                      Extempt
+                    </span>
+                  </span>
                 </div>
               ))
             ) : (
               <div> Loading.... </div>
             )}
           </div>
-  
+
           {/* Navigation Buttons */}
           <div className="flex justify-center items-center gap-6 mt-6">
             <button
@@ -105,7 +171,9 @@ const AdminView = () => {
             >
               {"<"}
             </button>
-            <span className="text-xl font-semibold">Year {new Date().getFullYear() + compartment - 1}</span>
+            <span className="text-xl font-semibold">
+              Year {new Date().getFullYear() + compartment - 1}
+            </span>
             <button
               onClick={() => setCompartment((prev) => Math.min(prev + 1, 2))}
               className="text-2xl font-bold bg-gray-300 px-4 py-2 rounded-lg shadow-md hover:bg-gray-400 transition"
@@ -114,70 +182,137 @@ const AdminView = () => {
             </button>
           </div>
         </div>
-  
+
         <div className="bg-white p-6 rounded-lg shadow-md border w-full">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">User Info</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            User Info
+          </h2>
           <div className="space-y-2 text-gray-700">
-            <p><strong>ID:</strong> {user?._id}</p>
-            <p><strong>Username:</strong> {user?.username}</p>
-            <p><strong>Donations:</strong> ₹{user?.totalDonation}</p>
-            <p><strong>Shop Name:</strong> {user?.shopName}</p>
-            <p><strong>Email:</strong> {user?.email}</p>
-            <p><strong>Contact:</strong> {user?.contact}</p>
-            <p><strong>Address:</strong> {user?.address}</p>
-            <p><strong>Monthly Rent:</strong> ₹{user?.monthRent}</p>
+            <p>
+              <strong>ID:</strong> {user?._id}
+            </p>
+            <p>
+              <strong>Username:</strong> {user?.username}
+            </p>
+            <p>
+              <strong>Donations:</strong> ₹{user?.totalDonation}
+            </p>
+            <p>
+              <strong>Shop Name:</strong> {user?.shopName}
+            </p>
+            <p>
+              <strong>Email:</strong> {user?.email}
+            </p>
+            <p>
+              <strong>Contact:</strong> {user?.contact}
+            </p>
+            <p>
+              <strong>Address:</strong> {user?.address}
+            </p>
+            <p>
+              <strong>Monthly Rent:</strong> ₹{user?.monthRent}
+            </p>
           </div>
         </div>
       </div>
-  
+
       {/* Payment section */}
       <div className="mt-12">
-        <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">Payments</h2>
-  
+        <h2 className="text-3xl font-semibold text-center mb-6 text-gray-800">
+          Payments
+        </h2>
+
         {/* Donations Section */}
         <div className="mt-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">Donations</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {payment.filter((e) => e?.notes?.paymentType === "donation").map((e, idx) => (
-              <div key={idx} className="border p-6 rounded-lg shadow-md bg-white transition transform hover:scale-105">
-                <p><strong>Username:</strong> {e?.notes?.username}</p>
-                <p><strong>Amount:</strong> ₹{e?.amount}</p>
-                <p><strong>Order ID:</strong> {e?.orderId}</p>
-                <p><strong>Receipt:</strong> {e?.receipt}</p>
-                <p><strong>Status:</strong> {e?.status}</p>
-                <p><strong>Paid At:</strong> {new Date(e?.createdAt).toLocaleString()}</p>
-              </div>
-            ))}
+            {payment
+              .filter((e) => e?.notes?.paymentType === "donation")
+              .map((e, idx) => (
+                <div
+                  key={idx}
+                  className="border p-6 rounded-lg shadow-md bg-white transition transform hover:scale-105"
+                >
+                  <p>
+                    <strong>Username:</strong> {e?.notes?.username}
+                  </p>
+                  <p>
+                    <strong>Amount:</strong> ₹{e?.amount}
+                  </p>
+                  <p>
+                    <strong>Order ID:</strong> {e?.orderId}
+                  </p>
+                  <p>
+                    <strong>Receipt:</strong> {e?.receipt}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {e?.status}
+                  </p>
+                  <p>
+                    <strong>Paid At:</strong>{" "}
+                    {new Date(e?.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              ))}
           </div>
         </div>
-  
+
         {/* Rent Payments Section */}
         <div className="mt-10">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Rent Payments</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-4">
+            Rent Payments
+          </h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {payment.filter((e) => e?.notes?.paymentType === "rent").map((e, idx) => (
-              <div key={idx} className="border p-6 rounded-lg shadow-md bg-white flex flex-col transition transform hover:scale-105">
-                <div className="flex-1">
-                  <p><strong>Username:</strong> {e?.notes?.username}</p>
-                  <p><strong>Amount:</strong> ₹{e?.amount}</p>
-                  <p><strong>Order ID:</strong> {e?.orderId}</p>
-                  <p><strong>Receipt:</strong> {e?.receipt}</p>
-                  <p><strong>Status:</strong> {e?.status}</p>
-                  <p><strong>Paid At:</strong> {new Date(e?.createdAt).toLocaleString()}</p>
-                </div>
-                {e?.status === "captured" && (
-                  <div className="mt-4 flex justify-between">
-                    <button onClick={() => handleDownload(e?.downloadUrl ?? "")} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition">Download Invoice</button>
-                    <button onClick={() => window.open(e?.url, "_blank")} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition">View Rent</button>
+            {payment
+              .filter((e) => e?.notes?.paymentType === "rent")
+              .map((e, idx) => (
+                <div
+                  key={idx}
+                  className="border p-6 rounded-lg shadow-md bg-white flex flex-col transition transform hover:scale-105"
+                >
+                  <div className="flex-1">
+                    <p>
+                      <strong>Username:</strong> {e?.notes?.username}
+                    </p>
+                    <p>
+                      <strong>Amount:</strong> ₹{e?.amount}
+                    </p>
+                    <p>
+                      <strong>Order ID:</strong> {e?.orderId}
+                    </p>
+                    <p>
+                      <strong>Receipt:</strong> {e?.receipt}
+                    </p>
+                    <p>
+                      <strong>Status:</strong> {e?.status}
+                    </p>
+                    <p>
+                      <strong>Paid At:</strong>{" "}
+                      {new Date(e?.createdAt).toLocaleString()}
+                    </p>
                   </div>
-                )}
-              </div>
-            ))}
+                  {e?.status === "captured" && (
+                    <div className="mt-4 flex justify-between">
+                      <button
+                        onClick={() => handleDownload(e?.downloadUrl ?? "")}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition"
+                      >
+                        Download Invoice
+                      </button>
+                      <button
+                        onClick={() => window.open(e?.url, "_blank")}
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition"
+                      >
+                        View Rent
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
         </div>
       </div>
     </div>
-
   );
 };
 
