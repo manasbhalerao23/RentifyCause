@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import express from "express"
-import {InvoiceModel, User} from "../models/db"
+import {InvoiceModel, paymentModel, User} from "../models/db"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import dotenv from "dotenv"
 import {Request , Response, Router} from "express"
@@ -84,13 +84,24 @@ authRouter.post("/reconnection", async (req: Request, res: Response) => {
 
 
 
+authRouter.get("/getRents", async(req: Request, res: Response) => {
+  try{
+    const user_id = req.query.user_id;
+    const resp = await paymentModel.find({ "notes.userId": user_id, "notes.paymentType": "rent"});
+    res.status(200).json({resp});
+  }
+  catch(e){
+    console.log(e);
+  }
+});
+
 authRouter.post("/login", async( req: Request, res: Response):Promise<void>=>{
   try{
     const {username, password} = req.body;
     
     
     const user = await User.findOne(
-      {$or:[{username},
+      {$or:[{username}, 
         {email:username}
       ]}
     );

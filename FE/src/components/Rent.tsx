@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Utils/store";
@@ -9,20 +9,48 @@ declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Razorpay: any;
-  }
+  } 
 }
 
 const Rent = () => {
+  interface Rent {
+    orderId: string;
+    amount: number;
+    receipt: string;
+    status: string;
+  }
+
   const dispatch = useDispatch();
   const userInfo = useSelector((store: RootState) => store.cart);
   const tokenInfo = useSelector((store: RootState) => store.auth);
-
+  const userid = userInfo._id;
   const [compartment, setCompartment] = useState(1); // Default to Year 2
   const [num, setNum] = useState(0);
   const [orderInfo, setOrderInfo] = useState("");
   const [rcpt, setRcpt] = useState("");
   const [url, setUrl] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
+  const [Rents, setRents] = useState<Rent[]>([]);
+
+
+  useEffect(() => {
+    const fetchedRents = async() => {
+      try{
+        const response = await axios.get(`${BACKEND_URL}/auth/getRents`,
+          {
+            headers: { authorization: `Bearer ${tokenInfo.token}` },
+            params: { userid}
+          }
+        );
+        console.log(response.data);
+        setRents(response.data);
+      }
+      catch(e){
+        console.log(e);
+      }
+    };
+    fetchedRents();
+  }, [tokenInfo.token]);
 
   const gettingNewData = async (orderId: string) => {
     const res = await axios.post(
@@ -86,7 +114,7 @@ const Rent = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl bg-red-100 mx-auto p-5 h-screen flex flex-col gap-6 shadow-lg rounded-xl px-6 md:px-12 lg:px-24 xl:px-32">
+    <div className="w-full max-w-7xl bg-red-100 mx-auto p-5 flex flex-col gap-6 shadow-lg rounded-xl px-6 md:px-12 lg:px-24 xl:px-32">
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4">User Info</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -200,6 +228,34 @@ const Rent = () => {
           </div>
         </div>
       </div>
+
+      {/* Recent Payments */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold text-center mb-4">Rent Payments</h2>
+      {Rents.filter((rent) => rent.status === 'captured').length > 0 ? (
+        <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2">Order ID</th>
+              <th className="border p-2">Amount (₹)</th>
+              <th className="border p-2">Receipt ID</th>
+              <th className="border p-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Rents.map((rent, index) => (
+              <tr key={index} className="text-center">
+                <td className="border p-2">{rent.orderId}</td>
+                <td className="border p-2">{rent.amount}</td>
+                <td className="border p-2">{rent.receipt}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="text-center text-gray-500">No rent payments found.</p>
+      )}
+    </div>
     </div>
   );
 };
