@@ -30,7 +30,8 @@ const Rent = () => {
   const [rcpt, setRcpt] = useState("");
   const [url, setUrl] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
-  const [Rents, setRents] = useState<Rent[]>([]);
+  const [Rents, setRents] = useState<Rent[]>([]); 
+
 
 
   useEffect(() => {
@@ -43,7 +44,11 @@ const Rent = () => {
           }
         );
         console.log(response.data);
-        setRents(response.data);
+        if (Array.isArray(response.data)) {
+          setRents(response.data); // Ensure it's set as an array
+        } else {
+          setRents([]); // If API response is not an array, set empty array
+        }
       }
       catch(e){
         console.log(e);
