@@ -1,11 +1,25 @@
 import express from "express"
 import { Request,Response } from "express";
-import {BlogsModel} from "../models/db"
+import {BlogsModel, paymentModel} from "../models/db"
 import { userAuth,AuthRequest, checkAdmin, verifyAcessToken } from "../middlewares/auth";
 import upload from "../middlewares/multer";
 import cloudinary, { deleteImage } from "../utils/cloudinary";
 const blogRouter= express.Router();
 
+
+blogRouter.get("/collection", checkAdmin, async(req: Request, res: Response) => {
+    try{
+        const blog_id = req.query.blog_id;
+        const resp = await paymentModel.find({
+            "notes.donationId": blog_id,
+            "notes.paymentType": "donation"
+        }).populate("notes.userId", "username email contact").exec();
+        res.status(200).json({resp});
+    }
+    catch(e){
+        console.log(e);
+    }
+});
 
 
 blogRouter.post("/create",verifyAcessToken,checkAdmin,upload.array("images",6) ,async(req:AuthRequest,res:Response)=>{ // add middlewares later rn for testing we have removed it --NOTE

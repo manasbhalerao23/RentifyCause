@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { BACKEND_URL } from "../config";
 import { useEffect, useState } from "react";
 import DOMPurify from "dompurify";
@@ -21,7 +21,25 @@ export const OpenBlog = () => {
   const [orderInfo, setOrderInfo] = useState("");
   const { blogId } = useParams();
   const [num, setNum] = useState<number>();
+  const [collections, setcollections] = useState({});
+  const [isAdmin, setisAdmin] = useState(false);
   const tokenInfo = useSelector((store: RootState) => store.auth);
+
+  const navigate = useNavigate();
+
+  const AdminShowData = async() => {
+    try{
+      const res = await axios.get(`${BACKEND_URL}/blog/collection?blog_id=${blogId}` ,{
+        headers: { authorization: `Bearer ${tokenInfo.token}` },
+      });
+      console.log(res);
+      if(res) setisAdmin(true);
+      setcollections(res.data.resp);
+    }
+    catch(e){
+      console.log(e);
+    }
+  }
 
   const fetchblog = async () => {
     try {
@@ -42,6 +60,7 @@ export const OpenBlog = () => {
   useEffect(() => {
     if (tokenInfo.token) {
       fetchblog();
+      AdminShowData();
     }
   }, [tokenInfo.token]);
 
@@ -87,6 +106,12 @@ export const OpenBlog = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-6 p-4 lg:p-6">
+
+      {isAdmin && (<div className="w-full mb-4flex justify-end">
+        <button className="cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" onClick={() => navigate('/collections', { state: {collections}})}>
+          View Collections
+          </button>
+      </div>)}
       {/* Image Slider */}
       <div className="w-full">
         <Swiper

@@ -15,6 +15,7 @@ import ProfilePage from "./components/ProfileBar";
 import OpenReceipt from "./components/OpenReceipt";
 import AdminTest from "./components/AdminTest";
 import AdminView from "./components/AdminView";
+import Collections from "./components/Collections";
 function App() {
   return (
     <Provider store={store}>
@@ -30,6 +31,7 @@ function App() {
             <Route path="/card" element={<Cards />} />
             <Route path="/test" element={<Test />} />
             {/* </Route> */}
+            <Route path="/collections" element={<Collections/>}/>
             <Route path="/openBlog/:blogId" element={<OpenBlog />} />
             <Route path="/rent" element={<Rent />} />
             <Route
