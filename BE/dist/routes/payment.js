@@ -50,7 +50,7 @@ paymentRouter.post("/payment/create", auth_1.userAuth, (req, res) => __awaiter(v
         // const {amount}=req.body;
         // const {email,contact,username,id}= req?.user;
         const id = (_b = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : "";
-        const email = (_d = (_c = req.user) === null || _c === void 0 ? void 0 : _c.contact) !== null && _d !== void 0 ? _d : "";
+        const email = (_d = (_c = req.user) === null || _c === void 0 ? void 0 : _c.email) !== null && _d !== void 0 ? _d : "";
         const contact = (_f = (_e = req.user) === null || _e === void 0 ? void 0 : _e.contact) !== null && _f !== void 0 ? _f : "";
         const username = (_h = (_g = req.user) === null || _g === void 0 ? void 0 : _g.username) !== null && _h !== void 0 ? _h : "";
         const { num } = req.body; // Num= number of month
@@ -111,7 +111,7 @@ paymentRouter.post("/payment/create/donate/:Did", auth_1.userAuth, (req, res) =>
     try {
         const id = (_b = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : "";
         const { Did } = (_c = req.params) !== null && _c !== void 0 ? _c : "";
-        const email = (_e = (_d = req.user) === null || _d === void 0 ? void 0 : _d.contact) !== null && _e !== void 0 ? _e : "";
+        const email = (_e = (_d = req.user) === null || _d === void 0 ? void 0 : _d.email) !== null && _e !== void 0 ? _e : "";
         const contact = (_g = (_f = req.user) === null || _f === void 0 ? void 0 : _f.contact) !== null && _g !== void 0 ? _g : "";
         const username = (_j = (_h = req.user) === null || _h === void 0 ? void 0 : _h.username) !== null && _j !== void 0 ? _j : "";
         const { num } = req.body; // Num= number of month

@@ -199,25 +199,44 @@ adminrouter.post("/generate-receipts", (req, res) => __awaiter(void 0, void 0, v
         res.status(500).json({ error: "Internal Server Error" });
     }
 }));
-adminrouter.post("/generate-receipts-without-link", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+adminrouter.post("/generate-excel", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const date = req.body.date;
-        if (!date) {
-            res.status(400).json({ error: "Date is required" });
+        const { date, month } = req.body;
+        let payments;
+        if (date) {
+            const startOfDay = new Date(date);
+            startOfDay.setUTCHours(0, 0, 0, 0);
+            const endOfDay = new Date(date);
+            endOfDay.setUTCHours(23, 59, 59, 999);
+            payments = yield db_1.paymentModel.find({
+                updatedAt: { $gte: startOfDay, $lte: endOfDay },
+                "notes.paymentType": "rent",
+                status: "captured",
+            });
+        }
+        else if (month) {
+            console.log("Received month:", month);
+            const startOfMonth = new Date();
+            startOfMonth.setUTCMonth(month, 1); // Set the given month (0-based)
+            startOfMonth.setUTCHours(0, 0, 0, 0);
+            const endOfMonth = new Date(startOfMonth);
+            endOfMonth.setMonth(startOfMonth.getMonth() + 1);
+            endOfMonth.setDate(0); // Last day of the month
+            endOfMonth.setUTCHours(23, 59, 59, 999);
+            console.log("Filtering payments from:", startOfMonth, "to", endOfMonth);
+            payments = yield db_1.paymentModel.find({
+                updatedAt: { $gte: startOfMonth, $lte: endOfMonth },
+                "notes.paymentType": "rent",
+                status: "captured",
+            });
+        }
+        else {
+            res.status(400).json({ error: "Either date or month is required" });
             return;
         }
-        const startOfDay = new Date(date);
-        startOfDay.setUTCHours(0, 0, 0, 0);
-        const endOfDay = new Date(date);
-        endOfDay.setUTCHours(23, 59, 59, 999);
-        // Fetch payments from DB
-        const payments = yield db_1.paymentModel.find({
-            updatedAt: { $gte: startOfDay, $lte: endOfDay },
-            "notes.paymentType": "rent",
-            status: "captured",
-        });
-        if (!payments.length) {
-            res.status(404).json({ message: "No payments found" });
+        console.log("Payments Data:", payments);
+        if (!payments) {
+            res.json({ message: "No payments found" });
             return;
         }
         // Create Excel file
@@ -249,11 +268,9 @@ adminrouter.post("/generate-receipts-without-link", (req, res) => __awaiter(void
             });
         });
         // Save file to a temporary directory
-        const fileName = `receipts_${date}.xlsx`;
+        const fileName = date ? `receipts_${date}.xlsx` : `receipts_${month}.xlsx`;
         const filePath = path_1.default.join(__dirname, "../temp", fileName);
         yield workbook.xlsx.writeFile(filePath);
-        // Send file as a response
-        console.log("reacher here");
         res.download(filePath, fileName, (err) => {
             if (err) {
                 console.error("Error sending file:", err);

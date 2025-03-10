@@ -44,7 +44,7 @@ paymentRouter.post("/payment/create", userAuth, async (req:AuthRequest,res:Respo
         // const {amount}=req.body;
         // const {email,contact,username,id}= req?.user;
         const id= req.user?.id ?? "";
-        const email= req.user?.contact ?? "";
+        const email= req.user?.email ?? "";
         const contact= req.user?.contact ?? "";
         const username= req.user?.username ?? "";
         const {num}= req.body // Num= number of month
@@ -123,7 +123,7 @@ paymentRouter.post("/payment/create/donate/:Did", userAuth, async (req:AuthReque
         
         const id= req.user?.id ?? "";
         const {Did}= req.params ?? "";
-        const email= req.user?.contact ?? "";
+        const email= req.user?.email ?? "";
         const contact= req.user?.contact ?? "";
         const username= req.user?.username ?? "";
         const {num}= req.body // Num= number of month

@@ -107,7 +107,7 @@ export const OpenBlog = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-6 p-4 lg:p-6">
 
-      {isAdmin && (<div className="w-full mb-4flex justify-end">
+      {isAdmin && (<div className="absolute z-20 right-0">
         <button className="cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" onClick={() => navigate('/collections', { state: {collections}})}>
           View Collections
           </button>

@@ -88,7 +88,7 @@ authRouter.post("/reconnection", (req, res) => __awaiter(void 0, void 0, void 0,
 authRouter.get("/getRents", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user_id = req.query.user_id;
-        const resp = yield db_1.paymentModel.find({ "notes.userId": user_id });
+        const resp = yield db_1.paymentModel.find({ "notes.userId": user_id, "notes.paymentType": "rent" });
         res.status(200).json({ resp });
     }
     catch (e) {

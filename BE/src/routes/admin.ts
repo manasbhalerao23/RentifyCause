@@ -231,84 +231,102 @@ const paymentsWithInvoices = payments.map(payment => {
         }
       });
 
-      adminrouter.post("/generate-receipts-without-link", async (req, res) => {
+      adminrouter.post("/generate-excel", async (req, res) => {
         try {
-          const date = req.body.date;
-          if (!date) {
-res.status(400).json({ error: "Date is required" });
-return 
-          }
-      
-          const startOfDay = new Date(date);
-          startOfDay.setUTCHours(0, 0, 0, 0);
-      
-          const endOfDay = new Date(date);
-          endOfDay.setUTCHours(23, 59, 59, 999);
-      
-          // Fetch payments from DB
-          const payments = await paymentModel.find({
-            updatedAt: { $gte: startOfDay, $lte: endOfDay },
-            "notes.paymentType": "rent",
-            status: "captured",
-          });
-      
-          if (!payments.length) {
-res.status(404).json({ message: "No payments found" });
-return 
-          }
-      
-          // Create Excel file
-          const workbook = new ExcelJs.Workbook();
-          const sheet = workbook.addWorksheet("Rent Receipts");
-      
-          // Add Headers
-          sheet.columns = [
-            { header: "Name", key: "name", width: 20 },
-            { header: "Contact", key: "contact", width: 15 },
-            { header: "Email", key: "email", width: 15 },
-            { header: "Amount Paid", key: "amount", width: 15 },
-            { header: "Months Paid", key: "monthsPaid", width: 10 },
-            { header: "Receipt ID", key: "receiptId", width: 20 },
-            { header: "Order Id", key: "orderId", width: 20 },
-            { header: "Date", key: "date", width: 20 },
-          ];
-      
-          // Add Data
-          payments.forEach((payment) => {
-            sheet.addRow({
-              name: payment?.notes?.username,
-              contact: payment?.notes?.contact,
-              email: payment?.notes?.email,
-              amount: payment.amount,
-              monthsPaid: payment?.notes?.months_paid,
-              receiptId: payment.receipt,
-              orderId: payment.orderId,
-              date: payment.updatedAt.toISOString().split("T")[0],
-            });
-          });
-      
-          // Save file to a temporary directory
-          const fileName = `receipts_${date}.xlsx`;
-          const filePath = path.join(__dirname, "../temp", fileName);
-          await workbook.xlsx.writeFile(filePath);
-      
-          // Send file as a response
-          console.log("reacher here")
-          res.download(filePath, fileName, (err) => {
-            if (err) {
-              console.error("Error sending file:", err);
-              res.status(500).json({ error: "Error generating file" });
-            }
-      
-            // Delete file after sending
-            fs.unlink(filePath, (unlinkErr) => {
-              if (unlinkErr) console.error("Error deleting file:", unlinkErr);
-            });
-          });
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ error: "Internal Server Error" });
-        }
-      });
+            const { date, month } = req.body;
+            let payments;
+    
+            if (date) {
+                const startOfDay = new Date(date);
+                startOfDay.setUTCHours(0, 0, 0, 0);
+    
+                const endOfDay = new Date(date);
+                endOfDay.setUTCHours(23, 59, 59, 999);
+    
+                payments = await paymentModel.find({
+                    updatedAt: { $gte: startOfDay, $lte: endOfDay },
+                    "notes.paymentType": "rent",
+                    status: "captured",
+                });
+            } else if (month) {
+                console.log("Received month:", month);
 
+                const startOfMonth = new Date();
+    startOfMonth.setUTCMonth(month, 1); // Set the given month (0-based)
+    startOfMonth.setUTCHours(0, 0, 0, 0);
+
+    const endOfMonth = new Date(startOfMonth);
+    endOfMonth.setMonth(startOfMonth.getMonth() + 1);
+    endOfMonth.setDate(0); // Last day of the month
+    endOfMonth.setUTCHours(23, 59, 59, 999);
+
+    console.log("Filtering payments from:", startOfMonth, "to", endOfMonth);
+
+    payments = await paymentModel.find({
+        updatedAt: { $gte: startOfMonth, $lte: endOfMonth },
+        "notes.paymentType": "rent",
+        status: "captured",
+    });
+            } else {
+                res.status(400).json({ error: "Either date or month is required" });
+                return
+            }
+            console.log("Payments Data:", payments);
+            if (!payments) {
+                res.json({ message: "No payments found" });
+                return
+            }
+    
+            // Create Excel file
+            const workbook = new ExcelJs.Workbook();
+            const sheet = workbook.addWorksheet("Rent Receipts");
+    
+            // Add Headers
+            sheet.columns = [
+                { header: "Name", key: "name", width: 20 },
+                { header: "Contact", key: "contact", width: 15 },
+                { header: "Email", key: "email", width: 15 },
+                { header: "Amount Paid", key: "amount", width: 15 },
+                { header: "Months Paid", key: "monthsPaid", width: 10 },
+                { header: "Receipt ID", key: "receiptId", width: 20 },
+                { header: "Order Id", key: "orderId", width: 20 },
+                { header: "Date", key: "date", width: 20 },
+            ];
+    
+            // Add Data
+            payments.forEach((payment) => {
+                sheet.addRow({
+                    name: payment?.notes?.username,
+                    contact: payment?.notes?.contact,
+                    email: payment?.notes?.email,
+                    amount: payment.amount,
+                    monthsPaid: payment?.notes?.months_paid,
+                    receiptId: payment.receipt,
+                    orderId: payment.orderId,
+                    date: payment.updatedAt.toISOString().split("T")[0],
+                });
+            });
+    
+            // Save file to a temporary directory
+            const fileName = date ? `receipts_${date}.xlsx` : `receipts_${month}.xlsx`;
+            const filePath = path.join(__dirname, "../temp", fileName);
+            await workbook.xlsx.writeFile(filePath);
+    
+            res.download(filePath, fileName, (err) => {
+                if (err) {
+                    console.error("Error sending file:", err);
+                    res.status(500).json({ error: "Error generating file" });
+                }
+            
+                // Delete file after sending
+                fs.unlink(filePath, (unlinkErr) => {
+                    if (unlinkErr) console.error("Error deleting file:", unlinkErr);
+                });
+            });
+            
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    });
 export default adminrouter;

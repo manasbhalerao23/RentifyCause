@@ -152,7 +152,11 @@ const AdminTest = () => {
         </select>
         
       </div>
-     
+      <Link to="/generateSheet">
+      <div className="p-2">
+      <button  className=" p-4 bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition-all duration-300">Generate Report</button>
+      </div>
+      </Link>
 
       {fetcherr && <p className="text-red-500 text-center">{fetcherr}</p>}
 

@@ -25,9 +25,11 @@ export const GenerateSheet = () => {
   const handleSubmit = async () => {
     try {
       const res = await axios.post(
-        `${BACKEND_URL}/admin/generate-receipts-without-link`,
+        `${BACKEND_URL}/admin/generate-excel`,
         {
-          date: "2025-03-03",
+          date: date,
+          month:obj[selectedMonth]
+          
         },
         { responseType: "blob" }
       );
@@ -35,7 +37,9 @@ export const GenerateSheet = () => {
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `receipts_2025-03-03.xlsx`); // Set file name 
+      
+      link.setAttribute('download', `receipts_${new Date(Date.now())}.xlsx`); 
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -46,25 +50,29 @@ export const GenerateSheet = () => {
   };
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-2xl border border-gray-200 mt-10 space-y-6">
+      <h2 className="text-xl font-semibold text-gray-800 text-center">Generate Report</h2>
+
       {/* Type Selection */}
       <div>
+        <label className="block text-gray-600 font-medium mb-2">Select Time</label>
         <select
-          className="p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none transition"
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value)}
         >
-          <option value="">Select Time</option>
+          <option value="">Select Time Type</option>
           <option value="date">Date</option>
           <option value="month">Month</option>
         </select>
       </div>
 
-      {/* Month Selection - Only visible if type is "month" */}
+      {/* Month Selection */}
       {selectedType === "month" && (
         <div>
+          <label className="block text-gray-600 font-medium mb-2">Select Month</label>
           <select
-            className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+            className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
           >
@@ -77,19 +85,25 @@ export const GenerateSheet = () => {
         </div>
       )}
 
-      {/* Date Selection - Only visible if type is "date" */}
+      {/* Date Selection */}
       {selectedType === "date" && (
-        <div className="flex items-center gap-5">
-          <div>Date:</div>
+        <div>
+          <label className="block text-gray-600 font-medium mb-2">Select Date</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-200 outline-none transition"
           />
         </div>
       )}
-      <button onClick={handleSubmit}>Generate</button>
+
+      <button
+        onClick={handleSubmit}
+        className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition-all duration-300"
+      >
+        Generate Report
+      </button>
     </div>
   );
 };
