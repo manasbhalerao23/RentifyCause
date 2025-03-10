@@ -101,6 +101,7 @@ const PaymentSchema = new mongoose_1.Schema({
         },
         donationId: {
             type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Blogs"
         }
     },
     paymentMethod: {

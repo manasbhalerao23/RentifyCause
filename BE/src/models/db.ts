@@ -109,6 +109,7 @@ const PaymentSchema=new Schema({
             },
             donationId:{
                 type: Schema.Types.ObjectId,
+                ref:"Blogs"
             }
 
         },

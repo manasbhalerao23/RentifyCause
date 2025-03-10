@@ -51,6 +51,19 @@ const auth_1 = require("../middlewares/auth");
 const multer_1 = __importDefault(require("../middlewares/multer"));
 const cloudinary_1 = __importStar(require("../utils/cloudinary"));
 const blogRouter = express_1.default.Router();
+blogRouter.get("/collection", auth_1.checkAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const blog_id = req.query.blog_id;
+        const resp = yield db_1.paymentModel.find({
+            "notes.donationId": blog_id,
+            "notes.paymentType": "donation"
+        }).populate("notes.userId", "username email contact").exec();
+        res.status(200).json({ resp });
+    }
+    catch (e) {
+        console.log(e);
+    }
+}));
 blogRouter.post("/create", auth_1.verifyAcessToken, auth_1.checkAdmin, multer_1.default.array("images", 6), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let imgUrlArr = [];
