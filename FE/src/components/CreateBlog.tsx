@@ -61,6 +61,7 @@ const BlogEditor = () => {
       alert("Please fill out all fields before submitting.");
       return;
     }
+    
 
     const formData = new FormData();
     formData.append("heading", mainHeading);

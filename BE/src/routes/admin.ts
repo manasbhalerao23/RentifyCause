@@ -2,6 +2,10 @@
 import express from "express";
 import { InvoiceModel, paymentModel, User } from "../models/db";
 import { checkAdmin, verifyAcessToken } from "../middlewares/auth";
+import ExcelJs from "exceljs"
+import fs from "fs"
+import cloudinary from "../utils/cloudinary";
+import path from "path"
 
 const adminrouter = express.Router();
 
@@ -156,5 +160,155 @@ const paymentsWithInvoices = payments.map(payment => {
             return;
         }
     })
+
+    adminrouter.post("/generate-receipts", async (req, res) => {
+        try {
+          const date = req.body.date;
+          if (!date) { res.status(400).json({ error: "Date is required" });
+          return}
+          const startOfDay = new Date(date);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+          
+          const endOfDay = new Date(date);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+          // Fetch payments from DB
+          const payments = await paymentModel.find({
+            updatedAt:{ $gte: startOfDay, $lte: endOfDay },
+            "notes.paymentType":"rent",
+            status:"captured"
+            }); // Adjust for SQL queries if needed
+      
+          if (!payments.length) { res.status(404).json({ message: "No payments found" });
+          return}
+      
+          // Create Excel file
+          const workbook = new ExcelJs.Workbook();
+          const sheet = workbook.addWorksheet("Rent Receipts");
+      
+          // Add Headers
+          sheet.columns = [
+            {header: "Name", key:"name", width:20},
+            {header: "Contact", key:"contact", width:15},
+            {header: "Email", key:"email", width:15},
+            { header: "Amount Paid", key: "amount", width: 15 },
+            {header:"Months Paid", key:"monthsPaid",width:10},
+            { header: "Receipt ID", key: "receiptId", width: 20 },
+            { header: "Order Id", key: "orderId", width: 20 },
+            { header: "Date", key: "date", width: 20 },
+          ];
+      
+          // Add Data
+          payments.forEach((payment) => {
+            sheet.addRow({
+                name: payment?.notes?.username,
+                contact: payment?.notes?.contact,
+                email: payment?.notes?.email,
+              amount: payment.amount,
+              monthsPaid: payment?.notes?.months_paid,
+              receiptId: payment.receipt, 
+              orderId: payment.orderId,
+              date: payment.updatedAt.toISOString().split("T")[0],
+            });
+          });
+      
+          // Save to a temp file
+          const filePath = `./receipts_${date}.xlsx`;
+          await workbook.xlsx.writeFile(filePath);
+      
+          // Upload to Cloudinary
+          const result = await cloudinary.uploader.upload(filePath, {
+            resource_type: "raw",
+            folder: "rent_receipts",
+          });
+      
+          // Delete local file
+          fs.unlinkSync(filePath);
+      
+          res.json({ message: "Receipt generated", url: result.url });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: "Internal Server Error" });
+        }
+      });
+
+      adminrouter.post("/generate-receipts-without-link", async (req, res) => {
+        try {
+          const date = req.body.date;
+          if (!date) {
+res.status(400).json({ error: "Date is required" });
+return 
+          }
+      
+          const startOfDay = new Date(date);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+      
+          const endOfDay = new Date(date);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+      
+          // Fetch payments from DB
+          const payments = await paymentModel.find({
+            updatedAt: { $gte: startOfDay, $lte: endOfDay },
+            "notes.paymentType": "rent",
+            status: "captured",
+          });
+      
+          if (!payments.length) {
+res.status(404).json({ message: "No payments found" });
+return 
+          }
+      
+          // Create Excel file
+          const workbook = new ExcelJs.Workbook();
+          const sheet = workbook.addWorksheet("Rent Receipts");
+      
+          // Add Headers
+          sheet.columns = [
+            { header: "Name", key: "name", width: 20 },
+            { header: "Contact", key: "contact", width: 15 },
+            { header: "Email", key: "email", width: 15 },
+            { header: "Amount Paid", key: "amount", width: 15 },
+            { header: "Months Paid", key: "monthsPaid", width: 10 },
+            { header: "Receipt ID", key: "receiptId", width: 20 },
+            { header: "Order Id", key: "orderId", width: 20 },
+            { header: "Date", key: "date", width: 20 },
+          ];
+      
+          // Add Data
+          payments.forEach((payment) => {
+            sheet.addRow({
+              name: payment?.notes?.username,
+              contact: payment?.notes?.contact,
+              email: payment?.notes?.email,
+              amount: payment.amount,
+              monthsPaid: payment?.notes?.months_paid,
+              receiptId: payment.receipt,
+              orderId: payment.orderId,
+              date: payment.updatedAt.toISOString().split("T")[0],
+            });
+          });
+      
+          // Save file to a temporary directory
+          const fileName = `receipts_${date}.xlsx`;
+          const filePath = path.join(__dirname, "../temp", fileName);
+          await workbook.xlsx.writeFile(filePath);
+      
+          // Send file as a response
+          console.log("reacher here")
+          res.download(filePath, fileName, (err) => {
+            if (err) {
+              console.error("Error sending file:", err);
+              res.status(500).json({ error: "Error generating file" });
+            }
+      
+            // Delete file after sending
+            fs.unlink(filePath, (unlinkErr) => {
+              if (unlinkErr) console.error("Error deleting file:", unlinkErr);
+            });
+          });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: "Internal Server Error" });
+        }
+      });
 
 export default adminrouter;

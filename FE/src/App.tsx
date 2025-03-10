@@ -15,6 +15,7 @@ import ProfilePage from "./components/ProfileBar";
 import OpenReceipt from "./components/OpenReceipt";
 import AdminTest from "./components/AdminTest";
 import AdminView from "./components/AdminView";
+import { GenerateSheet } from "./components/GenerateSheet";
 function App() {
   return (
     <Provider store={store}>
@@ -32,6 +33,8 @@ function App() {
             {/* </Route> */}
             <Route path="/openBlog/:blogId" element={<OpenBlog />} />
             <Route path="/rent" element={<Rent />} />
+            <Route path="/generateSheet" element={<GenerateSheet />} />
+
             <Route
               path="/profile"
               element={

@@ -15,6 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const db_1 = require("../models/db");
 const auth_1 = require("../middlewares/auth");
+const exceljs_1 = __importDefault(require("exceljs"));
+const fs_1 = __importDefault(require("fs"));
+const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
+const path_1 = __importDefault(require("path"));
 const adminrouter = express_1.default.Router();
 adminrouter.get("/getpaydetails", auth_1.verifyAcessToken, auth_1.checkAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userreceipt = req.query.rec; //check
@@ -127,6 +131,144 @@ adminrouter.post("/extempt", (req, res) => __awaiter(void 0, void 0, void 0, fun
         console.log(err);
         res.status(500).json({ message: "Error while doing the Task" });
         return;
+    }
+}));
+adminrouter.post("/generate-receipts", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const date = req.body.date;
+        if (!date) {
+            res.status(400).json({ error: "Date is required" });
+            return;
+        }
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        // Fetch payments from DB
+        const payments = yield db_1.paymentModel.find({
+            updatedAt: { $gte: startOfDay, $lte: endOfDay },
+            "notes.paymentType": "rent",
+            status: "captured"
+        }); // Adjust for SQL queries if needed
+        if (!payments.length) {
+            res.status(404).json({ message: "No payments found" });
+            return;
+        }
+        // Create Excel file
+        const workbook = new exceljs_1.default.Workbook();
+        const sheet = workbook.addWorksheet("Rent Receipts");
+        // Add Headers
+        sheet.columns = [
+            { header: "Name", key: "name", width: 20 },
+            { header: "Contact", key: "contact", width: 15 },
+            { header: "Email", key: "email", width: 15 },
+            { header: "Amount Paid", key: "amount", width: 15 },
+            { header: "Months Paid", key: "monthsPaid", width: 10 },
+            { header: "Receipt ID", key: "receiptId", width: 20 },
+            { header: "Order Id", key: "orderId", width: 20 },
+            { header: "Date", key: "date", width: 20 },
+        ];
+        // Add Data
+        payments.forEach((payment) => {
+            var _a, _b, _c, _d;
+            sheet.addRow({
+                name: (_a = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _a === void 0 ? void 0 : _a.username,
+                contact: (_b = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _b === void 0 ? void 0 : _b.contact,
+                email: (_c = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _c === void 0 ? void 0 : _c.email,
+                amount: payment.amount,
+                monthsPaid: (_d = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _d === void 0 ? void 0 : _d.months_paid,
+                receiptId: payment.receipt,
+                orderId: payment.orderId,
+                date: payment.updatedAt.toISOString().split("T")[0],
+            });
+        });
+        // Save to a temp file
+        const filePath = `./receipts_${date}.xlsx`;
+        yield workbook.xlsx.writeFile(filePath);
+        // Upload to Cloudinary
+        const result = yield cloudinary_1.default.uploader.upload(filePath, {
+            resource_type: "raw",
+            folder: "rent_receipts",
+        });
+        // Delete local file
+        fs_1.default.unlinkSync(filePath);
+        res.json({ message: "Receipt generated", url: result.url });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}));
+adminrouter.post("/generate-receipts-without-link", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const date = req.body.date;
+        if (!date) {
+            res.status(400).json({ error: "Date is required" });
+            return;
+        }
+        const startOfDay = new Date(date);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        // Fetch payments from DB
+        const payments = yield db_1.paymentModel.find({
+            updatedAt: { $gte: startOfDay, $lte: endOfDay },
+            "notes.paymentType": "rent",
+            status: "captured",
+        });
+        if (!payments.length) {
+            res.status(404).json({ message: "No payments found" });
+            return;
+        }
+        // Create Excel file
+        const workbook = new exceljs_1.default.Workbook();
+        const sheet = workbook.addWorksheet("Rent Receipts");
+        // Add Headers
+        sheet.columns = [
+            { header: "Name", key: "name", width: 20 },
+            { header: "Contact", key: "contact", width: 15 },
+            { header: "Email", key: "email", width: 15 },
+            { header: "Amount Paid", key: "amount", width: 15 },
+            { header: "Months Paid", key: "monthsPaid", width: 10 },
+            { header: "Receipt ID", key: "receiptId", width: 20 },
+            { header: "Order Id", key: "orderId", width: 20 },
+            { header: "Date", key: "date", width: 20 },
+        ];
+        // Add Data
+        payments.forEach((payment) => {
+            var _a, _b, _c, _d;
+            sheet.addRow({
+                name: (_a = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _a === void 0 ? void 0 : _a.username,
+                contact: (_b = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _b === void 0 ? void 0 : _b.contact,
+                email: (_c = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _c === void 0 ? void 0 : _c.email,
+                amount: payment.amount,
+                monthsPaid: (_d = payment === null || payment === void 0 ? void 0 : payment.notes) === null || _d === void 0 ? void 0 : _d.months_paid,
+                receiptId: payment.receipt,
+                orderId: payment.orderId,
+                date: payment.updatedAt.toISOString().split("T")[0],
+            });
+        });
+        // Save file to a temporary directory
+        const fileName = `receipts_${date}.xlsx`;
+        const filePath = path_1.default.join(__dirname, "../temp", fileName);
+        yield workbook.xlsx.writeFile(filePath);
+        // Send file as a response
+        console.log("reacher here");
+        res.download(filePath, fileName, (err) => {
+            if (err) {
+                console.error("Error sending file:", err);
+                res.status(500).json({ error: "Error generating file" });
+            }
+            // Delete file after sending
+            fs_1.default.unlink(filePath, (unlinkErr) => {
+                if (unlinkErr)
+                    console.error("Error deleting file:", unlinkErr);
+            });
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 }));
 exports.default = adminrouter;
