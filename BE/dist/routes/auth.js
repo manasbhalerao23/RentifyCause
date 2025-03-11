@@ -18,6 +18,7 @@ const db_1 = require("../models/db");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const auth_1 = require("../middlewares/auth");
+const mongoose_1 = __importDefault(require("mongoose"));
 dotenv_1.default.config();
 const authRouter = express_1.default.Router();
 //Fix this type error later
@@ -88,7 +89,13 @@ authRouter.post("/reconnection", (req, res) => __awaiter(void 0, void 0, void 0,
 authRouter.get("/getRents", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user_id = req.query.user_id;
-        const resp = yield db_1.paymentModel.find({ "notes.userId": user_id, "notes.paymentType": "rent" });
+        if (!user_id) {
+            res.status(400).json({ msg: "Not found ID" });
+            return;
+        }
+        const resp = yield db_1.InvoiceModel.find({ userId: new mongoose_1.default.Types.ObjectId(user_id.toString()) });
+        console.log(user_id);
+        console.log(resp);
         res.status(200).json({ resp });
     }
     catch (e) {

@@ -9,15 +9,16 @@ declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Razorpay: any;
-  } 
+  }
 }
 
 const Rent = () => {
   interface Rent {
     orderId: string;
     amount: number;
-    receipt: string;
+    receiptId: string;
     status: string;
+    downloadUrl:string
   }
 
   const dispatch = useDispatch();
@@ -30,27 +31,17 @@ const Rent = () => {
   const [rcpt, setRcpt] = useState("");
   const [url, setUrl] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
-  const [Rents, setRents] = useState<Rent[]>([]); 
-
-
+  const [Rents, setRents] = useState<Rent[]>([]);
 
   useEffect(() => {
-    const fetchedRents = async() => {
-      try{
-        const response = await axios.get(`${BACKEND_URL}/auth/getRents`,
-          {
-            headers: { authorization: `Bearer ${tokenInfo.token}` },
-            params: { userid}
-          }
-        );
-        console.log(response.data);
-        if (Array.isArray(response.data)) {
-          setRents(response.data); // Ensure it's set as an array
-        } else {
-          setRents([]); // If API response is not an array, set empty array
-        }
-      }
-      catch(e){
+    const fetchedRents = async () => {
+      try {
+        const response = await axios.get(`${BACKEND_URL}/auth/getRents`, {
+          headers: { authorization: `Bearer ${tokenInfo.token}` },
+          params: { user_id: userid },
+        });
+        setRents(response.data.resp); // Ensure it's set as an array
+      } catch (e) {
         console.log(e);
       }
     };
@@ -164,10 +155,9 @@ const Rent = () => {
                       userInfo.monthStatus[monthIndex] === true
                         ? "bg-green-300 border-2 border-blue-600"
                         : userInfo.monthStatus[monthIndex] === false
-                          ? "bg-gray-200"
-                          : "bg-yellow-300 border-2 border-red-600" // If null, apply yellow background
+                        ? "bg-gray-200"
+                        : "bg-yellow-300 border-2 border-red-600" // If null, apply yellow background
                     }`}
-                    
                   >
                     {new Date(0, index).toLocaleString("default", {
                       month: "long",
@@ -190,7 +180,7 @@ const Rent = () => {
                 {">"}
               </button>
             </div>
-            {url &&    (
+            {url && (
               <button
                 onClick={handleDownload}
                 className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -236,31 +226,39 @@ const Rent = () => {
 
       {/* Recent Payments */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-4">Rent Payments</h2>
-      {Rents.filter((rent) => rent.status === 'captured').length > 0 ? (
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Order ID</th>
-              <th className="border p-2">Amount (₹)</th>
-              <th className="border p-2">Receipt ID</th>
-              <th className="border p-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Rents.map((rent, index) => (
-              <tr key={index} className="text-center">
-                <td className="border p-2">{rent.orderId}</td>
-                <td className="border p-2">{rent.amount}</td>
-                <td className="border p-2">{rent.receipt}</td>
+        <h2 className="text-2xl font-bold text-center mb-4">Rent Payments</h2>
+        {Rents ? (
+          <table className="w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-2">Order ID</th>
+                <th className="border p-2">Receipt ID</th>
+                <th className="border p-2">Download</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p className="text-center text-gray-500">No rent payments found.</p>
-      )}
-    </div>
+            </thead>
+            <tbody>
+              {Rents.map((rent, index) => (
+                <tr key={index} className="text-center">
+                  <td className="border p-2">{rent.orderId}</td>
+                  <td className="border p-2">{rent.receiptId}</td>
+                  <td className="border p-2">
+                    {" "}
+                    <a
+                      href={rent.downloadUrl} // Replace with actual invoice file path
+                      download="invoice.pdf"
+                      className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block"
+                    >
+                      Download Invoice
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-center text-gray-500">No rent payments found.</p>
+        )}
+      </div>
     </div>
   );
 };

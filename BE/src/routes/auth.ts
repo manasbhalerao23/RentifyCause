@@ -6,6 +6,7 @@ import dotenv from "dotenv"
 import {Request , Response, Router} from "express"
 import { send } from "process"
 import { AuthRequest, checkAdmin, userAuth, verifyAcessToken } from "../middlewares/auth"
+import mongoose from "mongoose"
 dotenv.config()
 
 const authRouter= express.Router();
@@ -87,7 +88,14 @@ authRouter.post("/reconnection", async (req: Request, res: Response) => {
 authRouter.get("/getRents", async(req: Request, res: Response) => {
   try{
     const user_id = req.query.user_id;
-    const resp = await paymentModel.find({ "notes.userId": user_id, "notes.paymentType": "rent"});
+    if(!user_id){
+      res.status(400).json({msg:"Not found ID"})
+      return 
+    }
+    const resp = await InvoiceModel.find({  userId: new mongoose.Types.ObjectId(user_id.toString())});
+    console.log(user_id);
+    console.log(resp);
+    
     res.status(200).json({resp});
   }
   catch(e){
