@@ -20,6 +20,15 @@ const fs_1 = __importDefault(require("fs"));
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const path_1 = __importDefault(require("path"));
 const adminrouter = express_1.default.Router();
+adminrouter.get("/getRentDonations", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const resp = yield db_1.paymentModel.find({ status: "captured" });
+        res.json({ resp });
+    }
+    catch (e) {
+        console.log(e);
+    }
+}));
 adminrouter.get("/getpaydetails", auth_1.verifyAcessToken, auth_1.checkAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userreceipt = req.query.rec; //check
     try {

@@ -9,6 +9,16 @@ import path from "path"
 
 const adminrouter = express.Router();
 
+adminrouter.get("/getRentDonations", async (req, res) => {
+    try{
+        const resp = await paymentModel.find({status: "captured"});
+        res.json({resp});
+    }
+    catch(e){
+        console.log(e);
+    }
+})
+
 adminrouter.get("/getpaydetails",verifyAcessToken ,checkAdmin ,async (req, res) => {
     const userreceipt = req.query.rec;//check
     try{
