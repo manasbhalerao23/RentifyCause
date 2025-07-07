@@ -14,21 +14,6 @@ RentifyCause is a rent management/payment platform tailored for the Indian Red C
 
 ---
 
-## Architecture Flow
-
-```mermaid
-graph TD
-    A[User (Tenant/Shopkeeper)] -->|Login/Authenticate| B[Frontend (React + Redux)]
-    B --> |REST API Calls| C[Backend (Node.js + Express)]
-    C --> |Authenticate & Authorize| D[JWT Auth Service]
-    C --> |Create Payment Order| E[Payment Gateway (Razorpay)]
-    E --> |Callback (Payment Success/Fail)| C
-    C --> |Generate Invoice PDF| F[PDF Generation Service (pdf-lib)]
-    F --> |Store Invoice| G[Cloudinary (Cloud Storage)]
-    C --> |Update Payment & Rent Status| H[Database]
-    B --> |Fetch Rent Status, Payment History, Invoice URLs| C
-    B --> |Download Invoice| G
-```
 
 **Flow Explanation:**
 1. **Login:** User logs in and is authenticated via JWT.
