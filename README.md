@@ -1,6 +1,6 @@
 # RentifyCause
 
-RentifyCause is a rent management/payment platform tailored for the Indian Red Cross Society, Chhatarpur (M.P.). The application allows tenants (shopkeepers) to pay rent online, keep track of their rent payment status month-wise, and download official rent invoices. It is built with a TypeScript-based frontend and backend.
+RentifyCause is a rent management/payment platform tailored for the Indian Red Cross Society. The application allows tenants (shopkeepers) to pay rent online, keep track of their rent payment status month-wise, and download official rent invoices. It is built with a TypeScript-based frontend and backend.
 
 ---
 
@@ -16,7 +16,7 @@ RentifyCause is a rent management/payment platform tailored for the Indian Red C
 
 ## Architecture Flow
 
-
+```mermaid
 graph TD
     A[User (Tenant/Shopkeeper)] -->|Login/Authenticate| B[Frontend (React + Redux)]
     B --> |REST API Calls| C[Backend (Node.js + Express)]
@@ -53,14 +53,56 @@ graph TD
 
 ## Getting Started
 
-> _Please update these steps with your actual repo structure and setup instructions!_
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/manasbhalerao23/RentifyCause.git
    ```
-2. Install dependencies for both `FE` (frontend) and `BE` (backend).
-3. Set up environment variables for backend (e.g., payment gateway keys, JWT secret, Cloudinary credentials).
-4. Run backend and frontend servers.
+
+2. **Install dependencies for both `FE` (frontend) and `BE` (backend):**
+   ```bash
+   cd RentifyCause/FE
+   npm install
+   cd ../BE
+   npm install
+   ```
+
+3. **Set up environment variables for backend (`BE/.env`):**
+   - `RAZORPAY_KEY_ID`
+   - `RAZORPAY_KEY_SECRET`
+   - `JWT_SECRET`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+  
+
+4. **Run backend and frontend servers (from root of the repo):**
+   ```bash
+   # Start Backend
+   cd BE
+   npm run dev
+
+   # Start Frontend (in a new terminal)
+   cd ../FE
+   npm run dev
+   ```
+
+---
+
+## Folder Structure
+
+```
+RentifyCause/
+│
+├── BE/         # Backend (Node.js, Express)
+├── FE/         # Frontend (React, Vite, TS)
+└── README.md   # This file
+```
+
+---
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
 ---
