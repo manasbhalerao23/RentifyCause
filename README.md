@@ -16,7 +16,7 @@ RentifyCause is a rent management/payment platform tailored for the Indian Red C
 
 ## Architecture Flow
 
-```mermaid
+
 graph TD
     A[User (Tenant/Shopkeeper)] -->|Login/Authenticate| B[Frontend (React + Redux)]
     B --> |REST API Calls| C[Backend (Node.js + Express)]
